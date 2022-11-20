@@ -1,0 +1,25 @@
+<?php
+
+namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration;
+
+use DigitalMarketingFramework\Core\Model\Queue\Job;
+use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
+use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactory;
+
+trait JobTestTrait // extends \PHPUnit\Framework\TestCase
+{
+    protected function createJob($data, $genericRouteConfig, $pass = 0, $config = [], $context = []): JobInterface
+    {
+        $data = [
+            QueueDataFactory::KEY_ROUTE => 'generic',
+            QueueDataFactory::KEY_PASS => $pass,
+            QueueDataFactory::KEY_SUBMISSION => [
+                'data' => $data,
+                'configuration' => $config,
+                'context' => $context,
+            ]
+        ];
+        $data[QueueDataFactory::KEY_SUBMISSION]['configuration'][0]['routes']['generic'] = $genericRouteConfig;
+        return new Job(data:$data);
+    }
+}
