@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSet;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Service\Relay;
 
 trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
 {

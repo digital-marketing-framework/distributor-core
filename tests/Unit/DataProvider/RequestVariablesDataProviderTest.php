@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
-use DigitalMarketingFramework\Distributer\Core\DataProvider\RequestVariablesDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\RequestVariablesDataProvider;
 
 class RequestVariablesDataProviderTest extends AbstractDataProviderTest
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
 use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactory;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
 
 trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 
 class TimestampDataProvider extends DataProvider
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Registry\Plugin;
+namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryInterface;
-use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcherInterface;
+use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 
 interface DataDispatcherRegistryInterface extends PluginRegistryInterface
 {

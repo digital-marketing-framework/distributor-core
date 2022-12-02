@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\ConfigurationResolver\Evaluation;
+namespace DigitalMarketingFramework\Distributor\Core\ConfigurationResolver\Evaluation;
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\Evaluation;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 
 class GateEvaluation extends Evaluation
 {

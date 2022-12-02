@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\DataProvider;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\DataProvider;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProvider;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 class GenericDataProvider extends DataProvider
 {

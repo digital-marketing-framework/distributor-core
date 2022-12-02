@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
-use DigitalMarketingFramework\Distributer\Core\Tests\DataProvider\GenericDataProvider;
+use DigitalMarketingFramework\Distributor\Core\Tests\DataProvider\GenericDataProvider;
 
 class GenericDataProviderTest extends AbstractDataProviderTest
 {

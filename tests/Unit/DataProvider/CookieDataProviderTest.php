@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
-use DigitalMarketingFramework\Distributer\Core\DataProvider\CookieDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 
 class CookieDataProviderTest extends AbstractDataProviderTest
 {

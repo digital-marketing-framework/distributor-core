@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\EvaluationInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
@@ -8,10 +8,10 @@ use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\DataProviderInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

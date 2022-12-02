@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Model\Data\Value;
+namespace DigitalMarketingFramework\Distributor\Core\Model\Data\Value;
 
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Service;
+namespace DigitalMarketingFramework\Distributor\Core\Service;
 
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 
 interface RelayInterface
 {

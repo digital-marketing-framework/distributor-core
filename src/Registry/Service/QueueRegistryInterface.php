@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Registry\Service;
+namespace DigitalMarketingFramework\Distributor\Core\Registry\Service;
 
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 

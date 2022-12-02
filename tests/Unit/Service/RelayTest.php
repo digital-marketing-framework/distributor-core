@@ -1,18 +1,18 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Service;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Service;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactoryInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributer\Core\Route\RouteInterface;
-use DigitalMarketingFramework\Distributer\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Distributor\Core\Service\Relay;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

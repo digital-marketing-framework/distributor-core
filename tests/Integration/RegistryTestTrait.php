@@ -1,20 +1,20 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Log\LoggerFactoryInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
-use DigitalMarketingFramework\Distributer\Core\CoreInitialization;
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactory;
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactoryInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\Registry;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route\RouteSpyInterface;
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route\SpiedOnGenericRoute;
+use DigitalMarketingFramework\Distributor\Core\CoreInitialization;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\Registry;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\RouteSpyInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\SpiedOnGenericRoute;
 use PHPUnit\Framework\MockObject\MockObject;
 
 trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase

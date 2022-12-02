@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Model\Configuration;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Model\Configuration;
 
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfiguration;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class SubmissionConfigurationTest extends TestCase

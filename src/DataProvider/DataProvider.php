@@ -1,15 +1,15 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContext;
 use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContextInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Helper\ConfigurationResolverTrait;
 use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Plugin\Plugin;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 abstract class DataProvider extends Plugin implements DataProviderInterface
 {

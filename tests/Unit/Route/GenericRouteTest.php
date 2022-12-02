@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Route;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Route;
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\ContentResolver\GeneralContentResolver;
 use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\EvaluationInterface;
@@ -10,13 +10,13 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcherInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSet;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributer\Core\Route\Route;
-use DigitalMarketingFramework\Distributer\Core\Tests\Route\GenericRoute;
+use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\Route;
+use DigitalMarketingFramework\Distributor\Core\Tests\Route\GenericRoute;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

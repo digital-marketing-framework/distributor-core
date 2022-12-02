@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Registry\Plugin;
+namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 
 trait RouteRegistryTrait
 {

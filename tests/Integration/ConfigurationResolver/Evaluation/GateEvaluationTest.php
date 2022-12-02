@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration\ConfigurationResolver\Evaluation;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\ConfigurationResolver\Evaluation;
 
 use DigitalMarketingFramework\Core\Tests\Integration\ConfigurationResolver\Evaluation\AbstractEvaluationTest;
-use DigitalMarketingFramework\Distributer\Core\ConfigurationResolver\Evaluation\GateEvaluation;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfiguration;
-use DigitalMarketingFramework\Distributer\Core\Tests\Integration\ConfigurationResolverRegistryTestTrait;
+use DigitalMarketingFramework\Distributor\Core\ConfigurationResolver\Evaluation\GateEvaluation;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
+use DigitalMarketingFramework\Distributor\Core\Tests\Integration\ConfigurationResolverRegistryTestTrait;
 
 /**
  * @covers GateEvaluation

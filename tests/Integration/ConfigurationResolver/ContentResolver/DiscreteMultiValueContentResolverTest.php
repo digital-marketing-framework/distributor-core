@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration\ConfigurationResolver\ContentResolver;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\ConfigurationResolver\ContentResolver;
 
 use DigitalMarketingFramework\Core\Tests\Integration\ConfigurationResolver\ContentResolver\MultiValueContentResolverTest;
-use DigitalMarketingFramework\Distributer\Core\ConfigurationResolver\ContentResolver\DiscreteMultiValueContentResolver;
-use DigitalMarketingFramework\Distributer\Core\Model\Data\Value\DiscreteMultiValue;
-use DigitalMarketingFramework\Distributer\Core\Tests\Integration\ConfigurationResolverRegistryTestTrait;
+use DigitalMarketingFramework\Distributor\Core\ConfigurationResolver\ContentResolver\DiscreteMultiValueContentResolver;
+use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
+use DigitalMarketingFramework\Distributor\Core\Tests\Integration\ConfigurationResolverRegistryTestTrait;
 
 /**
  * @covers DiscreteMultiValueContentResolver

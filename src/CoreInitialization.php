@@ -1,13 +1,13 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core;
+namespace DigitalMarketingFramework\Distributor\Core;
 
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryInterface;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\CookieDataProvider;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\DataProviderInterface;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\IpAddressDataProvider;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\TimestampDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\TimestampDataProvider;
 
 class CoreInitialization extends Initialization
 {

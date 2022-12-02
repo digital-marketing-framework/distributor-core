@@ -1,12 +1,12 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration\Service;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\Service;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Queue\QueueException;
-use DigitalMarketingFramework\Distributer\Core\Route\Route;
-use DigitalMarketingFramework\Distributer\Core\Service\Relay;
-use DigitalMarketingFramework\Distributer\Core\Tests\Integration\RelayTestTrait;
+use DigitalMarketingFramework\Distributor\Core\Route\Route;
+use DigitalMarketingFramework\Distributor\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Tests\Integration\RelayTestTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

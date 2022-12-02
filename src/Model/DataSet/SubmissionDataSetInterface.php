@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Model\DataSet;
+namespace DigitalMarketingFramework\Distributor\Core\Model\DataSet;
 
 use DigitalMarketingFramework\Core\Model\DataSet\DataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 
 interface SubmissionDataSetInterface extends DataSetInterface
 {

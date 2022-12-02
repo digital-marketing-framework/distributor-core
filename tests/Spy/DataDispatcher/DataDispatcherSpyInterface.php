@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataDispatcher;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher;
 
 interface DataDispatcherSpyInterface
 {

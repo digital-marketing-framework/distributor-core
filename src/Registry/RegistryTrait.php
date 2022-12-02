@@ -1,20 +1,20 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Registry;
+namespace DigitalMarketingFramework\Distributor\Core\Registry;
 
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\ConfigurationResolverRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\Plugin\DataDispatcherRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Registry\Plugin\DataProviderRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Registry\Plugin\RouteRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Registry\Service\QueueDataFactoryRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Registry\Service\QueueRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\Service\Relay;
-use DigitalMarketingFramework\Distributer\Core\Service\RelayInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\RouteRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
 
 trait RegistryTrait
 {

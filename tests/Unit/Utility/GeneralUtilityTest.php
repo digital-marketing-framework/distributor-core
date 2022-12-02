@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Utility;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Utility;
 
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
 use DigitalMarketingFramework\Core\Tests\Unit\Utility\GeneralUtilityTest as CoreGeneralUtilityTest;
-use DigitalMarketingFramework\Distributer\Core\Model\Data\Value\DiscreteMultiValue;
+use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
 
 class GeneralUtilityTest extends CoreGeneralUtilityTest
 {

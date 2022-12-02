@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcherInterface;
+use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 
 interface RouteSpyInterface extends DataDispatcherInterface
 {

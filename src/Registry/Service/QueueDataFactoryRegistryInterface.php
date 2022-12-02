@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Registry\Service;
+namespace DigitalMarketingFramework\Distributor\Core\Registry\Service;
 
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactoryInterface;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 
 interface QueueDataFactoryRegistryInterface
 {

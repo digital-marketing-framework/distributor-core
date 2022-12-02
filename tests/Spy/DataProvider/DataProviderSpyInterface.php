@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 

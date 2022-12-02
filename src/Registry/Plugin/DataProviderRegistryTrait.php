@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Registry\Plugin;
+namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
-use DigitalMarketingFramework\Distributer\Core\DataProvider\DataProviderInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 
 trait DataProviderRegistryTrait
 {

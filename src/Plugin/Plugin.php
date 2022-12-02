@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Plugin;
+namespace DigitalMarketingFramework\Distributor\Core\Plugin;
 
 use DigitalMarketingFramework\Core\Plugin\Plugin as CorePlugin;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 class Plugin extends CorePlugin
 {

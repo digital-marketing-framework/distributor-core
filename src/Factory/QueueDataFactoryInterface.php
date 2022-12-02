@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Factory;
+namespace DigitalMarketingFramework\Distributor\Core\Factory;
 
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 
 interface QueueDataFactoryInterface
 {

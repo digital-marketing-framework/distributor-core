@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Model\Data\Value;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value;
 
 /**
  * This dummy class represents an invalid value class

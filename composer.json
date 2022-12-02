@@ -1,5 +1,5 @@
 {
-  "name": "digital-marketing-framework/distributer-core",
+  "name": "digital-marketing-framework/distributor-core",
   "type": "library",
   "description": "FormRelay is a data distribution framework.",
   "keywords": [
@@ -31,13 +31,13 @@
     }
   ],
   "repositories": [
-  {
-    "type": "vcs",
-    "url": "git@github.com:digital-marketing-framework/core.git",
-    "only": [
-      "digital-marketing-framework/core"
-    ]
-  }
+    {
+      "type": "vcs",
+      "url": "git@github.com:digital-marketing-framework/core.git",
+      "only": [
+        "digital-marketing-framework/core"
+      ]
+    }
   ],
   "require": {
     "php": "^8.1",
@@ -51,13 +51,13 @@
   },
   "autoload": {
     "psr-4": {
-      "DigitalMarketingFramework\\Distributer\\Core\\": "src/",
+      "DigitalMarketingFramework\\Distributor\\Core\\": "src/",
       "DigitalMarketingFramework\\Core\\": "../core/src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "DigitalMarketingFramework\\Distributer\\Core\\Tests\\": "tests/",
+      "DigitalMarketingFramework\\Distributor\\Core\\Tests\\": "tests/",
       "DigitalMarketingFramework\\Core\\Tests\\": "vendor/digital-marketing-framework/core/tests/"
     }
   },

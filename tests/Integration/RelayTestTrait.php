@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
-use DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route\RouteSpyInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\RouteSpyInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
 trait RelayTestTrait

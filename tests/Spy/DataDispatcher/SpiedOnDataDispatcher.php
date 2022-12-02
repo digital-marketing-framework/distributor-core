@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataDispatcher;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher;
 
-use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcher;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcher;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 class SpiedOnGenericDataDispatcher extends DataDispatcher
 {

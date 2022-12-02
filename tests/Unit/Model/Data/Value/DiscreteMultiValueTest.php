@@ -1,9 +1,9 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Model\Data\Value;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Model\Data\Value;
 
 use DigitalMarketingFramework\Core\Tests\Unit\Model\Data\MultiValueTest;
-use DigitalMarketingFramework\Distributer\Core\Model\Data\Value\DiscreteMultiValue;
+use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
 
 class DiscreteMultiValueTest extends MultiValueTest
 {

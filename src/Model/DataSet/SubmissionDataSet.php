@@ -1,13 +1,13 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Model\DataSet;
+namespace DigitalMarketingFramework\Distributor\Core\Model\DataSet;
 
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfiguration;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 
 class SubmissionDataSet implements SubmissionDataSetInterface
 {

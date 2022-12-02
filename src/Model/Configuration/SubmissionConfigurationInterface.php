@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Model\Configuration;
+namespace DigitalMarketingFramework\Distributor\Core\Model\Configuration;
 
 use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 

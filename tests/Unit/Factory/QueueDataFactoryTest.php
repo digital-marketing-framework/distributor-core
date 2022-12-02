@@ -1,18 +1,18 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Factory;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Factory;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactory;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSet;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Tests\Model\Data\Value\InvalidValue;
-use DigitalMarketingFramework\Distributer\Core\Tests\Model\Data\Value\StringValue;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\InvalidValue;
+use DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\StringValue;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -93,8 +93,8 @@ class QueueDataFactoryTest extends TestCase
                 'context' => [],
             ],
         ], $job->getData());
-        $this->assertEquals('5CACCF71524AEC083D728E46F72131B6', $job->getHash());
-        $this->assertEquals('5CACC#route1#6', $job->getLabel());
+        $this->assertEquals('C09010AC4B5B3C2A2AF84B4329007F9A', $job->getHash());
+        $this->assertEquals('C0901#route1#6', $job->getLabel());
     }
 
     /** @test */
@@ -212,7 +212,7 @@ class QueueDataFactoryTest extends TestCase
     {
         $job = $this->createJob([
             'data' => [
-                'field1' => ['type' => 'DigitalMarketingFramework\Distributer\Core\Model\Data\Value\ValueClassThatDoesNotExist', 'value' => ['value1']],
+                'field1' => ['type' => 'DigitalMarketingFramework\Distributor\Core\Model\Data\Value\ValueClassThatDoesNotExist', 'value' => ['value1']],
             ],
             'configuration' => [],
             'context' => [],
@@ -384,7 +384,7 @@ class QueueDataFactoryTest extends TestCase
                     'ctx1' => 'ctxValue1',
                     'ctx2' => 'ctxValue2',
                 ],
-                'a:3:{s:4:"data";a:2:{s:6:"field1";a:2:{s:4:"type";s:6:"string";s:5:"value";s:6:"value1";}s:6:"field2";a:2:{s:4:"type";s:77:"DigitalMarketingFramework\Distributer\Core\Tests\Model\Data\Value\StringValue";s:5:"value";a:1:{i:0;s:6:"value2";}}}s:13:"configuration";a:1:{i:0;a:2:{s:5:"conf1";s:10:"confValue1";s:5:"conf2";s:10:"confValue2";}}s:7:"context";a:2:{s:4:"ctx1";s:9:"ctxValue1";s:4:"ctx2";s:9:"ctxValue2";}}'
+                'a:3:{s:4:"data";a:2:{s:6:"field1";a:2:{s:4:"type";s:6:"string";s:5:"value";s:6:"value1";}s:6:"field2";a:2:{s:4:"type";s:77:"DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\StringValue";s:5:"value";a:1:{i:0;s:6:"value2";}}}s:13:"configuration";a:1:{i:0;a:2:{s:5:"conf1";s:10:"confValue1";s:5:"conf2";s:10:"confValue2";}}s:7:"context";a:2:{s:4:"ctx1";s:9:"ctxValue1";s:4:"ctx2";s:9:"ctxValue2";}}'
             ]
         ];
     }

@@ -1,12 +1,12 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcherInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributer\Core\Route\Route;
+use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\Route;
 
 class SpiedOnGenericRoute extends Route
 {

@@ -1,16 +1,16 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration\Factory;
+namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\Factory;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\Value\FileValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
 use DigitalMarketingFramework\Core\Model\File\FileInterface;
-use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactory;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSet;
+use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
-use DigitalMarketingFramework\Distributer\Core\Model\Data\Value\DiscreteMultiValue;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use PHPUnit\Framework\TestCase;
 
 /**

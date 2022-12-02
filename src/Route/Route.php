@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Route;
+namespace DigitalMarketingFramework\Distributor\Core\Route;
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContext;
 use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContextInterface;
@@ -12,10 +12,10 @@ use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Service\DataProcessor;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
-use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcherInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributer\Core\Plugin\Plugin;
-use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 abstract class Route extends Plugin implements RouteInterface
 {
