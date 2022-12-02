@@ -7,11 +7,11 @@ use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\ConfigurationResolverRegistryInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface as CoreRegistryInterface;
-use DigitalMarketingFramework\Core\Registry\Service\QueueRegistryInterface;
 use DigitalMarketingFramework\Distributer\Core\Registry\Plugin\DataDispatcherRegistryInterface;
 use DigitalMarketingFramework\Distributer\Core\Registry\Plugin\DataProviderRegistryInterface;
 use DigitalMarketingFramework\Distributer\Core\Registry\Plugin\RouteRegistryInterface;
 use DigitalMarketingFramework\Distributer\Core\Registry\Service\QueueDataFactoryRegistryInterface;
+use DigitalMarketingFramework\Distributer\Core\Registry\Service\QueueRegistryInterface;
 use DigitalMarketingFramework\Distributer\Core\Service\RelayInterface;
 
 interface RegistryInterface extends 

@@ -2,27 +2,29 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Request\RequestInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class CookieDataProvider extends DataProvider
 {
-    const KEY_COOKIE_FIELD_MAP = 'cookieFieldMap';
-    const DEFAULT_COOKIE_FIELD_MAP = [];
+    protected const KEY_COOKIE_FIELD_MAP = 'cookieFieldMap';
+    protected const DEFAULT_COOKIE_FIELD_MAP = [];
 
-    protected function processContext(SubmissionDataSetInterface $submission, RequestInterface $request): void
+    protected function processContext(ContextInterface $context): void
     {
         $cookies = array_keys($this->getConfig(static::KEY_COOKIE_FIELD_MAP));
         foreach ($cookies as $cookie) {
-            $this->addCookieToContext($submission, $request, $cookie);
+            $this->submission->getContext()->copyCookieFromContext($context, $cookie);
         }
     }
 
-    protected function process(SubmissionDataSetInterface $submission): void
+    protected function process(): void
     {
         $cookieFieldMap = $this->getConfig(static::KEY_COOKIE_FIELD_MAP);
         foreach ($cookieFieldMap as $cookie => $field) {
-            $this->setFieldFromCookie($submission, $cookie, $field);
+            $value = $this->submission->getContext()->getCookie($cookie);
+            if ($value !== null) {
+                $this->setField($field, $value);
+            }
         }
     }
 

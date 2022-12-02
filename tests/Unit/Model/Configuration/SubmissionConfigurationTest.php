@@ -10,7 +10,7 @@ class SubmissionConfigurationTest extends TestCase
     protected SubmissionConfiguration $subject;
 
     /** @test */
-    public function dataProviderFound()
+    public function dataProviderFound(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -29,7 +29,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function dataProviderNotFound()
+    public function dataProviderNotFound(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -48,7 +48,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function dataProviderExistsOnExistingDataProvider()
+    public function dataProviderExistsOnExistingDataProvider(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -67,7 +67,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function dataProviderExistsOnNonExistentDataProvider()
+    public function dataProviderExistsOnNonExistentDataProvider(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -86,7 +86,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routeFound()
+    public function routeFound(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -106,7 +106,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routeNotFound()
+    public function routeNotFound(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -125,7 +125,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassCountRouteWithoutPasses()
+    public function routePassCountRouteWithoutPasses(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -144,7 +144,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassCountRouteNotFound()
+    public function routePassCountRouteNotFound(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -163,7 +163,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassConfiguration()
+    public function routePassConfiguration(): void
     {
         $configList = [
             [
@@ -208,7 +208,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassConfigurationOverride()
+    public function routePassConfigurationOverride(): void
     {
         $configList = [
             [
@@ -275,7 +275,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassConfigurationIndicesNotContinuous()
+    public function routePassConfigurationIndicesNotContinuous(): void
     {
         $configList = [
             [
@@ -305,7 +305,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassConfigurationIndicesNotNumerical()
+    public function routePassConfigurationIndicesNotNumerical(): void
     {
         $configList = [
             [
@@ -335,7 +335,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassConfigurationOrder()
+    public function routePassConfigurationOrder(): void
     {
         $configList = [
             [
@@ -365,7 +365,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routeExistsOnNonExistingRoute()
+    public function routeExistsOnNonExistingRoute(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -385,7 +385,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routeExistsOnExistingRoute()
+    public function routeExistsOnExistingRoute(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -405,7 +405,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassExistsOnNonExistingRoute()
+    public function routePassExistsOnNonExistingRoute(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -425,7 +425,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassExistsOnExistingRouteWithoutPasses()
+    public function routePassExistsOnExistingRouteWithoutPasses(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -445,7 +445,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassExistsOnExistingRouteButNonExistentPass()
+    public function routePassExistsOnExistingRouteButNonExistentPass(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -471,7 +471,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routePassExistsOnExistingRouteAndExistingPass()
+    public function routePassExistsOnExistingRouteAndExistingPass(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -498,7 +498,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnNonExistingRouteBehavesLikeEmptyRoute()
+    public function getRoutePassLabelOnNonExistingRouteBehavesLikeEmptyRoute(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -517,7 +517,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithoutPasses()
+    public function getRoutePassLabelOnExistingRouteWithoutPasses(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -536,7 +536,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithOnePass()
+    public function getRoutePassLabelOnExistingRouteWithOnePass(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -560,7 +560,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithOnePassOfWhichTheKeyIsNotNumeric()
+    public function getRoutePassLabelOnExistingRouteWithOnePassOfWhichTheKeyIsNotNumeric(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -584,7 +584,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithOnePassOfWhichTheKeyIsNumericAndBiggerThanZero()
+    public function getRoutePassLabelOnExistingRouteWithOnePassOfWhichTheKeyIsNumericAndBiggerThanZero(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -608,7 +608,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithMultiplePassesWithNumericKeys()
+    public function getRoutePassLabelOnExistingRouteWithMultiplePassesWithNumericKeys(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -635,7 +635,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithMultiplePassesWithNonNumericKeys()
+    public function getRoutePassLabelOnExistingRouteWithMultiplePassesWithNonNumericKeys(): void
     {
         $conf = [
             'conf1' => 'val1',
@@ -662,7 +662,7 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function getRoutePassLabelOnExistingRouteWithMultiplePassesWithMixedKeys()
+    public function getRoutePassLabelOnExistingRouteWithMultiplePassesWithMixedKeys(): void
     {
         $conf = [
             'conf1' => 'val1',

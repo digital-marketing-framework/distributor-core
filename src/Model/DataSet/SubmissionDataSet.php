@@ -2,8 +2,8 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\Model\DataSet;
 
-use DigitalMarketingFramework\Core\Model\Context\Context;
-use DigitalMarketingFramework\Core\Model\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContext;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfiguration;
@@ -13,7 +13,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
 {
     protected DataInterface $data;
     protected SubmissionConfigurationInterface $configuration;
-    protected ContextInterface $context;
+    protected WriteableContextInterface $context;
 
     /**
      * @param array $data The form fields and their values as associative array
@@ -24,7 +24,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
     {
         $this->data = new Data($data);
         $this->configuration = new SubmissionConfiguration($configurationList);
-        $this->context = new Context($context);
+        $this->context = new WriteableContext($context);
     }
 
     public function getData(): DataInterface
@@ -37,7 +37,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
         return $this->configuration;
     }
 
-    public function getContext(): ContextInterface
+    public function getContext(): WriteableContextInterface
     {
         return $this->context;
     }

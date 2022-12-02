@@ -44,14 +44,15 @@
     "digital-marketing-framework/core": "dev-main"
   },
   "require-dev": {
-    "phpunit/phpunit": "^8.0"
+    "phpunit/phpunit": "^9.5"
   },
   "config": {
     "sort-packages": true
   },
   "autoload": {
     "psr-4": {
-      "DigitalMarketingFramework\\Distributer\\Core\\": "src/"
+      "DigitalMarketingFramework\\Distributer\\Core\\": "src/",
+      "DigitalMarketingFramework\\Core\\": "../core/src/"
     }
   },
   "autoload-dev": {

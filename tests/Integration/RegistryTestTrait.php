@@ -2,15 +2,15 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration;
 
-use DataRelay\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Log\LoggerFactoryInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
-use DigitalMarketingFramework\Core\Request\RequestInterface;
 use DigitalMarketingFramework\Distributer\Core\CoreInitialization;
 use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactory;
 use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributer\Core\Registry\Registry;
 use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
 use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
 use DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
 use DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route\RouteSpyInterface;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
 {
-    protected RequestInterface&MockObject $request;
+    protected ContextInterface&MockObject $context;
 
     protected LoggerFactoryInterface&MockObject $loggerFactory;
 
@@ -40,7 +40,7 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
     protected function initRegistry(): void
     {
         // mock everything from the outside world
-        $this->request = $this->createMock(RequestInterface::class);
+        $this->context = $this->createMock(ContextInterface::class);
         $this->loggerFactory = $this->createMock(LoggerFactoryInterface::class);
         $this->queue = $this->createMock(QueueInterface::class);
         $this->temporaryQueue = $this->createMock(QueueInterface::class);
@@ -49,7 +49,7 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
         $this->queueDataFactory = new QueueDataFactory();
 
         $this->registry = new Registry(
-            request:$this->request, 
+            context:$this->context, 
             loggerFactory:$this->loggerFactory, 
             persistentQueue:$this->queue, 
             nonPersistentQueue:$this->temporaryQueue, 

@@ -2,11 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\Tests\Unit\Service;
 
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
-use DigitalMarketingFramework\Core\Request\RequestInterface;
 use DigitalMarketingFramework\Distributer\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -22,7 +22,7 @@ class RelayTest extends TestCase
 
     protected LoggerInterface&MockObject $logger;
 
-    protected RequestInterface&MockObject $request;
+    protected ContextInterface&MockObject $context;
 
     protected QueueInterface&MockObject $persistentQueue;
 
@@ -54,7 +54,7 @@ class RelayTest extends TestCase
         parent::setUp();
 
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->request = $this->createMock(RequestInterface::class);
+        $this->context = $this->createMock(ContextInterface::class);
         $this->persistentQueue = $this->createMock(QueueInterface::class);
         $this->temporaryQueue = $this->createMock(QueueInterface::class);
         $this->queueDataFactory = $this->createMock(QueueDataFactoryInterface::class);
@@ -62,8 +62,7 @@ class RelayTest extends TestCase
         $this->temporaryQueueProcessor = $this->createMock(QueueProcessorInterface::class);
 
         $this->registry = $this->createMock(RegistryInterface::class);
-        //$this->registry->method('getLogger')->willReturn($this->logger);
-        $this->registry->method('getRequest')->willReturn($this->request);
+        $this->registry->method('getContext')->willReturn($this->context);
         $this->registry->method('getPersistentQueue')->willReturn($this->persistentQueue);
         $this->registry->method('getNonPersistentQueue')->willReturn($this->temporaryQueue);
         $this->registry->method('getQueueDataFactory')->willReturn($this->queueDataFactory);
@@ -74,6 +73,7 @@ class RelayTest extends TestCase
 
         $this->subject = new Relay($this->registry);
         $this->subject->setLogger($this->logger);
+        $this->subject->setContext($this->context);
 
         $this->registry->method('getQueueProcessor')->willReturnMap([
             [$this->persistentQueue, $this->subject, $this->persistentQueueProcessor],
@@ -81,7 +81,7 @@ class RelayTest extends TestCase
         ]);
     }
 
-    protected function initSubmission()
+    protected function initSubmission(): void
     {
         $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
         $this->submissionConfiguration->method('getWithRoutePassOverride')->willReturnCallback(function($name, $route, $pass, $default) {
@@ -92,21 +92,23 @@ class RelayTest extends TestCase
         $this->submission->method('getConfiguration')->willReturn($this->submissionConfiguration);
     }
 
-    protected function addRoute(string $keyword, array $passes)
+    protected function addRoute(string $keyword, array $passes, bool $enabled = true): void
     {
-        $route = $this->createMock(RouteInterface::class);
         $this->routeConfigs[$keyword] = $passes;
-        $this->routes[$keyword] = $route;
-        $route->method('getPassCount')->with($this->submission)->willReturn(count($passes));
+        foreach (array_keys($passes) as $pass) {
+            $route = $this->createMock(RouteInterface::class);
+            $route->method('getKeyword')->willReturn($keyword);
+            $route->method('getPass')->willReturn($pass);
+            $route->method('enabled')->willReturn($enabled);
+            $this->routes[] = $route;
 
-        foreach ($passes as $index => $pass) {
             $job = $this->createMock(JobInterface::class);
-            $this->jobs[$keyword . ':' . $index] = $job;
+            $this->jobs[$keyword . ':' . $pass] = $job;
         }
     }
 
     /** @test */
-    public function processSyncOneRouteOnePassWithStorage()
+    public function processSyncOneRouteOnePassWithStorage(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -149,7 +151,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processSyncOneRouteOnePassWithoutStorage()
+    public function processSyncOneRouteOnePassWithoutStorage(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -192,7 +194,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processAsyncOneRouteOnePassWithStorage()
+    public function processAsyncOneRouteOnePassWithStorage(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -232,7 +234,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processSyncOneRouteWithMultiplePasses()
+    public function processSyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -279,7 +281,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processAsyncOneRouteWithMultiplePasses()
+    public function processAsyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -322,7 +324,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processSyncAndAsyncOneRouteWithMultiplePasses()
+    public function processSyncAndAsyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -368,7 +370,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processAsyncWithoutStorageLogsErrorConvertsToSync()
+    public function processAsyncWithoutStorageLogsErrorConvertsToSync(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -411,7 +413,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processMixedSyncMixedStorageMultipleRoutesWithMultiplePasses()
+    public function processMixedSyncMixedStorageMultipleRoutesWithMultiplePasses(): void
     {
         $this->initSubmission();
         $this->addRoute('route1', [
@@ -466,6 +468,63 @@ class RelayTest extends TestCase
                 $this->jobs['route2:0'],
                 $this->jobs['route2:1'],
             ]);
+
+        $this->subject->process($this->submission);
+    }
+
+    /** @test */
+    public function disabledRouteAsyncWithStorageDoesNotCreateAJobAndIsNotProcessed(): void
+    {
+        $this->initSubmission();
+        $this->addRoute('route1', [
+            ['async' => true, 'disableStorage' => false]
+        ], enabled:false);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $this->queueDataFactory->expects($this->never())->method('convertSubmissionToJob');
+        $this->persistentQueue->expects($this->never())->method('addJob');
+        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->persistentQueueProcessor->expects($this->never())->method('processJobs');
+        $this->temporaryQueueProcessor->expects($this->never())->method('processJobs');
+
+        $this->subject->process($this->submission);
+    }
+
+    /** @test */
+    public function disabledRouteSyncWithStorageDoesNotCreateAJobAndIsNotProcessed(): void
+    {
+        $this->initSubmission();
+        $this->addRoute('route1', [
+            ['async' => false, 'disableStorage' => false]
+        ], enabled:false);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $this->queueDataFactory->expects($this->never())->method('convertSubmissionToJob');
+        $this->persistentQueue->expects($this->never())->method('addJob');
+        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->persistentQueueProcessor->expects($this->never())->method('processJobs');
+        $this->temporaryQueueProcessor->expects($this->never())->method('processJobs');
+
+        $this->subject->process($this->submission);
+    }
+
+    /** @test */
+    public function disabledRouteSyncWithoutStorageDoesNotCreateAJobAndIsNotProcessed(): void
+    {
+        $this->initSubmission();
+        $this->addRoute('route1', [
+            ['async' => false, 'disableStorage' => true]
+        ], enabled:false);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $this->queueDataFactory->expects($this->never())->method('convertSubmissionToJob');
+        $this->persistentQueue->expects($this->never())->method('addJob');
+        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->persistentQueueProcessor->expects($this->never())->method('processJobs');
+        $this->temporaryQueueProcessor->expects($this->never())->method('processJobs');
 
         $this->subject->process($this->submission);
     }

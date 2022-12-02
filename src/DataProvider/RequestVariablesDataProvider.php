@@ -2,7 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Request\RequestInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 
 class RequestVariablesDataProvider extends DataProvider
@@ -10,19 +10,22 @@ class RequestVariablesDataProvider extends DataProvider
     const KEY_VARIABLE_FIELD_MAP = 'variableFieldMap';
     const DEFAULT_VARIABLE_FIELD_MAP = [];
 
-    protected function processContext(SubmissionDataSetInterface $submission, RequestInterface $request): void
+    protected function processContext(ContextInterface $context): void
     {
         $variables = array_keys($this->getConfig(static::KEY_VARIABLE_FIELD_MAP));
         foreach ($variables as $variable) {
-            $this->addRequestVariableToContext($submission, $request, $variable);
+            $this->submission->getContext()->copyRequestVariableFromContext($context, $variable);
         }
     }
 
-    protected function process(SubmissionDataSetInterface $submission): void
+    protected function process(): void
     {
         $variableFieldMap = $this->getConfig(static::KEY_VARIABLE_FIELD_MAP);
         foreach ($variableFieldMap as $variable => $field) {
-            $this->setFieldFromRequestVariable($submission, $variable, $field);
+            $value = $this->submission->getContext()->getRequestVariable($variable);
+            if ($value !== null) {
+                $this->setField($field, $value);
+            }
         }
     }
 

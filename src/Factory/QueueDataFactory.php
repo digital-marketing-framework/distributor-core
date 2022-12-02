@@ -130,7 +130,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
      * @param array $data
      * @throws DigitalMarketingFrameworkException
      */
-    protected function validatePackage(array $data)
+    protected function validatePackage(array $data): void
     {
         if (!$data || !is_array($data) || empty($data)) {
             throw new DigitalMarketingFrameworkException('job data is empty');

@@ -1,32 +1,26 @@
 <?php
 
-namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\Route;
+namespace DigitalMarketingFramework\Distributer\Core\Tests\Route;
 
-use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Distributer\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributer\Core\Route\Route;
 
-class SpiedOnGenericRoute extends Route
+class GenericRoute extends Route
 {
     public function __construct(
         string $keyword, 
         RegistryInterface $registry,
         SubmissionDataSetInterface $submission,
         int $pass,
-        public RouteSpyInterface $routeSpy,
+        protected ?DataDispatcherInterface $dataDispatcher = null,
     ) {
         parent::__construct($keyword, $registry, $submission, $pass);
     }
 
-    public function addContext(ContextInterface $context): void
-    {
-        $this->routeSpy->addContext($context);
-    }
-
     protected function getDispatcher(): ?DataDispatcherInterface
     {
-        return $this->routeSpy;
+        return $this->dataDispatcher;
     }
 }

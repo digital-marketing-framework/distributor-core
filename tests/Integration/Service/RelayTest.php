@@ -4,6 +4,7 @@ namespace DigitalMarketingFramework\Distributer\Core\Tests\Integration\Service;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Queue\QueueException;
+use DigitalMarketingFramework\Distributer\Core\Route\Route;
 use DigitalMarketingFramework\Distributer\Core\Service\Relay;
 use DigitalMarketingFramework\Distributer\Core\Tests\Integration\RelayTestTrait;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +57,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processSyncOneRouteOnePassWithoutStorage()
+    public function processSyncOneRouteOnePassWithoutStorage(): void
     {
         $this->setSubmissionAsync(false);
         $this->setStorageDisabled(true);
@@ -88,7 +89,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processAsyncOneRouteOnePassWithStorage()
+    public function processAsyncOneRouteOnePassWithStorage(): void
     {
         $this->setSubmissionAsync(true);
         $this->setStorageDisabled(false);
@@ -142,14 +143,10 @@ class RelayTest extends TestCase
     }
 
     /**
-     * @param bool $async
-     * @param $disableStorage
-     * @param $routeEnabled
-     * @param $dataProviderEnabled
      * @dataProvider processAddContextProvider
      * @test
      */
-    public function processAddContext(bool $async, bool $disableStorage, bool $routeEnabled, bool $dataProviderEnabled)
+    public function processAddContext(bool $async, bool $disableStorage, bool $routeEnabled, bool $dataProviderEnabled): void
     {
         $this->setSubmissionAsync($async);
         $this->setStorageDisabled($disableStorage);
@@ -172,7 +169,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processSyncOneRouteWithMultiplePasses()
+    public function processSyncOneRouteWithMultiplePasses(): void
     {
         $this->setSubmissionAsync(false);
         $this->setStorageDisabled(false);
@@ -193,7 +190,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processAsyncOneRouteWithMultiplePasses()
+    public function processAsyncOneRouteWithMultiplePasses(): void
     {
         $this->setSubmissionAsync(true);
         $this->setStorageDisabled(false);
@@ -212,7 +209,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobThatSucceeds()
+    public function processJobThatSucceeds(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $job = $this->createJob(
@@ -246,12 +243,11 @@ class RelayTest extends TestCase
     }
 
     /**
-     * @param $pass
      * @throws QueueException
      * @dataProvider processJobFromSubmissionWithTwoPassesThatBothSucceedsProvider
      * @test
      */
-    public function processJobFromSubmissionWithTwoPassesThatBothSucceed($pass)
+    public function processJobFromSubmissionWithTwoPassesThatBothSucceed(int $pass): void
     {
         $expectedDataPerRoutePass = [
             0 => ['field1ext' => 'value2', 'field2ext' => 'value1',],
@@ -293,7 +289,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobThatSucceedsButIsSkipped()
+    public function processJobThatSucceedsButIsSkipped(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $job = $this->createJob(
@@ -315,7 +311,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobThatSucceedsButIsSkippedBecauseOfItsGate()
+    public function processJobThatSucceedsButIsSkippedBecauseOfItsGate(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $job = $this->createJob(
@@ -340,7 +336,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobThatSucceedsAndIsNotSkippedBecauseOfAForeignGate()
+    public function processJobThatSucceedsAndIsNotSkippedBecauseOfAForeignGate(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $job = $this->createJob(
@@ -378,7 +374,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobThatFails()
+    public function processJobThatFails(): void
     {
         $errorMessage = 'my error message';
         $this->routeSpy = $this->registerRouteSpy();
@@ -402,7 +398,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobWithDataProviderThatIsEnabled()
+    public function processJobWithDataProviderThatIsEnabled(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $this->dataProviderSpy = $this->registerDataProviderSpy();
@@ -435,7 +431,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobWithDataProviderThatIsNotEnabled()
+    public function processJobWithDataProviderThatIsNotEnabled(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $this->dataProviderSpy = $this->registerDataProviderSpy();
@@ -464,7 +460,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobWithDataProviderThatIsEnabledButRouteIsDisabled()
+    public function processJobWithDataProviderThatIsEnabledButRouteIsDisabled(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $this->dataProviderSpy = $this->registerDataProviderSpy();
@@ -493,7 +489,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processTwoJobsWithSameSubmissionTriggersDataProviderOnlyOnce()
+    public function processTwoJobsWithSameSubmissionTriggersDataProviderOnlyOnce(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $this->dataProviderSpy = $this->registerDataProviderSpy();
@@ -537,7 +533,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processTwoJobsWithDifferentSubmissionsTriggersDataProviderTwice()
+    public function processTwoJobsWithDifferentSubmissionsTriggersDataProviderTwice(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $this->dataProviderSpy = $this->registerDataProviderSpy();
@@ -581,7 +577,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobWhichProducesNoDataCausesQueueException()
+    public function processJobWhichProducesNoDataCausesQueueException(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $job = $this->createJob(
@@ -591,7 +587,7 @@ class RelayTest extends TestCase
             ]
         );
         $this->expectException(QueueException::class);
-        $this->expectExceptionMessage('no data generated for route "generic" in pass 0.');
+        $this->expectExceptionMessage(sprintf(Route::MESSAGE_DATA_EMPTY, 'generic', 0));
         $this->subject->processJob($job);
     }
 }

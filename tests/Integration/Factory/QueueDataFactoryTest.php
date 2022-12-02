@@ -117,7 +117,7 @@ class QueueDataFactoryTest extends TestCase
      * @dataProvider packProvider
      * @test
      */
-    public function pack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData)
+    public function pack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);
         $job = $this->subject->convertSubmissionToJob($submission, $route, $pass);
@@ -129,7 +129,7 @@ class QueueDataFactoryTest extends TestCase
      * @dataProvider packProvider
      * @test
      */
-    public function unpack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData)
+    public function unpack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData): void
     {
         $job = new Job();
         $job->setData($jobData);

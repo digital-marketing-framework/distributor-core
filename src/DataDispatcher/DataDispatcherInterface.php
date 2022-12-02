@@ -8,8 +8,7 @@ use DigitalMarketingFramework\Core\Plugin\PluginInterface;
 interface DataDispatcherInterface extends PluginInterface
 {
     /**
-     * @param array $data
      * @throws DigitalMarketingFrameworkException
      */
-    public function send(array $data);
+    public function send(array $data): void;
 }

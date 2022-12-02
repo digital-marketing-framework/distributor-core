@@ -2,7 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Request\RequestInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 
 class TimestampDataProvider extends DataProvider
@@ -13,19 +13,19 @@ class TimestampDataProvider extends DataProvider
     const KEY_FORMAT = 'format';
     const DEFAULT_FORMAT = 'c';
 
-    protected function processContext(SubmissionDataSetInterface $submission, RequestInterface $request): void
+    protected function processContext(ContextInterface $context): void
     {
-        $format = $this->getConfig(static::KEY_FORMAT);
-        $this->addToContext($submission, 'timestamp', date($format));
+        $this->submission->getContext()->copyTimestampFromContext($context);
     }
 
-    protected function process(SubmissionDataSetInterface $submission): void
+    protected function process(): void
     {
-        $this->setFieldFromContext(
-            $submission,
-            'timestamp',
-            $this->getConfig(static::KEY_FIELD)
-        );
+        $timestamp = $this->submission->getContext()->getTimestamp();
+        if ($timestamp !== null) {
+            $format = $this->getConfig(static::KEY_FORMAT);
+            $value = date($format, $timestamp);
+            $this->setField($this->getConfig(static::KEY_FIELD), $value);
+        }
     }
 
     public static function getDefaultConfiguration(): array

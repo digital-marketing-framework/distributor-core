@@ -6,5 +6,5 @@ use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetIn
 
 interface RelayInterface
 {
-    public function process(SubmissionDataSetInterface $submission);
+    public function process(SubmissionDataSetInterface $submission): void;
 }

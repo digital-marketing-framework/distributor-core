@@ -4,17 +4,16 @@ namespace DigitalMarketingFramework\Distributer\Core\Model\Configuration;
 
 use DigitalMarketingFramework\Core\Model\Configuration\Configuration;
 use DigitalMarketingFramework\Core\Utility\ConfigurationUtility;
-use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
 
 class SubmissionConfiguration extends Configuration implements SubmissionConfigurationInterface
 {
-    public function getWithRoutePassOverride(string $key, string $route, int $pass, $default = null)
+    public function getWithRoutePassOverride(string $key, string $route, int $pass, mixed $default = null): mixed
     {
         return $this->getRoutePassConfiguration($route, $pass)[$key]
             ?? $this->get($key, $default);
     }
 
-    public function getDataProviderConfiguration(string $dataProviderName)
+    public function getDataProviderConfiguration(string $dataProviderName): array
     {
         return $this->get(static::KEY_DATA_PROVIDERS, [])[$dataProviderName] ?? [];
     }

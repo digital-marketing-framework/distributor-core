@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributer\Core\Registry\Plugin;
 
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
+use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributer\Core\Route\RouteInterface;
 
 trait RouteRegistryTrait
@@ -14,14 +15,21 @@ trait RouteRegistryTrait
         $this->registerPlugin(RouteInterface::class, $class, $additionalArguments, $keyword);
     }
 
-    public function getRoutes(): array
+    public function getRoutes(SubmissionDataSetInterface $submission): array
     {
-        return $this->getAllPlugins(RouteInterface::class);
+        $routes = [];
+        foreach (array_keys($this->pluginClasses[RouteInterface::class]) as $keyword) {
+            $passCount = $submission->getConfiguration()->getRoutePassCount($keyword);
+            for ($pass = 0; $pass < $passCount; $pass++) {
+                $routes[] = $this->getRoute($keyword, $submission, $pass);
+            }
+        }
+        return $routes;
     }
 
-    public function getRoute(string $keyword): ?RouteInterface
+    public function getRoute(string $keyword, SubmissionDataSetInterface $submission, int $pass): ?RouteInterface
     {
-        return $this->getPlugin($keyword, RouteInterface::class);
+        return $this->getPlugin($keyword, RouteInterface::class, [$submission, $pass]);
     }
     
     public function deleteRoute(string $keyword): void

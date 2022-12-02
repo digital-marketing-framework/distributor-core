@@ -4,6 +4,7 @@ namespace DigitalMarketingFramework\Distributer\Core\Registry\Plugin;
 
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
 use DigitalMarketingFramework\Distributer\Core\DataProvider\DataProviderInterface;
+use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 
 trait DataProviderRegistryTrait
 {
@@ -14,14 +15,14 @@ trait DataProviderRegistryTrait
         $this->registerPlugin(DataProviderInterface::class, $class, $additionalArguments, $keyword);
     }
     
-    public function getDataProvider(string $keyword): ?DataProviderInterface
+    public function getDataProvider(string $keyword, SubmissionDataSetInterface $submission): ?DataProviderInterface
     {
-        return $this->getPlugin($keyword, DataProviderInterface::class);
+        return $this->getPlugin($keyword, DataProviderInterface::class, [$submission]);
     }
 
-    public function getDataProviders(): array
+    public function getDataProviders(SubmissionDataSetInterface $submission): array
     {
-        return $this->getAllPlugins(DataProviderInterface::class);
+        return $this->getAllPlugins(DataProviderInterface::class, [$submission]);
     }
 
     public function deleteDataProvider(string $keyword): void

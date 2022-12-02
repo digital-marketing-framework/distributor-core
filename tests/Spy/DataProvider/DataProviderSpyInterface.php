@@ -2,11 +2,10 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\Tests\Spy\DataProvider;
 
-use DigitalMarketingFramework\Core\Request\RequestInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 interface DataProviderSpyInterface
 {
-    public function processContext(SubmissionDataSetInterface $submission, RequestInterface $request): void;
-    public function process(SubmissionDataSetInterface $submission): void;
+    public function processContext(ContextInterface $context): void;
+    public function process(): void;
 }

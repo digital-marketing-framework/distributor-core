@@ -4,10 +4,41 @@ namespace DigitalMarketingFramework\Distributer\Core\ConfigurationResolver\Evalu
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\Evaluation;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
+use DigitalMarketingFramework\Distributer\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributer\Core\Route\RouteInterface;
 
 class GateEvaluation extends Evaluation
 {
+    protected const KEY_KEY = 'key';
+    protected const DEFAULT_KEY = '';
+
+    protected const KEY_PASS = 'pass';
+    protected const DEFAULT_PASS = '';
+
+    protected const KEY_KEYS_EVALUATED = 'keysEvaluated';
+    
+    protected const PASS_ANY = 'any';
+    protected const PASS_ALL = 'all';
+
     public const MESSAGE_LOOP_DETECTED = 'Gate dependency loop found for key %s!';
+
+    protected function getRoutePassCount(string $routeName): ?int
+    {
+        $configuration = $this->context['configuration'] ?? null;
+        if ($configuration instanceof SubmissionConfigurationInterface) {
+            return $configuration->getRoutePassCount($routeName);
+        }
+        return null;
+    }
+
+    protected function getRoutePassConfiguration(string $routeName, int $pass): ?array
+    {
+        $configuration = $this->context['configuration'] ?? null;
+        if ($configuration instanceof SubmissionConfigurationInterface) {
+            return $configuration->getRoutePassConfiguration($routeName, $pass);
+        }
+        return null;
+    }
 
     /*
      * # case 1: multiple keys, no passes
@@ -25,16 +56,19 @@ class GateEvaluation extends Evaluation
      *     }
      * }
      */
-    protected function evaluateMultipleRoutes()
+    protected function evaluateMultipleRoutes(): bool
     {
         $keys = GeneralUtility::castValueToArray($this->configuration);
         $gateConfig = ['or' => []];
         foreach ($keys as $key) {
-            $gateConfig['or'][] = ['gate' => ['key' => $key, 'pass' => 'any']];
+            $gateConfig['or'][] = [
+                RouteInterface::KEY_GATE => [
+                    static::KEY_KEY => $key, 
+                    static::KEY_PASS => static::PASS_ANY,
+                ],
+            ];
         }
-        /** @var EvaluationInterface $evaluation */
-        $evaluation = $this->resolveKeyword('general', $gateConfig);
-        return $evaluation->eval();
+        return $this->evaluate($gateConfig);
     }
 
     /*
@@ -49,17 +83,21 @@ class GateEvaluation extends Evaluation
      *     n.gate { key=routeA, pass=n }
      * }
      */
-    protected function evaluateMultiplePasses()
+    protected function evaluateMultiplePasses(): bool
     {
-        $key = $this->configuration['key'];
-        $gateConfigs = [];
-        $count = $this->context['configuration']->getRoutePassCount($key);
-        for ($i = 0; $i < $count; $i++) {
-            $gateConfigs[] = ['gate' => ['key' => $key, 'pass' => $i]];
+        $key = $this->getConfig(static::KEY_KEY);
+        $count = $this->getRoutePassCount($key);
+
+        if ($count === null) {
+            return false;
         }
-        /** @var EvaluationInterface $evaluation */
-        $evaluation = $this->resolveKeyword('general', [$this->configuration['pass'] === 'any' ? 'or' : 'and' => $gateConfigs]);
-        return $evaluation->eval();
+        
+        $gateConfigs = [];
+        for ($i = 0; $i < $count; $i++) {
+            $gateConfigs[] = [RouteInterface::KEY_GATE => [static::KEY_KEY => $key, static::KEY_PASS => $i]];
+        }
+        $pass = $this->getConfig(static::KEY_PASS);
+        return $this->evaluate([$pass === static::PASS_ANY ? 'or' : 'and' => $gateConfigs]);
     }
 
     /*
@@ -68,49 +106,65 @@ class GateEvaluation extends Evaluation
      * =>
      * actual evaluation of extension gate
      */
-    protected function evaluateSinglePass()
+    protected function evaluateSinglePass(): bool
     {
-        $result = true;
-        $key = $this->configuration['key'];
-        $pass = $this->configuration['pass'];
-        if (isset($this->context['keysEvaluated'][$key . '.' . $pass])) {
+        $key = $this->getConfig(static::KEY_KEY);
+        $pass = $this->getConfig(static::KEY_PASS);
+        $hash = $key . '.' . $pass;
+        
+        if (isset($this->context[static::KEY_KEYS_EVALUATED][$hash])) {
             // loop found, no evaluation possible
-            $this->logger->error(sprintf(static::MESSAGE_LOOP_DETECTED, $key . '.' . $pass));
-            $result = false;
-        } else {
-            $this->context['keysEvaluated'][$key . '.' . $pass] = true;
-            
-            $settings = $this->context['configuration']->getRoutePassConfiguration($key, $pass);
-            if (!isset($settings['enabled']) || !$settings['enabled']) {
-                $result = false;
-            } elseif (isset($settings['gate']) && !empty($settings['gate'])) {
-                /** @var EvaluationInterface $evaluation */
-                $evaluation = $this->resolveKeyword('general', $settings['gate']);
-                $result = $evaluation->eval();
-            } else {
-                // no gate is an automatic pass
-                $result = true;
-            }
-
-            unset($this->context['keysEvaluated'][$key . '.' . $pass]);
+            $this->logger->error(sprintf(static::MESSAGE_LOOP_DETECTED, $hash));
+            return false;
         }
+
+        $this->context[static::KEY_KEYS_EVALUATED][$hash] = true;
+
+        $settings = $this->getRoutePassConfiguration($key, $pass);
+        if ($settings === null) {
+            return false;
+        }
+
+        $result = true;
+        if (!isset($settings[RouteInterface::KEY_ENABLED]) || !$settings[RouteInterface::KEY_ENABLED]) {
+            $result = false;
+        } elseif (isset($settings[RouteInterface::KEY_GATE]) && !empty($settings[RouteInterface::KEY_GATE])) {
+            $result = $this->evaluate($settings[RouteInterface::KEY_GATE]);
+        } else {
+            // no gate is an automatic pass
+            $result = true;
+        }
+
+        // TODO is it necessary to remove the context value again? the parent context should not be affected anyway
+        //      maybe write a test like { 1.key = foo, 2.somethingThatWouldBeUsingContextKey }
+        unset($this->context[static::KEY_KEYS_EVALUATED][$hash]);
+        
         return $result;
     }
 
     public function eval(): bool
     {
-        if (!isset($this->context['keysEvaluated'])) {
-            $this->context['keysEvaluated'] = [];
+        if (!isset($this->context[static::KEY_KEYS_EVALUATED])) {
+            $this->context[static::KEY_KEYS_EVALUATED] = [];
         }
         
         if (!is_array($this->configuration)) {
             return $this->evaluateMultipleRoutes();
         }
 
-        if ($this->configuration['pass'] === 'any' || $this->configuration['pass'] === 'all') {
+        $pass = $this->getConfig(static::KEY_PASS);
+        if ($pass === static::PASS_ANY || $pass === static::PASS_ALL) {
             return $this->evaluateMultiplePasses();
         }
 
         return $this->evaluateSinglePass();
+    }
+
+    public static function getDefaultConfiguration(): array
+    {
+        return parent::getDefaultConfiguration() + [
+            static::KEY_KEY => static::DEFAULT_KEY,
+            static::KEY_PASS => static::DEFAULT_PASS,
+        ];
     }
 }

@@ -3,17 +3,18 @@
 namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
 
 use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContext;
-use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\GeneralEvaluation;
+use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContextInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Helper\ConfigurationResolverTrait;
 use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
-use DigitalMarketingFramework\Core\Plugin\Plugin;
-use DigitalMarketingFramework\Core\Request\RequestInterface;
-use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributer\Core\Plugin\Plugin;
 use DigitalMarketingFramework\Distributer\Core\Registry\RegistryInterface;
 
 abstract class DataProvider extends Plugin implements DataProviderInterface
 {
     use ConfigurationTrait;
+    use ConfigurationResolverTrait;
 
     const KEY_ENABLED = 'enabled';
     const DEFAULT_ENABLED = false;
@@ -26,64 +27,46 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
 
     public function __construct(
         string $keyword, 
-        protected RegistryInterface $registry
+        RegistryInterface $registry,
+        protected SubmissionDataSetInterface $submission
     ) {
-        parent::__construct($keyword);
+        parent::__construct($keyword, $registry);
+        $this->configuration = $this->submission->getConfiguration()->getDataProviderConfiguration($this->getKeyword());
     }
 
-    abstract protected function processContext(SubmissionDataSetInterface $submission, RequestInterface $request): void;
-    abstract protected function process(SubmissionDataSetInterface $submission): void;
+    abstract protected function processContext(ContextInterface $context): void;
+    abstract protected function process(): void;
 
-    protected function proceed(SubmissionDataSetInterface $submission): bool
+    protected function getConfigurationResolverContext(): ConfigurationResolverContextInterface
     {
-        $context = new ConfigurationResolverContext(
-            $submission->getData(),
-            [
-                'configuration' => $submission->getConfiguration(),
-            ]
+        return new ConfigurationResolverContext(
+            $this->submission->getData(), 
+            ['configuration' => $this->submission->getConfiguration()]
         );
-        /** @var GeneralEvaluation $evaluation */
-        $evaluation = $this->registry->getEvaluation(
-            'general',
-            $this->getConfig(static::KEY_ENABLED),
-            $context
-        );
-        return $evaluation->eval();
     }
 
-    protected function addRequestVariableToContext(SubmissionDataSetInterface $submission, RequestInterface $request, string $variableName): bool
+    /**
+     * Public information on whether the data provider is enabled.
+     * Can be used from outside to consider whether or not it should even be called or its configuration stored.
+     */
+    public function enabled(): bool
     {
-        $variableValue = $request->getRequestVariable($variableName);
-        if (!GeneralUtility::isEmpty($variableValue)) {
-            $submission->getContext()->setRequestVariable($variableName, $variableValue);
-            return true;
-        }
-        return false;
+        return (bool)$this->getConfig(static::KEY_ENABLED);
     }
 
-    protected function getRequestVariableFromContext(SubmissionDataSetInterface $submission, string $variableName)
+    /**
+     * Internal information on whether the data provider should proceed adding data.
+     * An enabled data provider may still have a reason not to add data,
+     * which is why this is different form the method enabled().
+     */
+    protected function proceed(): bool
     {
-        return $submission->getContext()->getRequestVariable($variableName);
+        return $this->enabled();
     }
 
-    protected function addCookieToContext(SubmissionDataSetInterface $submission, RequestInterface $request, string $cookieName, $default = null): bool
+    protected function appendToField($key, $value, $glue = "\n"): bool
     {
-        $cookieValue = $request->getCookies()[$cookieName] ?? $default;
-        if ($cookieValue !== null) {
-            $submission->getContext()->setCookie($cookieName, $cookieValue);
-            return true;
-        }
-        return false;
-    }
-
-    protected function getCookieFromContext(SubmissionDataSetInterface $submission, string $cookieName, $default = null)
-    {
-        return $submission->getContext()->getCookie($cookieName, $default);
-    }
-
-    protected function appendToField(SubmissionDataSetInterface $submission, $key, $value, $glue = "\n"): bool
-    {
-        $data = $submission->getData();
+        $data = $this->submission->getData();
         if (
             $this->getConfig(static::KEY_MUST_EXIST)
             && !$data->fieldExists($key)
@@ -100,9 +83,9 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
         return true;
     }
 
-    protected function setField(SubmissionDataSetInterface $submission, $key, $value): bool
+    protected function setField($key, $value): bool
     {
-        $data = $submission->getData();
+        $data = $this->submission->getData();
         if (
             $this->getConfig(static::KEY_MUST_EXIST)
             && !$data->fieldExists($key)
@@ -120,78 +103,17 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
         return true;
     }
 
-    protected function appendToFieldFromContext(SubmissionDataSetInterface $submission, $key, $field = null, $glue = "\n"): bool
+    public function addData(): void
     {
-        $value = $submission->getContext()[$key] ?? null;
-        if ($value !== null) {
-            return $this->appendToField($submission, $field ?: $key, $value, $glue);
-        }
-        return false;
-    }
-
-    protected function setFieldFromContext(SubmissionDataSetInterface $submission, $key, $field = null): bool
-    {
-        $value = $submission->getContext()[$key] ?? null;
-        if ($value !== null) {
-            return $this->setField($submission, $field ?: $key, $value);
-        }
-        return false;
-    }
-
-    protected function appendToFieldFromCookie(SubmissionDataSetInterface $submission, $cookieName, $field = null, $glue = "\n"): bool
-    {
-        $value = $this->getCookieFromContext($submission, $cookieName);
-        if ($value !== null) {
-            return $this->appendToField($submission, $field ?: $cookieName, $value, $glue);
-        }
-        return false;
-    }
-
-    protected function setFieldFromCookie(SubmissionDataSetInterface $submission, $cookieName, $field = null): bool
-    {
-        $value = $this->getCookieFromContext($submission, $cookieName);
-        if ($value !== null) {
-            return $this->setField($submission, $field ?: $cookieName, $value);
-        }
-        return false;
-    }
-
-    protected function appendToFieldFromRequestVariable(SubmissionDataSetInterface $submission, $variableName, $field = null, $glue = "\n"): bool
-    {
-        $value = $this->getRequestVariableFromContext($submission, $variableName);
-        if ($value !== null) {
-            return $this->appendToField($submission, $field ?: $variableName, $value, $glue);
-        }
-        return false;
-    }
-
-    protected function setFieldFromRequestVariable(SubmissionDataSetInterface $submission, $variableName, $field = null): bool
-    {
-        $value = $this->getRequestVariableFromContext($submission, $variableName);
-        if ($value !== null) {
-            return $this->setField($submission, $field ?: $variableName, $value);
-        }
-        return false;
-    }
-
-    public function addData(SubmissionDataSetInterface $submission): void
-    {
-        $this->configuration = $submission->getConfiguration()->getDataProviderConfiguration($this->getKeyword());
-        if ($this->proceed($submission)) {
-            $this->process($submission);
+        if ($this->proceed()) {
+            $this->process();
         }
     }
 
-    protected function addToContext(SubmissionDataSetInterface $submission, $key, $value)
+    public function addContext(ContextInterface $context): void
     {
-        $submission->getContext()[$key] = $value;
-    }
-
-    public function addContext(SubmissionDataSetInterface $submission, RequestInterface $request): void
-    {
-        $this->configuration = $submission->getConfiguration()->getDataProviderConfiguration($this->getKeyword());
-        if ($this->proceed($submission)) {
-            $this->processContext($submission, $request);
+        if ($this->enabled()) {
+            $this->processContext($context);
         }
     }
 

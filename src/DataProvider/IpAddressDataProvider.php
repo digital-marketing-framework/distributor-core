@@ -2,26 +2,24 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Request\RequestInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class IpAddressDataProvider extends DataProvider
 {
     const KEY_FIELD = 'field';
     const DEFAULT_FIELD = 'ip_address';
 
-    protected function processContext(SubmissionDataSetInterface $submission, RequestInterface $request): void
+    protected function processContext(ContextInterface $context): void
     {
-        $this->addToContext($submission, 'ip_address', $request->getIpAddress());
+        $this->submission->getContext()->copyIpAddressFromContext($context);
     }
 
-    protected function process(SubmissionDataSetInterface $submission): void
+    protected function process(): void
     {
-        $this->setFieldFromContext(
-            $submission,
-            'ip_address',
-            $this->getConfig(static::KEY_FIELD)
-        );
+        $value = $this->submission->getContext()->getIpAddress();
+        if ($value !== null) {
+            $this->setField($this->getConfig(static::KEY_FIELD), $value);
+        }
     }
 
     public static function getDefaultConfiguration(): array

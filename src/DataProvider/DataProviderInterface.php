@@ -2,14 +2,14 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Plugin\PluginInterface;
-use DigitalMarketingFramework\Core\Request\RequestInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 
 interface DataProviderInterface extends PluginInterface
 {
-    public function addContext(SubmissionDataSetInterface $submission, RequestInterface $request): void;
-    public function addData(SubmissionDataSetInterface $submission): void;
+    public function enabled(): bool;
+    public function addContext(ContextInterface $context): void;
+    public function addData(): void;
 
     public static function getDefaultConfiguration(): array;
 }

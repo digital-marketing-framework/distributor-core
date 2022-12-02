@@ -2,21 +2,31 @@
 
 namespace DigitalMarketingFramework\Distributer\Core\Route;
 
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Plugin\PluginInterface;
-use DigitalMarketingFramework\Core\Request\RequestInterface;
-use DigitalMarketingFramework\Distributer\Core\Model\DataSet\SubmissionDataSetInterface;
 
 interface RouteInterface extends PluginInterface
 {
-    public function getPassCount(SubmissionDataSetInterface $submission): int;
+    public const KEY_ENABLED = 'enabled';
+    public const DEFAULT_ENABLED = false;
+
+    public const KEY_GATE = 'gate';
+    public const DEFAULT_GATE = [];
+
+    // TODO should we have the processor configuration have its own config object KEY_DATA?
+    // public const KEY_DATA = 'data';
+
+    public function getPass(): int;
+
+    public function enabled(): bool;
 
     /**
      * @throws DigitalMarketingFrameworkException
      */
-    public function processPass(SubmissionDataSetInterface $submission, int $pass): bool;
+    public function process(): bool;
 
-    public function addContext(SubmissionDataSetInterface $submission, RequestInterface $request, int $pass): void;
+    public function addContext(ContextInterface $context): void;
 
     public static function getDefaultConfiguration(): array;
 }
