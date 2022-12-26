@@ -6,6 +6,7 @@ use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\ConfigurationResolverRegistryInterface;
+use DigitalMarketingFramework\Core\Registry\Plugin\IdentifierCollectorRegistryInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface as CoreRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryInterface;
@@ -21,7 +22,8 @@ interface RegistryInterface extends
     ConfigurationResolverRegistryInterface, 
     DataDispatcherRegistryInterface, 
     DataProviderRegistryInterface, 
-    RouteRegistryInterface
+    RouteRegistryInterface,
+    IdentifierCollectorRegistryInterface
 {
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface;
 

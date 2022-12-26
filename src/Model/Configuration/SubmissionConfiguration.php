@@ -7,6 +7,11 @@ use DigitalMarketingFramework\Core\Utility\ConfigurationUtility;
 
 class SubmissionConfiguration extends Configuration implements SubmissionConfigurationInterface
 {
+    protected function getDistributorConfiguration(bool $resolveNull = true): array
+    {
+        return $this->getMergedConfiguration($resolveNull)[static::KEY_DISTRIBUTOR] ?? [];
+    }
+
     public function getWithRoutePassOverride(string $key, string $route, int $pass, mixed $default = null): mixed
     {
         return $this->getRoutePassConfiguration($route, $pass)[$key]
@@ -25,7 +30,7 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
 
     protected function getRouteConfiguration(string $routeName): array
     {
-        $rawConfiguration = $this->getMergedConfiguration(false)[static::KEY_ROUTES][$routeName] ?? [];
+        $rawConfiguration = $this->getDistributorConfiguration(false)[static::KEY_ROUTES][$routeName] ?? [];
 
         $baseConfiguration = $rawConfiguration;
         unset($baseConfiguration[static::KEY_ROUTE_PASSES]);
@@ -82,7 +87,7 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
 
     public function routeExists(string $routeName): bool
     {
-        return isset($this->getMergedConfiguration()[static::KEY_ROUTES][$routeName]);
+        return isset($this->getDistributorConfiguration()[static::KEY_ROUTES][$routeName]);
     }
 
     public function routePassExists(string $routeName, int $pass): bool

@@ -15,6 +15,9 @@ trait RouteRegistryTrait
         $this->registerPlugin(RouteInterface::class, $class, $additionalArguments, $keyword);
     }
 
+    /**
+     * @return array<int,RouteInterface>
+     */
     public function getRoutes(SubmissionDataSetInterface $submission): array
     {
         $routes = [];
