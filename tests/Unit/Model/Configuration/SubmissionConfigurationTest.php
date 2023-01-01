@@ -18,8 +18,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'dataProviders' => [
-                    'dataProvider1' => $conf,
+                'distributor' => [
+                    'dataProviders' => [
+                        'dataProvider1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -37,8 +39,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'dataProviders' => [
-                    'dataProvider1' => $conf,
+                'distributor' => [
+                    'dataProviders' => [
+                        'dataProvider1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -56,8 +60,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'dataProviders' => [
-                    'dataProvider1' => $conf,
+                'distributor' => [
+                    'dataProviders' => [
+                        'dataProvider1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -75,8 +81,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'dataProviders' => [
-                    'dataProvider1' => $conf,
+                'distributor' => [
+                    'dataProviders' => [
+                        'dataProvider1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -94,8 +102,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -114,8 +124,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -133,8 +145,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -152,8 +166,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -167,19 +183,21 @@ class SubmissionConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'routes' => [
-                    'route1' => [
-                        'key1' => 'value1',
-                        'key2' => 'value2',
-                        'key3' => 'value3',
-                        'passes' => [
-                            [
-                                'key2' => 'value2b',
-                                'key4' => 'value4b'
-                            ],
-                            [
-                                'key3' => 'value3c',
-                                'key4' => 'value4c',
+                'distributor' => [
+                    'routes' => [
+                        'route1' => [
+                            'key1' => 'value1',
+                            'key2' => 'value2',
+                            'key3' => 'value3',
+                            'passes' => [
+                                [
+                                    'key2' => 'value2b',
+                                    'key4' => 'value4b'
+                                ],
+                                [
+                                    'key3' => 'value3c',
+                                    'key4' => 'value4c',
+                                ],
                             ],
                         ],
                     ],
@@ -212,35 +230,39 @@ class SubmissionConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'routes' => [
-                    'route1' => [
-                        'key1' => 'value1',
-                        'key2' => 'value2',
-                        'key3' => 'value3',
-                        'passes' => [
-                            [
-                                'key2' => 'value2b',
-                                'key4' => 'value4b'
-                            ],
-                            [
-                                'key3' => 'value3c',
-                                'key4' => 'value4c',
+                'distributor' => [
+                    'routes' => [
+                        'route1' => [
+                            'key1' => 'value1',
+                            'key2' => 'value2',
+                            'key3' => 'value3',
+                            'passes' => [
+                                [
+                                    'key2' => 'value2b',
+                                    'key4' => 'value4b'
+                                ],
+                                [
+                                    'key3' => 'value3c',
+                                    'key4' => 'value4c',
+                                ],
                             ],
                         ],
                     ],
                 ],
             ],
             [
-                'routes' => [
-                    'route1' => [
-                        'key1' => 'value1.2',
-                        'passes' => [
-                            0 => [
-                                'key2' => null,
-                                'key3' => 'value3b.2',
-                            ],
-                            2 => [
-                                'key1' => 'value1d.2',
+                'distributor' => [
+                    'routes' => [
+                        'route1' => [
+                            'key1' => 'value1.2',
+                            'passes' => [
+                                0 => [
+                                    'key2' => null,
+                                    'key3' => 'value3b.2',
+                                ],
+                                2 => [
+                                    'key1' => 'value1d.2',
+                                ],
                             ],
                         ],
                     ],
@@ -279,15 +301,17 @@ class SubmissionConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'routes' => [
-                    'route1' => [
-                        'key1' => 'value1',
-                        'passes' => [
-                            10 => [
-                                'key1' => 'value1.1',
-                            ],
-                            20 => [
-                                'key1' => 'value1.2',
+                'distributor' => [
+                    'routes' => [
+                        'route1' => [
+                            'key1' => 'value1',
+                            'passes' => [
+                                10 => [
+                                    'key1' => 'value1.1',
+                                ],
+                                20 => [
+                                    'key1' => 'value1.2',
+                                ],
                             ],
                         ],
                     ],
@@ -309,15 +333,17 @@ class SubmissionConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'routes' => [
-                    'route1' => [
-                        'key1' => 'value1',
-                        'passes' => [
-                            'pass1' => [
-                                'key1' => 'value1.1',
-                            ],
-                            'pass2' => [
-                                'key1' => 'value1.2',
+                'distributor' => [
+                    'routes' => [
+                        'route1' => [
+                            'key1' => 'value1',
+                            'passes' => [
+                                'pass1' => [
+                                    'key1' => 'value1.1',
+                                ],
+                                'pass2' => [
+                                    'key1' => 'value1.2',
+                                ],
                             ],
                         ],
                     ],
@@ -339,15 +365,17 @@ class SubmissionConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'routes' => [
-                    'route1' => [
-                        'key1' => 'value1',
-                        'passes' => [
-                            20 => [
-                                'key1' => 'value1.2',
-                            ],
-                            10 => [
-                                'key1' => 'value1.1',
+                'distributor' => [
+                    'routes' => [
+                        'route1' => [
+                            'key1' => 'value1',
+                            'passes' => [
+                                20 => [
+                                    'key1' => 'value1.2',
+                                ],
+                                10 => [
+                                    'key1' => 'value1.1',
+                                ],
                             ],
                         ],
                     ],
@@ -373,8 +401,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -393,8 +423,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -413,8 +445,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -433,8 +467,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -461,8 +497,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -487,8 +525,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -506,8 +546,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -525,8 +567,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -549,8 +593,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -573,8 +619,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -597,8 +645,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -624,8 +674,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -651,8 +703,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];
@@ -681,8 +735,10 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'routes' => [
-                    'route1' => $conf,
+                'distributor' => [
+                    'routes' => [
+                        'route1' => $conf,
+                    ],
                 ],
             ],
         ];

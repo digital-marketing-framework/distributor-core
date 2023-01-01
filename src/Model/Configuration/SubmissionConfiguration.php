@@ -14,18 +14,21 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
 
     public function getWithRoutePassOverride(string $key, string $route, int $pass, mixed $default = null): mixed
     {
-        return $this->getRoutePassConfiguration($route, $pass)[$key]
-            ?? $this->get($key, $default);
+        $value = $this->getRoutePassConfiguration($route, $pass)[$key] ?? null;
+        if ($value !== null) {
+            return $value;
+        }
+        return $this->getDistributorConfiguration()[$key] ?? $default;
     }
 
     public function getDataProviderConfiguration(string $dataProviderName): array
     {
-        return $this->get(static::KEY_DATA_PROVIDERS, [])[$dataProviderName] ?? [];
+        return $this->getDistributorConfiguration()[static::KEY_DATA_PROVIDERS][$dataProviderName] ?? [];
     }
 
     public function dataProviderExists(string $dataProviderName): bool
     {
-        return isset($this->get(static::KEY_DATA_PROVIDERS, [])[$dataProviderName]);
+        return isset($this->getDistributorConfiguration()[static::KEY_DATA_PROVIDERS][$dataProviderName]);
     }
 
     protected function getRouteConfiguration(string $routeName): array

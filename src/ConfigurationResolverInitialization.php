@@ -20,10 +20,4 @@ class ConfigurationResolverInitialization extends Initialization
             DiscreteMultiValueContentResolver::class,
         ],
     ];
-    
-    public static function initialize(PluginRegistryInterface $registry): void
-    {
-        CoreConfigurationResolverInitialization::initialize($registry);
-        parent::initialize($registry);
-    }
 }

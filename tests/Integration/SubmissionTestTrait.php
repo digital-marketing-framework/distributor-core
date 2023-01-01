@@ -18,9 +18,11 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     protected function baseConfiguration(): array
     {
         return [
-            Relay::KEY_ASYNC => false,
-            SubmissionConfigurationInterface::KEY_DATA_PROVIDERS => [],
-            SubmissionConfigurationInterface::KEY_ROUTES => [],
+            'distributor' => [
+                Relay::KEY_ASYNC => false,
+                SubmissionConfigurationInterface::KEY_DATA_PROVIDERS => [],
+                SubmissionConfigurationInterface::KEY_ROUTES => [],
+            ],
         ];
     }
 
@@ -38,21 +40,21 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
 
     protected function addRouteConfiguration(string $name, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index][SubmissionConfigurationInterface::KEY_ROUTES][$name] = $configuration;
+        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_ROUTES][$name] = $configuration;
     }
 
     protected function addDataProviderConfiguration(string $name, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index][SubmissionConfigurationInterface::KEY_DATA_PROVIDERS][$name] = $configuration;
+        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_DATA_PROVIDERS][$name] = $configuration;
     }
 
     protected function setSubmissionAsync(bool $async = true, int $index = 0): void
     {
-        $this->submissionConfiguration[$index][Relay::KEY_ASYNC] = $async;
+        $this->submissionConfiguration[$index]['distributor'][Relay::KEY_ASYNC] = $async;
     }
 
     protected function setStorageDisabled(bool $disableStorage = false, int $index = 0): void
     {
-        $this->submissionConfiguration[$index][Relay::KEY_DISABLE_STORAGE] = $disableStorage;
+        $this->submissionConfiguration[$index]['distributor'][Relay::KEY_DISABLE_STORAGE] = $disableStorage;
     }
 }

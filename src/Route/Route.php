@@ -47,10 +47,7 @@ abstract class Route extends Plugin implements RouteInterface
     protected function buildData(): DataInterface
     {
         $data = $this->resolveContent([
-            // TODO should we have the processor configuration have its own config object KEY_DATA?
-            //'dataMap' => $this->getConfig(static::KEY_DATA),
-            //'dataMap' => $this->getConfig(static::KEY_DATA, $this->configuration),
-            'dataMap' => $this->configuration,
+            'dataMap' => $this->getConfig(static::KEY_DATA),
         ]);
         if (!$data instanceof DataInterface) {
             $data = new Data();
@@ -90,7 +87,7 @@ abstract class Route extends Plugin implements RouteInterface
         }
 
         $data = $this->buildData();
-        
+
         if (GeneralUtility::isEmpty($data)) {
             throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->pass));
         }
@@ -111,11 +108,8 @@ abstract class Route extends Plugin implements RouteInterface
         return [
             static::KEY_ENABLED => static::DEFAULT_ENABLED,
             static::KEY_GATE => static::DEFAULT_GATE,
-
+            static::KEY_DATA => DataProcessor::getDefaultConfiguration(),
             // TODO: static::KEY_MARKETING_CONSENT => static::DEFAULT_MARKETING_CONSENT?
-
-            // TODO should we have the processor configuration have its own config object KEY_DATA?
-            // static::KEY_DATA => DataProcessor::getDefaultConfiguration(),
-        ] + DataProcessor::getDefaultConfiguration();
+        ];
     }
 }

@@ -61,21 +61,23 @@ class GateEvaluationTest extends AbstractEvaluationTest
     protected function createRouteConfig($name, $gatePasses): void
     {
         $routeConf = [
-            'routes' => [
-                $name => [
-                    'enabled' => true,
-                ]
+            'distributor' => [
+                'routes' => [
+                    $name => [
+                        'enabled' => true,
+                    ]
+                ],
             ],
         ];
         if (is_array($gatePasses)) {
-            $routeConf['routes'][$name]['passes'] = [];
+            $routeConf['distributor']['routes'][$name]['passes'] = [];
             foreach ($gatePasses as $pass => $passGatePasses) {
-                $routeConf['routes'][$name]['passes'][$pass] = [
+                $routeConf['distributor']['routes'][$name]['passes'][$pass] = [
                     'gate' => $this->createGateConfig($passGatePasses),
                 ];
             }
         } else {
-            $routeConf['routes'][$name]['gate'] = $this->createGateConfig($gatePasses);
+            $routeConf['distributor']['routes'][$name]['gate'] = $this->createGateConfig($gatePasses);
         }
         $this->submissionConfiguration[] = $routeConf;
     }
@@ -174,15 +176,17 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function recursiveGateEvaluationSucceeds(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route2',
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route2',
+                        ],
                     ],
-                ],
-                'route2' => [
-                    'enabled' => true,
+                    'route2' => [
+                        'enabled' => true,
+                    ],
                 ],
             ],
         ];
@@ -200,15 +204,17 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function recursiveGateEvaluationFails(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route2',
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route2',
+                        ],
                     ],
-                ],
-                'route2' => [
-                    'enabled' => false,
+                    'route2' => [
+                        'enabled' => false,
+                    ],
                 ],
             ],
         ];
@@ -226,21 +232,23 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function deepRecursiveGateEvaluationWithoutLoopSucceeds(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route2',
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route2',
+                        ],
                     ],
-                ],
-                'route2' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route3',
+                    'route2' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route3',
+                        ],
                     ],
-                ],
-                'route3' => [
-                    'enabled' => true,
+                    'route3' => [
+                        'enabled' => true,
+                    ],
                 ],
             ],
         ];
@@ -258,23 +266,25 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function deepRecursiveGateEvaluationWithLoopFailsAndLogsError(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route2',
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route2',
+                        ],
                     ],
-                ],
-                'route2' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route3',
+                    'route2' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route3',
+                        ],
                     ],
-                ],
-                'route3' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route1',
+                    'route3' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route1',
+                        ],
                     ],
                 ],
             ],
@@ -293,11 +303,13 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function selfReferenceCountsAsLoopThusFailsAndLogsError(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route1',
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route1',
+                        ],
                     ],
                 ],
             ],
@@ -316,15 +328,17 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function selfReferencedPassCountsAsLoopThusFailsAndLogsError(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'passes' => [
-                        [
-                            'gate' => [
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'passes' => [
+                            [
                                 'gate' => [
-                                    'key' => 'route1',
-                                    'pass' => 0,
+                                    'gate' => [
+                                        'key' => 'route1',
+                                        'pass' => 0,
+                                    ],
                                 ],
                             ],
                         ],
@@ -349,23 +363,25 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function passLoopWithinOneRouteFailsAndLogsError(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'passes' => [
-                        [
-                            'gate' => [
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'passes' => [
+                            [
                                 'gate' => [
-                                    'key' => 'route1',
-                                    'pass' => 1,
+                                    'gate' => [
+                                        'key' => 'route1',
+                                        'pass' => 1,
+                                    ],
                                 ],
                             ],
-                        ],
-                        [
-                            'gate' => [
+                            [
                                 'gate' => [
-                                    'key' => 'route1',
-                                    'pass' => 0,
+                                    'gate' => [
+                                        'key' => 'route1',
+                                        'pass' => 0,
+                                    ],
                                 ],
                             ],
                         ],
@@ -390,20 +406,22 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function passDependencyWithinOneRouteWithoutLoopSucceeds(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'passes' => [
-                        [
-                            'enabled' => true,
-                            'gate' => [
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'passes' => [
+                            [
+                                'enabled' => true,
                                 'gate' => [
-                                    'key' => 'route1',
-                                    'pass' => 1,
+                                    'gate' => [
+                                        'key' => 'route1',
+                                        'pass' => 1,
+                                    ],
                                 ],
                             ],
-                        ],
-                        [
-                            'enabled' => true,
+                            [
+                                'enabled' => true,
+                            ],
                         ],
                     ],
                 ],
@@ -426,15 +444,17 @@ class GateEvaluationTest extends AbstractEvaluationTest
     public function twoSeparateEvaluationsWithSameGateDoNotCountAsLoopAndSucceed(): void
     {
         $this->submissionConfiguration[] = [
-            'routes' => [
-                'route1' => [
-                    'enabled' => true,
-                    'gate' => [
-                        'gate' => 'route2',
+            'distributor' => [
+                'routes' => [
+                    'route1' => [
+                        'enabled' => true,
+                        'gate' => [
+                            'gate' => 'route2',
+                        ],
                     ],
-                ],
-                'route2' => [
-                    'enabled' => true,
+                    'route2' => [
+                        'enabled' => true,
+                    ],
                 ],
             ],
         ];

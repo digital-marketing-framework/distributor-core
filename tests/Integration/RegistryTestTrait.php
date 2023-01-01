@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\ConfigurationResolverInitialization;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Log\LoggerFactoryInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
@@ -55,6 +56,7 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
             nonPersistentQueue:$this->temporaryQueue, 
             queueDataFactory:$this->queueDataFactory
         );
+        ConfigurationResolverInitialization::initialize($this->registry);
         CoreInitialization::initialize($this->registry);
     }
 

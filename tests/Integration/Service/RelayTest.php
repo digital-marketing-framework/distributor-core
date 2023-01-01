@@ -31,9 +31,11 @@ class RelayTest extends TestCase
         $this->setStorageDisabled(false);
         $this->addRouteSpy([
             'enabled' => true,
-            'fields' => [
-                'field1ext' => [ 'field' => 'field1' ],
-                'field2ext' => [ 'field' => 'field2' ],
+            'data' => [
+                'fields' => [
+                    'field1ext' => [ 'field' => 'field1' ],
+                    'field2ext' => [ 'field' => 'field2' ],
+                ],
             ],
         ]);
         $this->submissionData = [
@@ -42,7 +44,8 @@ class RelayTest extends TestCase
         ];
 
         $this->queue->expects($this->once())->method('addJob');
-        $this->queue->expects($this->once())->method('markListAsRunning');
+        $this->queue->expects($this->once())->method('markListAsPending');
+        $this->queue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
             'field1ext' => 'value1',
             'field2ext' => 'value2',
@@ -50,7 +53,8 @@ class RelayTest extends TestCase
         $this->queue->expects($this->once())->method('markAsDone');
 
         $this->temporaryQueue->expects($this->never())->method('addJob');
-        $this->temporaryQueue->expects($this->never())->method('markListAsRunning');
+        $this->temporaryQueue->expects($this->never())->method('markListAsPending');
+        $this->temporaryQueue->expects($this->never())->method('markAsRunning');
         $this->temporaryQueue->expects($this->never())->method('markAsDone');
 
         $this->subject->process($this->getSubmission());
@@ -63,9 +67,11 @@ class RelayTest extends TestCase
         $this->setStorageDisabled(true);
         $this->addRouteSpy([
             'enabled' => true,
-            'fields' => [
-                'field1ext' => [ 'field' => 'field1' ],
-                'field2ext' => [ 'field' => 'field2' ],
+            'data' => [
+                'fields' => [
+                    'field1ext' => [ 'field' => 'field1' ],
+                    'field2ext' => [ 'field' => 'field2' ],
+                ],
             ],
         ]);
         $this->submissionData = [
@@ -74,7 +80,8 @@ class RelayTest extends TestCase
         ];
 
         $this->temporaryQueue->expects($this->once())->method('addJob');
-        $this->temporaryQueue->expects($this->once())->method('markListAsRunning');
+        $this->temporaryQueue->expects($this->once())->method('markListAsPending');
+        $this->temporaryQueue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
             'field1ext' => 'value1',
             'field2ext' => 'value2',
@@ -82,7 +89,8 @@ class RelayTest extends TestCase
         $this->temporaryQueue->expects($this->once())->method('markAsDone');
 
         $this->queue->expects($this->never())->method('addJob');
-        $this->queue->expects($this->never())->method('markListAsRunning');
+        $this->queue->expects($this->never())->method('markListAsPending');
+        $this->queue->expects($this->never())->method('markAsRunning');
         $this->queue->expects($this->never())->method('markAsDone');
 
         $this->subject->process($this->getSubmission());
@@ -95,9 +103,11 @@ class RelayTest extends TestCase
         $this->setStorageDisabled(false);
         $this->addRouteSpy([
             'enabled' => true,
-            'fields' => [
-                'field1ext' => [ 'field' => 'field1' ],
-                'field2ext' => [ 'field' => 'field2' ],
+            'data' => [
+                'fields' => [
+                    'field1ext' => [ 'field' => 'field1' ],
+                    'field2ext' => [ 'field' => 'field2' ],
+                ],
             ],
         ]);
         $this->submissionData = [
@@ -109,11 +119,13 @@ class RelayTest extends TestCase
 
         $this->routeSpy->expects($this->never())->method('send');
 
-        $this->queue->expects($this->never())->method('markListAsRunning');
+        $this->queue->expects($this->never())->method('markListAsPending');
+        $this->queue->expects($this->never())->method('markAsRunning');
         $this->queue->expects($this->never())->method('markAsDone');
 
         $this->temporaryQueue->expects($this->never())->method('addJob');
-        $this->temporaryQueue->expects($this->never())->method('markListAsRunning');
+        $this->temporaryQueue->expects($this->never())->method('markListAsPending');
+        $this->temporaryQueue->expects($this->never())->method('markAsRunning');
         $this->temporaryQueue->expects($this->never())->method('markAsDone');
 
         $this->subject->process($this->getSubmission());
@@ -153,7 +165,9 @@ class RelayTest extends TestCase
         $this->submissionData = ['field1' => 'value1', 'field2' => 'value2'];
         $this->addRouteSpy([
             'enabled' => $routeEnabled,
-            'fields' => [ 'field1ext' => 'constValue1', ],
+            'data' => [
+                'fields' => [ 'field1ext' => 'constValue1', ],
+            ],
         ]);
         $this->addDataProviderSpy([
             'enabled' => $dataProviderEnabled,
@@ -175,12 +189,15 @@ class RelayTest extends TestCase
         $this->setStorageDisabled(false);
         $this->addRouteSpy([
             'enabled' => true,
-            'fields' => [ 'field1ext' => 'constValue1', ],
+            'data' => [
+                'fields' => [ 'field1ext' => 'constValue1', ],
+            ],
             'passes' => [[], []],
         ]);
         $this->submissionData = [ 'field1' => 'value1', ];
         $this->queue->expects($this->exactly(2))->method('addJob');
-        $this->queue->expects($this->once())->method('markListAsRunning');
+        $this->queue->expects($this->once())->method('markListAsPending');
+        $this->queue->expects($this->exactly(2))->method('markAsRunning');
         $this->routeSpy->expects($this->exactly(2))->method('send')->with([
             'field1ext' => 'constValue1',
         ]);
@@ -196,12 +213,15 @@ class RelayTest extends TestCase
         $this->setStorageDisabled(false);
         $this->addRouteSpy([
             'enabled' => true,
-            'fields' => [ 'field1ext' => 'constValue1', ],
+            'data' => [
+                'fields' => [ 'field1ext' => 'constValue1', ],
+            ],
             'passes' => [[], []],
         ]);
         $this->submissionData = [ 'field1' => 'value1', ];
         $this->queue->expects($this->exactly(2))->method('addJob');
-        $this->queue->expects($this->never())->method('markListAsRunning');
+        $this->queue->expects($this->never())->method('markListAsPending');
+        $this->queue->expects($this->never())->method('markAsRunning');
         $this->routeSpy->expects($this->never())->method('send');
         $this->queue->expects($this->never())->method('markAsDone');
 
@@ -220,9 +240,11 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => true,
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
+                'data' => [
+                    'fields' => [
+                        'field1ext' => [ 'field' => 'field1' ],
+                        'field2ext' => [ 'field' => 'field2' ],
+                    ],
                 ],
             ]
         );
@@ -262,21 +284,27 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => true,
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
+                'data' => [
+                    'fields' => [
+                        'field1ext' => [ 'field' => 'field1' ],
+                        'field2ext' => [ 'field' => 'field2' ],
+                    ],
                 ],
                 'passes' => [
                     [
-                        'fields' => [
-                            'field1ext' => [ 'field' => 'field2' ],
-                            'field2ext' => [ 'field' => 'field1' ],
+                        'data' => [
+                            'fields' => [
+                                'field1ext' => [ 'field' => 'field2' ],
+                                'field2ext' => [ 'field' => 'field1' ],
+                            ],
                         ],
                     ],
                     [
-                        'fields' => [
-                            'field1ext' => [ 'field' => 'field2' ],
-                            'field2ext' => [ 'field' => 'field3' ],
+                        'data' => [
+                            'fields' => [
+                                'field1ext' => [ 'field' => 'field2' ],
+                                'field2ext' => [ 'field' => 'field3' ],
+                            ],
                         ],
                     ],
                 ],
@@ -299,9 +327,11 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => false,
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
+                'data' => [
+                    'fields' => [
+                        'field1ext' => [ 'field' => 'field1' ],
+                        'field2ext' => [ 'field' => 'field2' ],
+                    ],
                 ],
             ]
         );
@@ -324,9 +354,11 @@ class RelayTest extends TestCase
                 'gate' => [
                     'field1' => 'value2',
                 ],
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
+                'data' => [
+                    'fields' => [
+                        'field1ext' => [ 'field' => 'field1' ],
+                        'field2ext' => [ 'field' => 'field2' ],
+                    ],
                 ],
             ]
         );
@@ -349,17 +381,21 @@ class RelayTest extends TestCase
                 'gate' => [
                     'gate' => 'route2',
                 ],
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
+                'data' => [
+                    'fields' => [
+                        'field1ext' => [ 'field' => 'field1' ],
+                        'field2ext' => [ 'field' => 'field2' ],
+                    ],
                 ],
             ],
             0,
             [
                 [
-                    'routes' => [
-                        'route2' => [
-                            'enabled' => true,
+                    'distributor' => [
+                        'routes' => [
+                            'route2' => [
+                                'enabled' => true,
+                            ],
                         ],
                     ],
                 ]
@@ -385,9 +421,11 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => true,
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
+                'data' => [
+                    'fields' => [
+                        'field1ext' => [ 'field' => 'field1' ],
+                        'field2ext' => [ 'field' => 'field2' ],
+                    ],
                 ],
             ]
         );
@@ -409,19 +447,23 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => true,
-                'fields' => [
-                    'field1ext' => 'constValue1',
-                ]
+                'data' => [
+                    'fields' => [
+                        'field1ext' => 'constValue1',
+                    ],
+                ],
             ],
             0,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [
-                            'enabled' => true,
-                        ]
-                    ]
-                ]
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [
+                                'enabled' => true,
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
         $this->dataProviderSpy->expects($this->once())->method('process');
@@ -442,14 +484,18 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => true,
-                'fields' => [ 'field1ext' => 'constValue1', ]
+                'data' => [
+                    'fields' => [ 'field1ext' => 'constValue1', ],
+                ],
             ],
             0,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [ 'enabled' => false, ]
-                    ]
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [ 'enabled' => false, ]
+                        ],
+                    ],
                 ]
             ]
         );
@@ -471,14 +517,18 @@ class RelayTest extends TestCase
             ],
             [
                 'enabled' => false,
-                'fields' => [ 'field1ext' => 'constValue1', ]
+                'data' => [
+                    'fields' => [ 'field1ext' => 'constValue1', ],
+                ],
             ],
             0,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [ 'enabled' => true, ]
-                    ]
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [ 'enabled' => true, ]
+                        ],
+                    ],
                 ]
             ]
         );
@@ -497,16 +547,20 @@ class RelayTest extends TestCase
             [ 'field1' => [ 'type' => 'string', 'value' => 'value1' ] ],
             [
                 'enabled' => true,
-                'fields' => [ 'field1ext' => 'constValue1' ],
+                'data' => [
+                    'fields' => [ 'field1ext' => 'constValue1' ],
+                ],
                 'passes' => [[], []],
             ],
             0,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [ 'enabled' => true, ],
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [ 'enabled' => true, ],
+                        ],
                     ],
-                ]
+                ],
             ]
         );
 
@@ -514,16 +568,20 @@ class RelayTest extends TestCase
             [ 'field1' => [ 'type' => 'string', 'value' => 'value1' ] ],
             [
                 'enabled' => true,
-                'fields' => [ 'field1ext' => 'constValue1' ],
+                'data' => [
+                    'fields' => [ 'field1ext' => 'constValue1' ],
+                ],
                 'passes' => [[], []],
             ],
             1,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [ 'enabled' => true, ],
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [ 'enabled' => true, ],
+                        ],
                     ],
-                ]
+                ],
             ]
         );
 
@@ -541,14 +599,18 @@ class RelayTest extends TestCase
             [ 'field1' => [ 'type' => 'string', 'value' => 'value1' ] ],
             [
                 'enabled' => true,
-                'fields' => [ 'field1ext' => 'constValue1' ],
+                'data' => [
+                    'fields' => [ 'field1ext' => 'constValue1' ],
+                ],
                 'passes' => [[], []],
             ],
             0,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [ 'enabled' => true, ],
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [ 'enabled' => true, ],
+                        ],
                     ],
                 ]
             ]
@@ -558,14 +620,18 @@ class RelayTest extends TestCase
             [ 'field1' => [ 'type' => 'string', 'value' => 'value2' ] ],
             [
                 'enabled' => true,
-                'fields' => [ 'field1ext' => 'constValue1' ],
+                'data' => [
+                    'fields' => [ 'field1ext' => 'constValue1' ],
+                ],
                 'passes' => [[], []],
             ],
             1,
             [
                 [
-                    'dataProviders' => [
-                        'generic' => [ 'enabled' => true, ],
+                    'distributor' => [
+                        'dataProviders' => [
+                            'generic' => [ 'enabled' => true, ],
+                        ],
                     ],
                 ]
             ]

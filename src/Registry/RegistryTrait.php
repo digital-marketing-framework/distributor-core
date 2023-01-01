@@ -6,8 +6,6 @@ use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
-use DigitalMarketingFramework\Core\Registry\Plugin\ConfigurationResolverRegistryTrait;
-use DigitalMarketingFramework\Core\Registry\Plugin\IdentifierCollectorRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
@@ -21,11 +19,9 @@ trait RegistryTrait
 {
     use QueueRegistryTrait;
     use QueueDataFactoryRegistryTrait;
-    use ConfigurationResolverRegistryTrait;
     use DataDispatcherRegistryTrait;
     use DataProviderRegistryTrait;
     use RouteRegistryTrait;
-    use IdentifierCollectorRegistryTrait;
 
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
     {

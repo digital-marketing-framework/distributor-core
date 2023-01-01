@@ -96,7 +96,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $job->getData()[static::KEY_ROUTE] ?? static::DEFAULT_ROUTE;
     }
 
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $route, int $pass, int $status = QueueInterface::STATUS_PENDING): JobInterface
+    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $route, int $pass, int $status = QueueInterface::STATUS_QUEUED): JobInterface
     {
         $submissionData = $this->pack($submission);
         $job = $this->createJob();

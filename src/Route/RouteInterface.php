@@ -14,8 +14,7 @@ interface RouteInterface extends PluginInterface
     public const KEY_GATE = 'gate';
     public const DEFAULT_GATE = [];
 
-    // TODO should we have the processor configuration have its own config object KEY_DATA?
-    // public const KEY_DATA = 'data';
+    public const KEY_DATA = 'data';
 
     public function getPass(): int;
 
