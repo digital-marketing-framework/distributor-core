@@ -7,7 +7,7 @@ use DigitalMarketingFramework\Core\Utility\ConfigurationUtility;
 
 class SubmissionConfiguration extends Configuration implements SubmissionConfigurationInterface
 {
-    protected function getDistributorConfiguration(bool $resolveNull = true): array
+    public function getDistributorConfiguration(bool $resolveNull = true): array
     {
         return $this->getMergedConfiguration($resolveNull)[static::KEY_DISTRIBUTOR] ?? [];
     }

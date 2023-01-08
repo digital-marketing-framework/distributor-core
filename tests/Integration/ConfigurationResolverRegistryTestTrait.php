@@ -2,8 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
-use DigitalMarketingFramework\Distributor\Core\ConfigurationResolverInitialization;
 use DigitalMarketingFramework\Core\Registry\Plugin\ConfigurationResolverRegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\CorePluginInitialization;
+use DigitalMarketingFramework\Distributor\Core\DistributorPluginInitialization;
 
 trait ConfigurationResolverRegistryTestTrait // extends \DigitalMarketingFramework\Core\Tests\Integration\RegistryTestTrait
 {
@@ -12,6 +13,7 @@ trait ConfigurationResolverRegistryTestTrait // extends \DigitalMarketingFramewo
     protected function initRegistry(): void
     {
         parent::initRegistry();
-        ConfigurationResolverInitialization::initialize($this->registry);
+        CorePluginInitialization::initialize($this->registry);
+        DistributorPluginInitialization::initialize($this->registry);
     }
 }

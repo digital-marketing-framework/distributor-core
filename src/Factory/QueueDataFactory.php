@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Factory;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
@@ -24,6 +25,11 @@ class QueueDataFactory implements QueueDataFactoryInterface
 
     const DEFAULT_LABEL = 'undefined';
 
+    public function __construct(
+        protected ConfigurationDocumentManagerInterface $configurationDocumentManager,
+    ) {
+    }
+
     protected function createJob(): JobInterface
     {
         return new Job();
@@ -41,7 +47,6 @@ class QueueDataFactory implements QueueDataFactoryInterface
 
     public function getJobHash(JobInterface $job): string
     {
-        // $this->updateLegacyJobData($job);
         return $this->getSubmissionDataHash($this->getJobSubmissionData($job));
     }
 
@@ -69,7 +74,6 @@ class QueueDataFactory implements QueueDataFactoryInterface
 
     public function getJobLabel(JobInterface $job): string
     {
-        // $this->updateLegacyJobData($job);
         return $this->getSubmissionDataLabel(
             $this->getJobSubmissionData($job),
             $this->getJobRoute($job),
@@ -80,19 +84,16 @@ class QueueDataFactory implements QueueDataFactoryInterface
 
     protected function getJobSubmissionData(JobInterface $job): array
     {
-        // $this->updateLegacyJobData($job);
         return $job->getData()[static::KEY_SUBMISSION] ?? static::DEFAULT_SUBMISSION;
     }
 
     public function getJobRoutePass(JobInterface $job): int
     {
-        // $this->updateLegacyJobData($job);
         return $job->getData()[static::KEY_PASS] ?? static::DEFAULT_PASS;
     }
 
     public function getJobRoute(JobInterface $job): string
     {
-        // $this->updateLegacyJobData($job);
         return $job->getData()[static::KEY_ROUTE] ?? static::DEFAULT_ROUTE;
     }
 
@@ -113,7 +114,6 @@ class QueueDataFactory implements QueueDataFactoryInterface
 
     public function convertJobToSubmission(JobInterface $job): SubmissionDataSetInterface
     {
-        // $this->updateLegacyJobData($job);
         return $this->unpack($this->getJobSubmissionData($job));
     }
 
@@ -121,7 +121,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
     {
         return [
             'data' => $submission->getData()->pack(),
-            'configuration' => $submission->getConfiguration()->toArray(),
+            'configuration' => $submission->getConfiguration()->getRootConfiguration(),
             'context' => $submission->getContext()->toArray(),
         ];
     }
@@ -149,37 +149,19 @@ class QueueDataFactory implements QueueDataFactoryInterface
     protected function unpack(array $data): SubmissionDataSetInterface
     {
         $this->validatePackage($data);
+
         $submissionData = Data::unpack($data['data']);
-        return new SubmissionDataSet($submissionData->toArray(), $data['configuration'], $data['context']);
+        $submissionConfiguration = $this->configurationDocumentManager->getConfigurationStackFromConfiguration($data['configuration']);
+
+        return new SubmissionDataSet(
+            $submissionData->toArray(),
+            $submissionConfiguration,
+            $data['context']
+        );
     }
 
     public function getSubmissionCacheKey(SubmissionDataSetInterface $submission): string
     {
         return serialize($this->pack($submission));
     }
-
-    // /**
-    //  * Taking legacy data structure into account
-    //  *
-    //  * @param JobInterface $job
-    //  * @return bool
-    //  */
-    // public function updateLegacyJobData(JobInterface $job): bool
-    // {
-    //     $data = $job->getData();
-    //     if (empty($data)) {
-    //         return false;
-    //     }
-    //     if (isset($data['context']['job'])) {
-    //         $route = $data['context']['job']['route'] ?? static::DEFAULT_ROUTE;
-    //         $pass = $data['context']['job']['pass'] ?? static::DEFAULT_PASS;
-    //         unset($data['context']['job']);
-    //         $job->setData([
-    //             static::KEY_ROUTE => $route,
-    //             static::KEY_PASS => $pass,
-    //             static::KEY_SUBMISSION => $data,
-    //         ]);
-    //     }
-    //     return true;
-    // }
 }

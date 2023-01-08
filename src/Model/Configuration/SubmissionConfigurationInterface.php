@@ -12,6 +12,8 @@ interface SubmissionConfigurationInterface extends ConfigurationInterface
     public const KEY_ROUTES = 'routes';
     public const KEY_ROUTE_PASSES = 'passes';
 
+    public function getDistributorConfiguration(): array;
+
     public function getWithRoutePassOverride(string $key, string $route, int $pass, $default = null): mixed;
 
     public function dataProviderExists(string $dataProviderName): bool;

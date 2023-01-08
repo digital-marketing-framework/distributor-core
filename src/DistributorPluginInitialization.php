@@ -2,14 +2,13 @@
 
 namespace DigitalMarketingFramework\Distributor\Core;
 
-use DigitalMarketingFramework\Core\Initialization;
-use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryInterface;
+use DigitalMarketingFramework\Core\PluginInitialization;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\TimestampDataProvider;
 
-class CoreInitialization extends Initialization
+class DistributorPluginInitialization extends PluginInitialization
 {
     const PLUGINS = [
         DataProviderInterface::class => [
@@ -18,10 +17,4 @@ class CoreInitialization extends Initialization
             TimestampDataProvider::class,
         ],
     ];
-    
-    public static function initialize(PluginRegistryInterface $registry): void
-    {
-        ConfigurationResolverInitialization::initialize($registry);
-        parent::initialize($registry);
-    }
 }

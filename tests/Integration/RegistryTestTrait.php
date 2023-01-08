@@ -2,15 +2,15 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
-use DigitalMarketingFramework\Core\ConfigurationResolverInitialization;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\CorePluginInitialization;
+use DigitalMarketingFramework\Distributor\Core\CorePluginInitialization as DistributorCorePluginInitalization;
 use DigitalMarketingFramework\Core\Log\LoggerFactoryInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
-use DigitalMarketingFramework\Distributor\Core\CoreInitialization;
+use DigitalMarketingFramework\Distributor\Core\DistributorPluginInitialization;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Registry;
-use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
@@ -30,7 +30,7 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
 
     protected QueueDataFactoryInterface $queueDataFactory;
 
-    protected RegistryInterface $registry;
+    protected Registry $registry;
 
     protected RouteSpyInterface&MockObject $routeSpy;
 
@@ -49,15 +49,15 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
         // initialize the rest regularly
         $this->queueDataFactory = new QueueDataFactory();
 
-        $this->registry = new Registry(
-            context:$this->context, 
-            loggerFactory:$this->loggerFactory, 
-            persistentQueue:$this->queue, 
-            nonPersistentQueue:$this->temporaryQueue, 
-            queueDataFactory:$this->queueDataFactory
-        );
-        ConfigurationResolverInitialization::initialize($this->registry);
-        CoreInitialization::initialize($this->registry);
+        $this->registry = new Registry();
+        $this->registry->setContext($this->context);
+        $this->registry->setLoggerFactory($this->loggerFactory);
+        $this->registry->setPersistentQueue($this->queue);
+        $this->registry->setNonPersistentQueue($this->temporaryQueue);
+        $this->registry->setQueueDataFactory($this->queueDataFactory);
+        CorePluginInitialization::initialize($this->registry);
+        DistributorCorePluginInitalization::initialize($this->registry);
+        DistributorPluginInitialization::initialize($this->registry);
     }
 
     protected function registerRouteSpy(): RouteSpyInterface&MockObject

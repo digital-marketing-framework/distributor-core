@@ -23,5 +23,4 @@ interface RegistryInterface extends
 {
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface;
     public function getRelay(): RelayInterface;
-    public function getDefaultConfiguration(): array;
 }

@@ -2,34 +2,55 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry;
 
-use DigitalMarketingFramework\Core\Cache\DataCache;
-use DigitalMarketingFramework\Core\Cache\DataCacheInterface;
-use DigitalMarketingFramework\Core\Cache\NonPersistentCache;
-use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\Context\RequestContext;
-use DigitalMarketingFramework\Core\Log\LoggerFactoryInterface;
-use DigitalMarketingFramework\Core\Log\NullLoggerFactory;
-use DigitalMarketingFramework\Core\Model\Configuration\Configuration;
-use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
-use DigitalMarketingFramework\Core\Queue\NonPersistentQueue;
-use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
-use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
-use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
+use DigitalMarketingFramework\Core\Queue\QueueInterface;
+use DigitalMarketingFramework\Core\Queue\QueueProcessor;
+use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
+use DigitalMarketingFramework\Core\Queue\WorkerInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\RouteRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
 
 class Registry extends CoreRegistry implements RegistryInterface
 {
-    use RegistryTrait;
+    use QueueRegistryTrait;
+    use QueueDataFactoryRegistryTrait;
+    use DataDispatcherRegistryTrait;
+    use DataProviderRegistryTrait;
+    use RouteRegistryTrait;
 
-    public function __construct(
-        LoggerFactoryInterface $loggerFactory = new NullLoggerFactory(),
-        ContextInterface $context = new RequestContext(),
-        DataCacheInterface $cache = new DataCache(new NonPersistentCache()),
-        ConfigurationInterface $globalConfiguration = new Configuration([]),
-        protected QueueInterface $persistentQueue = new NonPersistentQueue(),
-        protected QueueInterface $nonPersistentQueue = new NonPersistentQueue(),
-        protected QueueDataFactoryInterface $queueDataFactory = new QueueDataFactory(),
-    ) {
-        parent::__construct($loggerFactory, $context, $cache, $globalConfiguration);
+    public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
+    {
+        return $this->createObject(QueueProcessor::class, [$queue, $worker]);
+    }
+
+    public function getRelay(): RelayInterface
+    {
+        return $this->createObject(Relay::class, [$this]);
+    }
+
+    public function getDistributorDefaultConfiguration(): array
+    {
+        $defaultDistributorConfiguration = Relay::getDefaultConfiguration();
+        $defaultDistributorConfiguration[SubmissionConfigurationInterface::KEY_DATA_PROVIDERS] = $this->getDataProviderDefaultConfigurations();
+        $defaultDistributorConfiguration[SubmissionConfigurationInterface::KEY_ROUTES] = $this->getRouteDefaultConfigurations();
+        return $defaultDistributorConfiguration;
+    }
+
+    public function getDefaultConfiguration(): array
+    {
+        $defaultConfiguration = parent::getDefaultConfiguration();
+        $defaultConfiguration[SubmissionConfigurationInterface::KEY_DISTRIBUTOR] = $this->getDistributorDefaultConfiguration();
+        return $defaultConfiguration;
+    }
+
+    public function getConfigurationSchema(): array
+    {
+        return parent::getConfigurationSchema();
     }
 }
