@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\CorePluginInitialization;
 use DigitalMarketingFramework\Distributor\Core\CorePluginInitialization as DistributorCorePluginInitalization;
@@ -28,6 +29,8 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
 
     protected QueueInterface&MockObject $temporaryQueue;
 
+    protected ConfigurationDocumentManagerInterface&MockObject $configurationDocumentManager;
+
     protected QueueDataFactoryInterface $queueDataFactory;
 
     protected Registry $registry;
@@ -45,9 +48,13 @@ trait RegistryTestTrait // extends \PHPUnit\Framework\TestCase
         $this->loggerFactory = $this->createMock(LoggerFactoryInterface::class);
         $this->queue = $this->createMock(QueueInterface::class);
         $this->temporaryQueue = $this->createMock(QueueInterface::class);
+        $this->configurationDocumentManager = $this->createMock(ConfigurationDocumentManagerInterface::class);
+        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(function($configuration) {
+            return [$configuration];
+        });
 
         // initialize the rest regularly
-        $this->queueDataFactory = new QueueDataFactory();
+        $this->queueDataFactory = new QueueDataFactory($this->configurationDocumentManager);
 
         $this->registry = new Registry();
         $this->registry->setContext($this->context);

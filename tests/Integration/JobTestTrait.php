@@ -19,7 +19,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
                 'context' => $context,
             ]
         ];
-        $data[QueueDataFactory::KEY_SUBMISSION]['configuration'][0]['distributor']['routes']['generic'] = $genericRouteConfig;
+        $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['distributor']['routes']['generic'] = $genericRouteConfig;
         return new Job(data:$data);
     }
 }

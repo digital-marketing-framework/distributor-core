@@ -390,15 +390,13 @@ class RelayTest extends TestCase
             ],
             0,
             [
-                [
-                    'distributor' => [
-                        'routes' => [
-                            'route2' => [
-                                'enabled' => true,
-                            ],
+                'distributor' => [
+                    'routes' => [
+                        'route2' => [
+                            'enabled' => true,
                         ],
                     ],
-                ]
+                ],
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -455,12 +453,10 @@ class RelayTest extends TestCase
             ],
             0,
             [
-                [
-                    'distributor' => [
-                        'dataProviders' => [
-                            'generic' => [
-                                'enabled' => true,
-                            ],
+                'distributor' => [
+                    'dataProviders' => [
+                        'generic' => [
+                            'enabled' => true,
                         ],
                     ],
                 ],
@@ -523,13 +519,11 @@ class RelayTest extends TestCase
             ],
             0,
             [
-                [
-                    'distributor' => [
-                        'dataProviders' => [
-                            'generic' => [ 'enabled' => true, ]
-                        ],
+                'distributor' => [
+                    'dataProviders' => [
+                        'generic' => [ 'enabled' => true, ]
                     ],
-                ]
+                ],
             ]
         );
         $this->dataProviderSpy->expects($this->once())->method('process');
@@ -554,11 +548,9 @@ class RelayTest extends TestCase
             ],
             0,
             [
-                [
-                    'distributor' => [
-                        'dataProviders' => [
-                            'generic' => [ 'enabled' => true, ],
-                        ],
+                'distributor' => [
+                    'dataProviders' => [
+                        'generic' => [ 'enabled' => true, ],
                     ],
                 ],
             ]
@@ -575,11 +567,9 @@ class RelayTest extends TestCase
             ],
             1,
             [
-                [
-                    'distributor' => [
-                        'dataProviders' => [
-                            'generic' => [ 'enabled' => true, ],
-                        ],
+                'distributor' => [
+                    'dataProviders' => [
+                        'generic' => [ 'enabled' => true, ],
                     ],
                 ],
             ]
@@ -606,13 +596,11 @@ class RelayTest extends TestCase
             ],
             0,
             [
-                [
-                    'distributor' => [
-                        'dataProviders' => [
-                            'generic' => [ 'enabled' => true, ],
-                        ],
+                'distributor' => [
+                    'dataProviders' => [
+                        'generic' => [ 'enabled' => true, ],
                     ],
-                ]
+                ],
             ]
         );
 
@@ -627,13 +615,11 @@ class RelayTest extends TestCase
             ],
             1,
             [
-                [
-                    'distributor' => [
-                        'dataProviders' => [
-                            'generic' => [ 'enabled' => true, ],
-                        ],
+                'distributor' => [
+                    'dataProviders' => [
+                        'generic' => [ 'enabled' => true, ],
                     ],
-                ]
+                ],
             ]
         );
 

@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\Factory;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\Value\FileValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
@@ -11,6 +12,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,12 +20,18 @@ use PHPUnit\Framework\TestCase;
  */
 class QueueDataFactoryTest extends TestCase
 {
+    protected ConfigurationDocumentManagerInterface&MockObject $configurationDocumentManager;
+
     protected QueueDataFactory $subject;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->subject = new QueueDataFactory();
+        $this->configurationDocumentManager = $this->createMock(ConfigurationDocumentManagerInterface::class);
+        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(function(array $configuration) {
+            return [$configuration];
+        });
+        $this->subject = new QueueDataFactory($this->configurationDocumentManager);
     }
 
     protected function routePassProvider(): array
@@ -101,7 +109,7 @@ class QueueDataFactoryTest extends TestCase
                                 'pass' => $pass,
                                 'submission' => [
                                     'data' => $packedData,
-                                    'configuration' => [$packedConfiguration],
+                                    'configuration' => $packedConfiguration,
                                     'context' => $packedContext,
                                 ],
                             ],

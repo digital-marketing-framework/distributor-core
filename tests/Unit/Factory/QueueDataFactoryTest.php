@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Factory;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
@@ -30,10 +31,18 @@ class QueueDataFactoryTest extends TestCase
 
     protected ContextInterface&MockObject $submissionContext;
 
+    protected ConfigurationDocumentManagerInterface&MockObject $configurationDocumentManager;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->subject = new QueueDataFactory();
+
+        $this->configurationDocumentManager = $this->createMock(ConfigurationDocumentManagerInterface::class);
+        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(function($configuration) {
+            return [$configuration];
+        });
+
+        $this->subject = new QueueDataFactory($this->configurationDocumentManager);
     }
 
     protected function createRouteConfig(string $routeName, int $passCount = 1): array
@@ -65,12 +74,12 @@ class QueueDataFactoryTest extends TestCase
                 'data' => [
                     'field1' => ['type' => 'string', 'value' => 'value1'],
                 ],
-                'configuration' => $configuration,
+                'configuration' => $configuration[0],
                 'context' => [],
             ],
         ], $job->getData());
-        $this->assertEquals('6A91A75B0A1EB9D023EC7120538ED1EF', $job->getHash());
-        $this->assertEquals('6A91A#route1#6', $job->getLabel());
+        $this->assertEquals('1F6F7D0082DE10270D0193DA6E1C7F63', $job->getHash());
+        $this->assertEquals('1F6F7#route1#6', $job->getLabel());
     }
 
     /** @test */
@@ -89,12 +98,12 @@ class QueueDataFactoryTest extends TestCase
                 'data' => [
                     'field1' => ['type' => StringValue::class, 'value' => ['value1']],
                 ],
-                'configuration' => $configuration,
+                'configuration' => $configuration[0],
                 'context' => [],
             ],
         ], $job->getData());
-        $this->assertEquals('C09010AC4B5B3C2A2AF84B4329007F9A', $job->getHash());
-        $this->assertEquals('C0901#route1#6', $job->getLabel());
+        $this->assertEquals('3ECF19772F0DC7C7DD192635FCB37AF6', $job->getHash());
+        $this->assertEquals('3ECF1#route1#6', $job->getLabel());
     }
 
     /** @test */
@@ -105,7 +114,7 @@ class QueueDataFactoryTest extends TestCase
         ];
         $configuration = $this->createRouteConfig('route1', 6);
         $submission = new SubmissionDataSet($data, $configuration);
-        
+
         $this->expectException(InvalidArgumentException::class);
         $this->subject->convertSubmissionToJob($submission, 'route1', 5);
     }
@@ -132,7 +141,7 @@ class QueueDataFactoryTest extends TestCase
             ]
         ];
         $submission = new SubmissionDataSet($data, $configuration, $context);
-        
+
         $job = $this->subject->convertSubmissionToJob($submission, 'route1', 0);
         $this->assertEquals([
             'route' => 'route1',
@@ -141,12 +150,12 @@ class QueueDataFactoryTest extends TestCase
                 'data' => [
                     'field1' => ['type' => 'string', 'value' => 'value1'],
                 ],
-                'configuration' => $configuration,
+                'configuration' => $configuration[0],
                 'context' => $context,
             ],
         ], $job->getData());
-        $this->assertEquals('99C96D6D47E55CE1A99D73EE99728E29', $job->getHash());
-        $this->assertEquals('99C96#route1', $job->getLabel());
+        $this->assertEquals('D2323A197F09464AD6181B1BE6BEB411', $job->getHash());
+        $this->assertEquals('D2323#route1', $job->getLabel());
     }
 
     protected function createJob(array $submissionData, string $route, int $pass = 0, string $hash = ''): JobInterface
@@ -229,7 +238,6 @@ class QueueDataFactoryTest extends TestCase
                     ['field1' => 'value1',],
                     [
                         ['conf1' => 'confValue1',],
-                        ['conf1' => 'confValue1b',],
                     ],
                     ['context1' => 'contextValue1',]
                 ),
@@ -237,15 +245,14 @@ class QueueDataFactoryTest extends TestCase
                     [
                         'data' => ['field1' => ['type' => 'string', 'value' => 'value1']],
                         'configuration' => [
-                            ['conf1' => 'confValue1',],
-                            ['conf1' => 'confValue1b',],
+                            'conf1' => 'confValue1',
                         ],
                         'context' => ['context1' => 'contextValue1',]
                     ],
                     'route1',
                     0
                 ),
-                '23D25FE3588D5FE0394DC26C5247D294'
+                'ED477ABB7C729B515486967A71C87447'
             ],
         ];
     }
@@ -309,7 +316,7 @@ class QueueDataFactoryTest extends TestCase
     {
         $submission = new SubmissionDataSet([], [['routes' => ['route1' => []]]]);
         $label = $this->subject->getSubmissionLabel($submission, 'route1', 0);
-        $this->assertEquals('4CE97#route1', $label);
+        $this->assertEquals('93031#route1', $label);
     }
 
     /** @test */
@@ -367,7 +374,7 @@ class QueueDataFactoryTest extends TestCase
                 [],
                 [[]],
                 [],
-                'a:3:{s:4:"data";a:0:{}s:13:"configuration";a:1:{i:0;a:0:{}}s:7:"context";a:0:{}}'
+                'a:3:{s:4:"data";a:0:{}s:13:"configuration";a:0:{}s:7:"context";a:0:{}}'
             ],
             [
                 [
@@ -384,7 +391,7 @@ class QueueDataFactoryTest extends TestCase
                     'ctx1' => 'ctxValue1',
                     'ctx2' => 'ctxValue2',
                 ],
-                'a:3:{s:4:"data";a:2:{s:6:"field1";a:2:{s:4:"type";s:6:"string";s:5:"value";s:6:"value1";}s:6:"field2";a:2:{s:4:"type";s:77:"DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\StringValue";s:5:"value";a:1:{i:0;s:6:"value2";}}}s:13:"configuration";a:1:{i:0;a:2:{s:5:"conf1";s:10:"confValue1";s:5:"conf2";s:10:"confValue2";}}s:7:"context";a:2:{s:4:"ctx1";s:9:"ctxValue1";s:4:"ctx2";s:9:"ctxValue2";}}'
+                'a:3:{s:4:"data";a:2:{s:6:"field1";a:2:{s:4:"type";s:6:"string";s:5:"value";s:6:"value1";}s:6:"field2";a:2:{s:4:"type";s:77:"DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\StringValue";s:5:"value";a:1:{i:0;s:6:"value2";}}}s:13:"configuration";a:2:{s:5:"conf1";s:10:"confValue1";s:5:"conf2";s:10:"confValue2";}s:7:"context";a:2:{s:4:"ctx1";s:9:"ctxValue1";s:4:"ctx2";s:9:"ctxValue2";}}'
             ]
         ];
     }
