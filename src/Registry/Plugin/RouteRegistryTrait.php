@@ -21,7 +21,7 @@ trait RouteRegistryTrait
     public function getRoutes(SubmissionDataSetInterface $submission): array
     {
         $routes = [];
-        foreach (array_keys($this->pluginClasses[RouteInterface::class]) as $keyword) {
+        foreach (array_keys($this->pluginClasses[RouteInterface::class] ?? []) as $keyword) {
             $passCount = $submission->getConfiguration()->getRoutePassCount($keyword);
             for ($pass = 0; $pass < $passCount; $pass++) {
                 $routes[] = $this->getRoute($keyword, $submission, $pass);
@@ -34,7 +34,7 @@ trait RouteRegistryTrait
     {
         return $this->getPlugin($keyword, RouteInterface::class, [$submission, $pass]);
     }
-    
+
     public function deleteRoute(string $keyword): void
     {
         $this->deletePlugin($keyword, RouteInterface::class);
@@ -43,7 +43,7 @@ trait RouteRegistryTrait
     public function getRouteDefaultConfigurations(): array
     {
         $result = [];
-        foreach ($this->pluginClasses[RouteInterface::class] as $key => $class) {
+        foreach ($this->pluginClasses[RouteInterface::class] ?? [] as $key => $class) {
             $result[$key] = $class::getDefaultConfiguration();
         }
         return $result;
