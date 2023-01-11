@@ -34,7 +34,7 @@ interface QueueDataFactoryInterface
      * Converts a set of a submission, a route name and a route pass to a job.
      * Additionally the initial status of the job can be passed too.
      */
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $route, int $pass, int $status = QueueInterface::STATUS_PENDING): JobInterface;
+    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $route, int $pass, int $status = QueueInterface::STATUS_QUEUED): JobInterface;
 
     /**
      * Converts a job to a submission.

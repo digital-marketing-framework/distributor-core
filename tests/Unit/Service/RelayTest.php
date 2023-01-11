@@ -121,7 +121,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_RUNNING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -164,7 +164,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_RUNNING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -207,7 +207,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_QUEUED]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -248,8 +248,8 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_RUNNING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_RUNNING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
+                [$this->submission, 'route1', 1, QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -295,8 +295,8 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_QUEUED],
+                [$this->submission, 'route1', 1, QueueInterface::STATUS_QUEUED]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -338,8 +338,8 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_RUNNING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
+                [$this->submission, 'route1', 1, QueueInterface::STATUS_QUEUED]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -383,7 +383,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_RUNNING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -431,10 +431,10 @@ class RelayTest extends TestCase
             ->expects($this->exactly(4))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_RUNNING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_PENDING],
-                [$this->submission, 'route2', 0, QueueInterface::STATUS_RUNNING],
-                [$this->submission, 'route2', 1, QueueInterface::STATUS_RUNNING]
+                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
+                [$this->submission, 'route1', 1, QueueInterface::STATUS_QUEUED],
+                [$this->submission, 'route2', 0, QueueInterface::STATUS_PENDING],
+                [$this->submission, 'route2', 1, QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 

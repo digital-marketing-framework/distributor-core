@@ -125,7 +125,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
                 $async = false;
             }
 
-            $status = $async ? QueueInterface::STATUS_PENDING : QueueInterface::STATUS_RUNNING;
+            $status = $async ? QueueInterface::STATUS_QUEUED : QueueInterface::STATUS_PENDING;
             $queue = $disableStorage ? $this->temporaryQueue : $this->persistentQueue;
 
             $job = $this->queueDataFactory->convertSubmissionToJob($submission, $routeName, $pass, $status);
