@@ -39,9 +39,9 @@ class GenericRouteTest extends TestCase
     protected WriteableContextInterface&MockObject $submissionContext;
 
     protected EvaluationInterface&MockObject $gateEvaluation;
-    
+
     protected GeneralContentResolver&MockObject $contentResolver;
-    
+
     protected GenericRoute $subject;
 
     public function setUp(): void
@@ -52,12 +52,12 @@ class GenericRouteTest extends TestCase
 
         $this->gateEvaluation = $this->createMock(EvaluationInterface::class);
         $this->registry->expects($this->any())->method('getEvaluation')->willReturn($this->gateEvaluation);
-        
+
         $this->contentResolver = $this->createMOck(GeneralContentResolver::class);
         $this->registry->expects($this->any())->method('getContentResolver')->willReturn($this->contentResolver);
-        
+
         $this->dataDispatcher = $this->createMock(DataDispatcherInterface::class);
-        
+
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
         $this->submissionContext = $this->createMock(WriteableContextInterface::class);
@@ -70,10 +70,10 @@ class GenericRouteTest extends TestCase
     protected function createRoute(string $keyword = 'myCustomKeyword', bool $useDispatcher = true, ?SubmissionDataSetInterface $submission = null): void
     {
         $this->subject = new GenericRoute(
-            $keyword, 
-            $this->registry, 
-            $submission ?? $this->submission, 
-            0, 
+            $keyword,
+            $this->registry,
+            $submission ?? $this->submission,
+            0,
             $useDispatcher ? $this->dataDispatcher : null
         );
         $this->subject->setLogger($this->logger);
@@ -101,7 +101,11 @@ class GenericRouteTest extends TestCase
     {
         $this->gateEvaluation->expects($this->once())->method('eval')->willReturn(false);
         $this->logger->expects($this->once())->method('debug')->with(sprintf(Route::MESSAGE_GATE_FAILED, 'myCustomKeyword', 0));
-       
+
+        $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+            'enabled' => true,
+        ]);
+
         $this->createRoute();
         $result = $this->subject->process();
         $this->assertFalse($result);
@@ -111,6 +115,9 @@ class GenericRouteTest extends TestCase
     public function processPassEmptyInputDataWillCauseException(): void
     {
         $this->gateEvaluation->expects($this->once())->method('eval')->willReturn(true);
+        $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+            'enabled' => true,
+        ]);
 
         $this->expectException(DigitalMarketingFrameworkException::class);
         $this->expectExceptionMessage(sprintf(Route::MESSAGE_DATA_EMPTY, 'myCustomKeyword', 0));
@@ -126,6 +133,7 @@ class GenericRouteTest extends TestCase
         $this->submissionData['field1'] = 'value1';
 
         $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+            'enabled' => true,
             'fields' => [
                 'field1' => ['field' => 'field1'],
             ],
@@ -152,6 +160,7 @@ class GenericRouteTest extends TestCase
         $this->submissionData['field2'] = 'value2';
 
         $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+            'enabled' => true,
             'fields' => [
                 'processedField1' => 'someConfig',
                 'processedField2' => 'someOtherConfig',
@@ -159,15 +168,15 @@ class GenericRouteTest extends TestCase
         ]);
 
         $this->contentResolver->expects($this->once())->method('resolve')->willReturn(new Data([
-            'processedField1' => 'processedValue1', 
+            'processedField1' => 'processedValue1',
             'processedField2' => 'processedValue2',
         ]));
 
         $this->dataDispatcher->expects($this->once())->method('send')->with([
-            'processedField1' => 'processedValue1', 
+            'processedField1' => 'processedValue1',
             'processedField2' => 'processedValue2'
         ]);
-        
+
         $this->createRoute();
         $this->subject->process();
     }

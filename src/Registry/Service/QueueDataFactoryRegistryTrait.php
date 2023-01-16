@@ -16,7 +16,7 @@ trait QueueDataFactoryRegistryTrait
     {
         if (!isset($this->queueDataFactory)) {
             $configurationDocumentManager = $this->getConfigurationDocumentManager();
-            $this->queueDataFactory = new QueueDataFactory($configurationDocumentManager);
+            $this->queueDataFactory = $this->createObject(QueueDataFactory::class, [$configurationDocumentManager]);
         }
         return $this->queueDataFactory;
     }

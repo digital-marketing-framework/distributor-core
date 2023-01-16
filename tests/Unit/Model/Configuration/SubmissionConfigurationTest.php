@@ -175,7 +175,7 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $this->subject = new SubmissionConfiguration($configList);
         $result = $this->subject->getRoutePassCount('route2');
-        $this->assertEquals(0, $result);
+        $this->assertEquals(1, $result);
     }
 
     /** @test */
@@ -393,50 +393,6 @@ class SubmissionConfigurationTest extends TestCase
     }
 
     /** @test */
-    public function routeExistsOnNonExistingRoute(): void
-    {
-        $conf = [
-            'conf1' => 'val1',
-            'conf2' => 'val2',
-        ];
-        $configList = [
-            [
-                'distributor' => [
-                    'routes' => [
-                        'route1' => $conf,
-                    ],
-                ],
-            ],
-        ];
-        $this->subject = new SubmissionConfiguration($configList);
-
-        $result = $this->subject->routeExists('route2');
-        $this->assertFalse($result);
-    }
-
-    /** @test */
-    public function routeExistsOnExistingRoute(): void
-    {
-        $conf = [
-            'conf1' => 'val1',
-            'conf2' => 'val2',
-        ];
-        $configList = [
-            [
-                'distributor' => [
-                    'routes' => [
-                        'route1' => $conf,
-                    ],
-                ],
-            ],
-        ];
-        $this->subject = new SubmissionConfiguration($configList);
-
-        $result = $this->subject->routeExists('route1');
-        $this->assertTrue($result);
-    }
-
-    /** @test */
     public function routePassExistsOnNonExistingRoute(): void
     {
         $conf = [
@@ -454,7 +410,7 @@ class SubmissionConfigurationTest extends TestCase
         ];
         $this->subject = new SubmissionConfiguration($configList);
 
-        $this->assertFalse($this->subject->routePassExists('route2', 0));
+        $this->assertTrue($this->subject->routePassExists('route2', 0));
         $this->assertFalse($this->subject->routePassExists('route2', 1));
     }
 

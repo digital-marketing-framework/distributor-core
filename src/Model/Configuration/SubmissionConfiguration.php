@@ -75,9 +75,6 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
 
     public function getRoutePassCount(string $routeName): int
     {
-        if (!$this->routeExists($routeName)) {
-            return 0;
-        }
         $configuration = $this->getRouteConfiguration($routeName);
         return count($configuration);
     }
@@ -86,11 +83,6 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
     {
         $configuration = array_values($this->getRouteConfiguration($routeName));
         return $configuration[$pass];
-    }
-
-    public function routeExists(string $routeName): bool
-    {
-        return isset($this->getDistributorConfiguration()[static::KEY_ROUTES][$routeName]);
     }
 
     public function routePassExists(string $routeName, int $pass): bool

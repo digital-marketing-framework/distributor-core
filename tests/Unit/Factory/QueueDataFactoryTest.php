@@ -366,44 +366,4 @@ class QueueDataFactoryTest extends TestCase
         $pass = $this->subject->getJobRoutePass($job);
         $this->assertEquals(5, $pass);
     }
-
-    public function getSubmissionCacheKeyProvider(): array
-    {
-        return [
-            [
-                [],
-                [[]],
-                [],
-                'a:3:{s:4:"data";a:0:{}s:13:"configuration";a:0:{}s:7:"context";a:0:{}}'
-            ],
-            [
-                [
-                    'field1' => 'value1',
-                    'field2' => new StringValue('value2')
-                ],
-                [
-                    [
-                        'conf1' => 'confValue1',
-                        'conf2' => 'confValue2',
-                    ]
-                ],
-                [
-                    'ctx1' => 'ctxValue1',
-                    'ctx2' => 'ctxValue2',
-                ],
-                'a:3:{s:4:"data";a:2:{s:6:"field1";a:2:{s:4:"type";s:6:"string";s:5:"value";s:6:"value1";}s:6:"field2";a:2:{s:4:"type";s:77:"DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\StringValue";s:5:"value";a:1:{i:0;s:6:"value2";}}}s:13:"configuration";a:2:{s:5:"conf1";s:10:"confValue1";s:5:"conf2";s:10:"confValue2";}s:7:"context";a:2:{s:4:"ctx1";s:9:"ctxValue1";s:4:"ctx2";s:9:"ctxValue2";}}'
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider getSubmissionCacheKeyProvider
-     * @test
-     */
-    public function getSubmissionCacheKey(array $data, array $configuration, array $context, string $expectedCacheKey): void
-    {
-        $submission = new SubmissionDataSet($data, $configuration, $context);
-        $cacheKey = $this->subject->getSubmissionCacheKey($submission);
-        $this->assertEquals($expectedCacheKey, $cacheKey);
-    }
 }

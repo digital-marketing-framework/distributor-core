@@ -50,11 +50,4 @@ interface QueueDataFactoryInterface
      * Returns the route name of a job.
      */
     public function getJobRoute(JobInterface $job): string;
-
-    /**
-     * Returns a cache key for the submission built over the form data, context and configuration of the submission.
-     * Unlike the hash it does contain the submission configuration.
-     * It is used to cache actions made on submissions (like processing of data providers).
-     */
-    public function getSubmissionCacheKey(SubmissionDataSetInterface $submission): string;
 }

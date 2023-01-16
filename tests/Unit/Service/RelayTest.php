@@ -84,10 +84,6 @@ class RelayTest extends TestCase
     protected function initSubmission(): void
     {
         $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
-        $this->submissionConfiguration->method('getWithRoutePassOverride')->willReturnCallback(function($name, $route, $pass, $default) {
-            return $this->routeConfigs[$route][$pass][$name];
-        });
-
         $this->submission = $this->createMock(SubmissionDataSetInterface::class);
         $this->submission->method('getConfiguration')->willReturn($this->submissionConfiguration);
     }
@@ -95,11 +91,13 @@ class RelayTest extends TestCase
     protected function addRoute(string $keyword, array $passes, bool $enabled = true): void
     {
         $this->routeConfigs[$keyword] = $passes;
-        foreach (array_keys($passes) as $pass) {
+        foreach ($passes as $pass => $passConfig) {
             $route = $this->createMock(RouteInterface::class);
             $route->method('getKeyword')->willReturn($keyword);
             $route->method('getPass')->willReturn($pass);
             $route->method('enabled')->willReturn($enabled);
+            $route->method('async')->willReturn($passConfig['async'] ?? null);
+            $route->method('disableStorage')->willReturn($passConfig['disableStorage'] ?? null);
             $this->routes[] = $route;
 
             $job = $this->createMock(JobInterface::class);

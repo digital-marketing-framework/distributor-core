@@ -19,7 +19,6 @@ interface SubmissionConfigurationInterface extends ConfigurationInterface
     public function dataProviderExists(string $dataProviderName): bool;
     public function getDataProviderConfiguration(string $dataProviderName): array;
 
-    public function routeExists(string $routeName): bool;
     public function routePassExists(string $routeName, int $pass): bool;
     public function getRoutePassCount(string $routeName): int;
     public function getRoutePassConfiguration(string $routeName, int $pass): array;

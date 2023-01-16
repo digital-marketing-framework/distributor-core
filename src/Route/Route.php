@@ -16,18 +16,22 @@ use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInte
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
 
 abstract class Route extends Plugin implements RouteInterface
 {
     use ConfigurationTrait;
     use ConfigurationResolverTrait;
 
+    protected const DEFAULT_ASYNC = null;
+    protected const DEFAULT_DISABLE_STORAGE = null;
+
     public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" in pass %d.';
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" in pass %d.';
     public const MESSAGE_DISPATCHER_NOT_FOUND = 'No dispatcher found for route "%s" in pass %d.';
 
     public function __construct(
-        string $keyword, 
+        string $keyword,
         RegistryInterface $registry,
         protected SubmissionDataSetInterface $submission,
         protected int $pass,
@@ -57,12 +61,8 @@ abstract class Route extends Plugin implements RouteInterface
 
     protected function processGate(): bool
     {
-        return $this->evaluate([
-            'gate' => [
-                'key' => $this->getKeyword(),
-                'pass' => $this->getPass(),
-            ],
-        ]);
+        return $this->enabled()
+            && $this->evaluate($this->getConfig(static::KEY_GATE));
     }
 
     public function getPass(): int
@@ -73,6 +73,16 @@ abstract class Route extends Plugin implements RouteInterface
     public function enabled(): bool
     {
         return (bool)$this->getConfig(static::KEY_ENABLED);
+    }
+
+    public function async(): ?bool
+    {
+        return $this->getConfig(RelayInterface::KEY_ASYNC);
+    }
+
+    public function disableStorage(): ?bool
+    {
+        return $this->getConfig(RelayInterface::KEY_DISABLE_STORAGE);
     }
 
     public function addContext(ContextInterface $context): void
@@ -107,6 +117,8 @@ abstract class Route extends Plugin implements RouteInterface
     {
         return [
             static::KEY_ENABLED => static::DEFAULT_ENABLED,
+            RelayInterface::KEY_ASYNC => static::DEFAULT_ASYNC,
+            RelayInterface::KEY_DISABLE_STORAGE => static::DEFAULT_DISABLE_STORAGE,
             static::KEY_GATE => static::DEFAULT_GATE,
             static::KEY_DATA => DataProcessor::getDefaultConfiguration(),
             // TODO: static::KEY_MARKETING_CONSENT => static::DEFAULT_MARKETING_CONSENT?

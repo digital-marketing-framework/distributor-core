@@ -159,9 +159,4 @@ class QueueDataFactory implements QueueDataFactoryInterface
             $data['context']
         );
     }
-
-    public function getSubmissionCacheKey(SubmissionDataSetInterface $submission): string
-    {
-        return serialize($this->pack($submission));
-    }
 }

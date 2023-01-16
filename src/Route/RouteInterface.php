@@ -19,6 +19,8 @@ interface RouteInterface extends PluginInterface
     public function getPass(): int;
 
     public function enabled(): bool;
+    public function async(): ?bool;
+    public function disableStorage(): ?bool;
 
     /**
      * @throws DigitalMarketingFrameworkException

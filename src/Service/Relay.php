@@ -19,12 +19,6 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
     use LoggerAwareTrait;
     use ContextAwareTrait;
 
-    public const KEY_DISABLE_STORAGE = 'disableStorage';
-    public const DEFAULT_DISABLE_STORAGE = true;
-
-    public const KEY_ASYNC = 'async';
-    public const DEFAULT_ASYNC = false;
-
     protected RegistryInterface $registry;
 
     protected QueueInterface $persistentQueue;
@@ -32,8 +26,6 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
     protected QueueInterface $temporaryQueue;
 
     protected QueueDataFactoryInterface $queueDataFactory;
-
-    protected array $enrichedSubmissionCache = [];
 
     public function __construct(RegistryInterface $registry)
     {
@@ -65,26 +57,19 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         }
     }
 
-    protected function processDataProviders(SubmissionDataSetInterface $submission): SubmissionDataSetInterface
+    protected function processDataProviders(SubmissionDataSetInterface $submission): void
     {
-        $cacheKey = $this->queueDataFactory->getSubmissionCacheKey($submission);
-        if (isset($this->enrichedSubmissionCache[$cacheKey])) {
-            return $this->enrichedSubmissionCache[$cacheKey];
-        }
-
         $dataProviders = $this->registry->getDataProviders($submission);
         foreach ($dataProviders as $dataProvider) {
             $dataProvider->addData();
         }
-        $this->enrichedSubmissionCache[$cacheKey] = $submission;
-        return $submission;
     }
 
     public function processJob(JobInterface $job): bool
     {
         try {
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
-            $submission = $this->processDataProviders($submission);
+            $this->processDataProviders($submission);
 
             $routeName = $this->queueDataFactory->getJobRoute($job);
             $pass = $this->queueDataFactory->getJobRoutePass($job);
@@ -109,6 +94,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         $syncPersistentJobs = [];
         $syncTemporaryJobs = [];
         $routes = $this->registry->getRoutes($submission);
+        $distributorConfiguration = $submission->getConfiguration()->getDistributorConfiguration();
 
         foreach ($routes as $route) {
             if (!$route->enabled()) {
@@ -117,8 +103,8 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
 
             $routeName = $route->getKeyword();
             $pass = $route->getPass();
-            $async = $submission->getConfiguration()->getWithRoutePassOverride(static::KEY_ASYNC, $routeName, $pass, static::DEFAULT_ASYNC);
-            $disableStorage = $submission->getConfiguration()->getWithRoutePassOverride(static::KEY_DISABLE_STORAGE, $routeName, $pass, static::DEFAULT_DISABLE_STORAGE);
+            $async = $route->async() ?? $distributorConfiguration[static::KEY_ASYNC] ?? static::DEFAULT_ASYNC;
+            $disableStorage = $route->disableStorage() ?? $distributorConfiguration[static::KEY_DISABLE_STORAGE] ?? static::DEFAULT_DISABLE_STORAGE;
 
             if ($disableStorage && $async) {
                 $this->logger->error('Async submissions without storage are not possible. Using sync submission instead.');
