@@ -21,6 +21,7 @@ interface RouteInterface extends PluginInterface
     public function enabled(): bool;
     public function async(): ?bool;
     public function disableStorage(): ?bool;
+    public function getEnabledDataProviders(): array;
 
     /**
      * @throws DigitalMarketingFrameworkException

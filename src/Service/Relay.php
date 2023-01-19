@@ -57,10 +57,22 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         }
     }
 
-    protected function processDataProviders(SubmissionDataSetInterface $submission): void
+    protected function processDataProviders(SubmissionDataSetInterface $submission, array $enabledDataProviders = ['*']): void
     {
         $dataProviders = $this->registry->getDataProviders($submission);
         foreach ($dataProviders as $dataProvider) {
+            $keyword = $dataProvider->getKeyword();
+
+            // check blacklist
+            if (in_array('!' . $keyword, $enabledDataProviders)) {
+                continue;
+            }
+
+            // check whitelist
+            if (!in_array('*', $enabledDataProviders) && !in_array($keyord, $enabledDataProviders)) {
+                continue;
+            }
+
             $dataProvider->addData();
         }
     }
@@ -69,7 +81,6 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
     {
         try {
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
-            $this->processDataProviders($submission);
 
             $routeName = $this->queueDataFactory->getJobRoute($job);
             $pass = $this->queueDataFactory->getJobRoutePass($job);
@@ -79,6 +90,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
                 throw new DigitalMarketingFrameworkException('route "' . $routeName . '" not found');
             }
 
+            $this->processDataProviders($submission, $route->getEnabledDataProviders());
             return $route->process();
 
         } catch (DigitalMarketingFrameworkException $e) {

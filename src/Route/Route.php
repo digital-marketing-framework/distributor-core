@@ -26,6 +26,9 @@ abstract class Route extends Plugin implements RouteInterface
     protected const DEFAULT_ASYNC = null;
     protected const DEFAULT_DISABLE_STORAGE = null;
 
+    protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
+    protected const DEFAULT_ENABLE_DATA_PROVIDERS = '*';
+
     public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" in pass %d.';
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" in pass %d.';
     public const MESSAGE_DISPATCHER_NOT_FOUND = 'No dispatcher found for route "%s" in pass %d.';
@@ -85,6 +88,15 @@ abstract class Route extends Plugin implements RouteInterface
         return $this->getConfig(RelayInterface::KEY_DISABLE_STORAGE);
     }
 
+    public function getEnabledDataProviders(): array
+    {
+        return GeneralUtility::castValueToArray(
+            $this->resolveContent(
+                $this->getConfig(static::KEY_ENABLE_DATA_PROVIDERS)
+            )
+        );
+    }
+
     public function addContext(ContextInterface $context): void
     {
     }
@@ -119,6 +131,7 @@ abstract class Route extends Plugin implements RouteInterface
             static::KEY_ENABLED => static::DEFAULT_ENABLED,
             RelayInterface::KEY_ASYNC => static::DEFAULT_ASYNC,
             RelayInterface::KEY_DISABLE_STORAGE => static::DEFAULT_DISABLE_STORAGE,
+            static::KEY_ENABLE_DATA_PROVIDERS => static::DEFAULT_ENABLE_DATA_PROVIDERS,
             static::KEY_GATE => static::DEFAULT_GATE,
             static::KEY_DATA => DataProcessor::getDefaultConfiguration(),
             // TODO: static::KEY_MARKETING_CONSENT => static::DEFAULT_MARKETING_CONSENT?
