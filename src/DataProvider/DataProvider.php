@@ -2,10 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContext;
-use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContextInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\Helper\ConfigurationResolverTrait;
 use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
@@ -14,7 +11,6 @@ use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 abstract class DataProvider extends Plugin implements DataProviderInterface
 {
     use ConfigurationTrait;
-    use ConfigurationResolverTrait;
 
     const KEY_ENABLED = 'enabled';
     const DEFAULT_ENABLED = false;
@@ -36,14 +32,6 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
 
     abstract protected function processContext(ContextInterface $context): void;
     abstract protected function process(): void;
-
-    protected function getConfigurationResolverContext(): ConfigurationResolverContextInterface
-    {
-        return new ConfigurationResolverContext(
-            $this->submission->getData(), 
-            ['configuration' => $this->submission->getConfiguration()]
-        );
-    }
 
     /**
      * Public information on whether the data provider is enabled.

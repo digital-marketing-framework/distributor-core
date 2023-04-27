@@ -2,13 +2,13 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
-use DigitalMarketingFramework\Core\Registry\Plugin\ConfigurationResolverRegistryInterface;
+use DigitalMarketingFramework\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\CorePluginInitialization;
 use DigitalMarketingFramework\Distributor\Core\DistributorPluginInitialization;
 
-trait ConfigurationResolverRegistryTestTrait // extends \DigitalMarketingFramework\Core\Tests\Integration\RegistryTestTrait
+trait DataProcessorRegistryTestTrait // extends \DigitalMarketingFramework\Core\Tests\Integration\RegistryTestTrait
 {
-    protected ConfigurationResolverRegistryInterface $registry;
+    protected RegistryInterface $registry;
 
     protected function initRegistry(): void
     {

@@ -6,6 +6,7 @@ use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\EvaluationIn
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
@@ -31,17 +32,12 @@ abstract class AbstractDataProviderTest extends TestCase
 
     protected WriteableContextInterface $submissionContext;
 
-    protected EvaluationInterface&MockObject $enabledEvaluation;
-
     protected DataProviderInterface $subject;
 
     public function setUp(): void
     {
         $this->registry = $this->createMock(RegistryInterface::class);
         $this->globalContext = $this->createMock(ContextInterface::class);
-
-        $this->enabledEvaluation = $this->createMock(EvaluationInterface::class);
-        $this->registry->expects($this->any())->method('getEvaluation')->willReturn($this->enabledEvaluation);
 
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);

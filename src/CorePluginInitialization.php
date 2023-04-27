@@ -2,11 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core;
 
-use DigitalMarketingFramework\Core\ConfigurationResolver\ContentResolver\ContentResolverInterface;
-use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\EvaluationInterface;
+use DigitalMarketingFramework\Core\DataProcessor\Evaluation\EvaluationInterface;
+use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterface;
 use DigitalMarketingFramework\Core\PluginInitialization;
-use DigitalMarketingFramework\Distributor\Core\ConfigurationResolver\ContentResolver\DiscreteMultiValueContentResolver;
-use DigitalMarketingFramework\Distributor\Core\ConfigurationResolver\Evaluation\GateEvaluation;
+use DigitalMarketingFramework\Distributor\Core\DataProcessor\Evaluation\GateEvaluation;
+use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 
 class CorePluginInitialization extends PluginInitialization
 {
@@ -14,8 +14,8 @@ class CorePluginInitialization extends PluginInitialization
         EvaluationInterface::class => [
             GateEvaluation::class,
         ],
-        ContentResolverInterface::class => [
-            DiscreteMultiValueContentResolver::class,
+        ValueSourceInterface::class => [
+            DiscreteMultiValueValueSource::class,
         ],
     ];
 }

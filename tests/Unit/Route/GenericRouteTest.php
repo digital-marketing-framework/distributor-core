@@ -2,10 +2,10 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Route;
 
-use DigitalMarketingFramework\Core\ConfigurationResolver\ContentResolver\GeneralContentResolver;
-use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\EvaluationInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
+use DigitalMarketingFramework\Core\DataProcessor\Evaluation\EvaluationInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
@@ -24,6 +24,8 @@ class GenericRouteTest extends TestCase
 {
     protected RegistryInterface&MockObject $registry;
 
+    protected DataProcessorInterface&MockObject $dataProcessor;
+
     protected ContextInterface&MockObject $globalContext;
 
     protected LoggerInterface&MockObject $logger;
@@ -38,10 +40,6 @@ class GenericRouteTest extends TestCase
 
     protected WriteableContextInterface&MockObject $submissionContext;
 
-    protected EvaluationInterface&MockObject $gateEvaluation;
-
-    protected GeneralContentResolver&MockObject $contentResolver;
-
     protected GenericRoute $subject;
 
     public function setUp(): void
@@ -50,11 +48,7 @@ class GenericRouteTest extends TestCase
         $this->globalContext = $this->createMock(ContextInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->gateEvaluation = $this->createMock(EvaluationInterface::class);
-        $this->registry->expects($this->any())->method('getEvaluation')->willReturn($this->gateEvaluation);
-
-        $this->contentResolver = $this->createMOck(GeneralContentResolver::class);
-        $this->registry->expects($this->any())->method('getContentResolver')->willReturn($this->contentResolver);
+        $this->dataProcessor = $this->createMock(DataProcessorInterface::class);
 
         $this->dataDispatcher = $this->createMock(DataDispatcherInterface::class);
 
@@ -77,6 +71,7 @@ class GenericRouteTest extends TestCase
             $useDispatcher ? $this->dataDispatcher : null
         );
         $this->subject->setLogger($this->logger);
+        $this->subject->setDataProcessor($this->dataProcessor);
     }
 
     /** @test */
@@ -99,7 +94,7 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassGateFails(): void
     {
-        $this->gateEvaluation->expects($this->once())->method('eval')->willReturn(false);
+        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(false);
         $this->logger->expects($this->once())->method('debug')->with(sprintf(Route::MESSAGE_GATE_FAILED, 'myCustomKeyword', 0));
 
         $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
@@ -114,7 +109,7 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassEmptyInputDataWillCauseException(): void
     {
-        $this->gateEvaluation->expects($this->once())->method('eval')->willReturn(true);
+        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
         $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
             'enabled' => true,
         ]);
@@ -129,7 +124,7 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassNoDispatcherWillCauseException(): void
     {
-        $this->gateEvaluation->expects($this->once())->method('eval')->willReturn(true);
+        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
         $this->submissionData['field1'] = 'value1';
 
         $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
@@ -139,11 +134,9 @@ class GenericRouteTest extends TestCase
             ],
         ]);
 
-        $this->contentResolver->expects($this->once())->method('resolve')->willReturn(
-            new Data([
-                'field1' => 'processedValue1',
-            ])
-        );
+        $this->dataProcessor->expects($this->once())->method('processDataMapper')->willReturn(new Data([
+            'field1' => 'processedValue1',
+        ]));
 
         $this->expectException(DigitalMarketingFrameworkException::class);
         $this->expectExceptionMessage(sprintf(Route::MESSAGE_DISPATCHER_NOT_FOUND, 'myCustomKeyword', 0));
@@ -155,7 +148,7 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassWithFieldConfigWillSendProcessedData(): void
     {
-        $this->gateEvaluation->expects($this->once())->method('eval')->willReturn(true);
+        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
         $this->submissionData['field1'] = 'value1';
         $this->submissionData['field2'] = 'value2';
 
@@ -167,7 +160,7 @@ class GenericRouteTest extends TestCase
             ],
         ]);
 
-        $this->contentResolver->expects($this->once())->method('resolve')->willReturn(new Data([
+        $this->dataProcessor->expects($this->once())->method('processDataMapper')->willReturn(new Data([
             'processedField1' => 'processedValue1',
             'processedField2' => 'processedValue2',
         ]));

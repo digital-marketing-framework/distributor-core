@@ -32,10 +32,7 @@ class RelayTest extends TestCase
         $this->addRouteSpy([
             'enabled' => true,
             'data' => [
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
-                ],
+                'passthroughFields' => ['enabled' => true]
             ],
         ]);
         $this->submissionData = [
@@ -47,8 +44,8 @@ class RelayTest extends TestCase
         $this->queue->expects($this->once())->method('markListAsPending');
         $this->queue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
-            'field1ext' => 'value1',
-            'field2ext' => 'value2',
+            'field1' => 'value1',
+            'field2' => 'value2',
         ]);
         $this->queue->expects($this->once())->method('markAsDone');
 
@@ -68,10 +65,7 @@ class RelayTest extends TestCase
         $this->addRouteSpy([
             'enabled' => true,
             'data' => [
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
-                ],
+                'passthroughFields' => ['enabled' => true],
             ],
         ]);
         $this->submissionData = [
@@ -83,8 +77,8 @@ class RelayTest extends TestCase
         $this->temporaryQueue->expects($this->once())->method('markListAsPending');
         $this->temporaryQueue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
-            'field1ext' => 'value1',
-            'field2ext' => 'value2',
+            'field1' => 'value1',
+            'field2' => 'value2',
         ]);
         $this->temporaryQueue->expects($this->once())->method('markAsDone');
 
@@ -104,10 +98,7 @@ class RelayTest extends TestCase
         $this->addRouteSpy([
             'enabled' => true,
             'data' => [
-                'fields' => [
-                    'field1ext' => [ 'field' => 'field1' ],
-                    'field2ext' => [ 'field' => 'field2' ],
-                ],
+                'passthroughFields' => ['enabled' => true],
             ],
         ]);
         $this->submissionData = [
@@ -166,7 +157,7 @@ class RelayTest extends TestCase
         $this->addRouteSpy([
             'enabled' => $routeEnabled,
             'data' => [
-                'fields' => [ 'field1ext' => 'constValue1', ],
+                'passthroughFields' => ['enabled' => true],
             ],
         ]);
         $this->addDataProviderSpy([
@@ -190,7 +181,7 @@ class RelayTest extends TestCase
         $this->addRouteSpy([
             'enabled' => true,
             'data' => [
-                'fields' => [ 'field1ext' => 'constValue1', ],
+                'passthroughFields' => ['enabled' => true],
             ],
             'passes' => [[], []],
         ]);
@@ -199,7 +190,7 @@ class RelayTest extends TestCase
         $this->queue->expects($this->once())->method('markListAsPending');
         $this->queue->expects($this->exactly(2))->method('markAsRunning');
         $this->routeSpy->expects($this->exactly(2))->method('send')->with([
-            'field1ext' => 'constValue1',
+            'field1' => 'value1',
         ]);
         $this->queue->expects($this->exactly(2))->method('markAsDone');
 
@@ -214,11 +205,11 @@ class RelayTest extends TestCase
         $this->addRouteSpy([
             'enabled' => true,
             'data' => [
-                'fields' => [ 'field1ext' => 'constValue1', ],
+                'passthroughFields' => ['enabled' => true],
             ],
             'passes' => [[], []],
         ]);
-        $this->submissionData = [ 'field1' => 'value1', ];
+        $this->submissionData = ['field1' => 'value1'];
         $this->queue->expects($this->exactly(2))->method('addJob');
         $this->queue->expects($this->never())->method('markListAsPending');
         $this->queue->expects($this->never())->method('markAsRunning');
@@ -241,16 +232,14 @@ class RelayTest extends TestCase
             [
                 'enabled' => true,
                 'data' => [
-                    'fields' => [
-                        'field1ext' => [ 'field' => 'field1' ],
-                        'field2ext' => [ 'field' => 'field2' ],
-                    ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->with([
-            'field1ext' => 'value1',
-            'field2ext' => 'value2',
+            'field1' => 'value1',
+            'field2' => 'value2',
+            'field3' => 'value3',
         ]);
         $result = $this->subject->processJob($job);
         $this->assertTrue($result);
@@ -286,24 +275,33 @@ class RelayTest extends TestCase
                 'enabled' => true,
                 'data' => [
                     'fields' => [
-                        'field1ext' => [ 'field' => 'field1' ],
-                        'field2ext' => [ 'field' => 'field2' ],
+                        'enabled' => true,
+                        'fields' => [
+                            'field1ext' => ['data' => [ 'type' => 'field', 'config' => [ 'field' => [ 'fieldName' => 'field1' ] ] ], 'modifiers' => []],
+                            'field2ext' => ['data' => [ 'type' => 'field', 'config' => [ 'field' => [ 'fieldName' => 'field2' ] ] ], 'modifiers' => []],
+                        ],
                     ],
                 ],
                 'passes' => [
                     [
                         'data' => [
                             'fields' => [
-                                'field1ext' => [ 'field' => 'field2' ],
-                                'field2ext' => [ 'field' => 'field1' ],
+                                'enabled' => true,
+                                'fields' => [
+                                    'field1ext' => ['data' => [ 'type' => 'field', 'config' => [ 'field' => [ 'fieldName' => 'field2' ] ] ], 'modifiers' => []],
+                                    'field2ext' => ['data' => [ 'type' => 'field', 'config' => [ 'field' => [ 'fieldName' => 'field1' ] ] ], 'modifiers' => []],
+                                ],
                             ],
                         ],
                     ],
                     [
                         'data' => [
                             'fields' => [
-                                'field1ext' => [ 'field' => 'field2' ],
-                                'field2ext' => [ 'field' => 'field3' ],
+                                'enabled' => true,
+                                'fields' => [
+                                    'field1ext' => ['data' => [ 'type' => 'field', 'config' => [ 'field' => [ 'fieldName' => 'field2' ] ] ], 'modifiers' => []],
+                                    'field2ext' => ['data' => [ 'type' => 'field', 'config' => [ 'field' => [ 'fieldName' => 'field3' ] ] ], 'modifiers' => []],
+                                ],
                             ],
                         ],
                     ],
@@ -328,10 +326,7 @@ class RelayTest extends TestCase
             [
                 'enabled' => false,
                 'data' => [
-                    'fields' => [
-                        'field1ext' => [ 'field' => 'field1' ],
-                        'field2ext' => [ 'field' => 'field2' ],
-                    ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ]
         );
@@ -352,13 +347,17 @@ class RelayTest extends TestCase
             [
                 'enabled' => true,
                 'gate' => [
-                    'field1' => 'value2',
+                    'type' => 'comparison',
+                    'config' => [
+                        'comparison' => [
+                            'type' => 'equals',
+                            'firstOperand' => ['data' => ['type' => 'field', 'config' => ['field' => ['fieldName' => 'field1']]], 'modifiers' => []],
+                            'secondOperand' => ['data' => ['type' => 'constant', 'config' => ['constant' => ['value' => 'value2']]], 'modifiers' => []],
+                        ],
+                    ],
                 ],
                 'data' => [
-                    'fields' => [
-                        'field1ext' => [ 'field' => 'field1' ],
-                        'field2ext' => [ 'field' => 'field2' ],
-                    ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ]
         );
@@ -379,13 +378,15 @@ class RelayTest extends TestCase
             [
                 'enabled' => true,
                 'gate' => [
-                    'gate' => 'route2',
+                    'type' => 'gate',
+                    'config' => [
+                        'gate' => [
+                            'key' => 'route2',
+                        ]
+                    ],
                 ],
                 'data' => [
-                    'fields' => [
-                        'field1ext' => [ 'field' => 'field1' ],
-                        'field2ext' => [ 'field' => 'field2' ],
-                    ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ],
             0,
@@ -400,8 +401,8 @@ class RelayTest extends TestCase
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->with([
-            'field1ext' => 'value1',
-            'field2ext' => 'value2',
+            'field1' => 'value1',
+            'field2' => 'value2',
         ]);
         $result = $this->subject->processJob($job);
         $this->assertTrue($result);
@@ -420,10 +421,7 @@ class RelayTest extends TestCase
             [
                 'enabled' => true,
                 'data' => [
-                    'fields' => [
-                        'field1ext' => [ 'field' => 'field1' ],
-                        'field2ext' => [ 'field' => 'field2' ],
-                    ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ]
         );
@@ -446,9 +444,7 @@ class RelayTest extends TestCase
             [
                 'enabled' => true,
                 'data' => [
-                    'fields' => [
-                        'field1ext' => 'constValue1',
-                    ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ],
             0,
@@ -463,7 +459,7 @@ class RelayTest extends TestCase
             ]
         );
         $this->dataProviderSpy->expects($this->once())->method('process');
-        $this->routeSpy->expects($this->once())->method('send')->with(['field1ext' => 'constValue1']);
+        $this->routeSpy->expects($this->once())->method('send')->with(['field1' => 'value1', 'field2' => 'value2']);
         $result = $this->subject->processJob($job);
         $this->assertTrue($result);
     }
@@ -481,7 +477,7 @@ class RelayTest extends TestCase
             [
                 'enabled' => true,
                 'data' => [
-                    'fields' => [ 'field1ext' => 'constValue1', ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ],
             0,
@@ -496,7 +492,7 @@ class RelayTest extends TestCase
             ]
         );
         $this->dataProviderSpy->expects($this->never())->method('process');
-        $this->routeSpy->expects($this->once())->method('send')->with(['field1ext' => 'constValue1']);
+        $this->routeSpy->expects($this->once())->method('send')->with(['field1' => 'value1', 'field2' => 'value2']);
         $result = $this->subject->processJob($job);
         $this->assertTrue($result);
     }
@@ -514,7 +510,7 @@ class RelayTest extends TestCase
             [
                 'enabled' => false,
                 'data' => [
-                    'fields' => [ 'field1ext' => 'constValue1', ],
+                    'passthroughFields' => ['enabled' => true],
                 ],
             ],
             0,
@@ -540,6 +536,9 @@ class RelayTest extends TestCase
             [ 'field1' => [ 'type' => 'string', 'value' => 'value1' ], ],
             [
                 'enabled' => true,
+                'data' => [
+                    'passthroughFields' => ['enabled' => false],
+                ],
             ]
         );
         $this->expectException(QueueException::class);

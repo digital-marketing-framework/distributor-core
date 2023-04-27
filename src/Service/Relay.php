@@ -69,7 +69,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             }
 
             // check whitelist
-            if (!in_array('*', $enabledDataProviders) && !in_array($keyord, $enabledDataProviders)) {
+            if (!in_array('*', $enabledDataProviders) && !in_array($keyword, $enabledDataProviders)) {
                 continue;
             }
 

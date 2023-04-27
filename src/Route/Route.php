@@ -2,15 +2,14 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
-use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContext;
-use DigitalMarketingFramework\Core\ConfigurationResolver\Context\ConfigurationResolverContextInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessor;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
-use DigitalMarketingFramework\Core\Helper\ConfigurationResolverTrait;
 use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
-use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Core\Service\DataProcessor;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -18,13 +17,13 @@ use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
 
-abstract class Route extends Plugin implements RouteInterface
+abstract class Route extends Plugin implements RouteInterface, DataProcessorAwareInterface
 {
     use ConfigurationTrait;
-    use ConfigurationResolverTrait;
+    use DataProcessorAwareTrait;
 
-    protected const DEFAULT_ASYNC = null;
-    protected const DEFAULT_DISABLE_STORAGE = null;
+    protected const DEFAULT_ASYNC = InheritableBooleanSchema::VALUE_INHERIT;
+    protected const DEFAULT_DISABLE_STORAGE = InheritableBooleanSchema::VALUE_INHERIT;
 
     protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
     protected const DEFAULT_ENABLE_DATA_PROVIDERS = '*';
@@ -43,29 +42,36 @@ abstract class Route extends Plugin implements RouteInterface
         $this->configuration = $this->submission->getConfiguration()->getRoutePassConfiguration($this->getKeyword(), $this->pass);
     }
 
-    protected function getConfigurationResolverContext(): ConfigurationResolverContextInterface
+    protected function buildData(): DataInterface
     {
-        return new ConfigurationResolverContext(
+        return $this->dataProcessor->processDataMapper(
+            $this->getConfig(static::KEY_DATA),
             $this->submission->getData(),
-            ['configuration' => $this->submission->getConfiguration()]
+            $this->submission->getConfiguration()
         );
     }
 
-    protected function buildData(): DataInterface
+    protected function getDataProcessorContext(): DataProcessorContextInterface
     {
-        $data = $this->resolveContent([
-            'dataMap' => $this->getConfig(static::KEY_DATA),
-        ]);
-        if (!$data instanceof DataInterface) {
-            $data = new Data();
-        }
-        return $data;
+        return $this->dataProcessor->createContext(
+            $this->submission->getData(),
+            $this->submission->getConfiguration()
+        );
     }
 
     protected function processGate(): bool
     {
-        return $this->enabled()
-            && $this->evaluate($this->getConfig(static::KEY_GATE));
+        if (!$this->enabled()) {
+            return false;
+        }
+        $gate = $this->getConfig(static::KEY_GATE);
+        if (empty($gate)) {
+            return true;
+        }
+        return $this->dataProcessor->processEvaluation(
+            $this->getConfig(static::KEY_GATE),
+            $this->getDataProcessorContext()
+        );
     }
 
     public function getPass(): int
@@ -80,20 +86,18 @@ abstract class Route extends Plugin implements RouteInterface
 
     public function async(): ?bool
     {
-        return $this->getConfig(RelayInterface::KEY_ASYNC);
+        return InheritableBooleanSchema::convert($this->getConfig(RelayInterface::KEY_ASYNC));
     }
 
     public function disableStorage(): ?bool
     {
-        return $this->getConfig(RelayInterface::KEY_DISABLE_STORAGE);
+        return InheritableBooleanSchema::convert($this->getConfig(RelayInterface::KEY_DISABLE_STORAGE));
     }
 
     public function getEnabledDataProviders(): array
     {
         return GeneralUtility::castValueToArray(
-            $this->resolveContent(
-                $this->getConfig(static::KEY_ENABLE_DATA_PROVIDERS)
-            )
+            $this->getConfig(static::KEY_ENABLE_DATA_PROVIDERS)
         );
     }
 
@@ -132,8 +136,8 @@ abstract class Route extends Plugin implements RouteInterface
             RelayInterface::KEY_ASYNC => static::DEFAULT_ASYNC,
             RelayInterface::KEY_DISABLE_STORAGE => static::DEFAULT_DISABLE_STORAGE,
             static::KEY_ENABLE_DATA_PROVIDERS => static::DEFAULT_ENABLE_DATA_PROVIDERS,
-            static::KEY_GATE => static::DEFAULT_GATE,
-            static::KEY_DATA => DataProcessor::getDefaultConfiguration(),
+            static::KEY_GATE => DataProcessor::getDefaultEvaluationConfiguration(),
+            static::KEY_DATA => DataProcessor::getDefaultDataMapperConfiguration(),
             // TODO: static::KEY_MARKETING_CONSENT => static::DEFAULT_MARKETING_CONSENT?
         ];
     }
