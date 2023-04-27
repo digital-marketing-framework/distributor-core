@@ -2,6 +2,14 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\DataMapperSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\EvaluationSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessor;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
@@ -140,5 +148,20 @@ abstract class Route extends Plugin implements RouteInterface, DataProcessorAwar
             static::KEY_DATA => DataProcessor::getDefaultDataMapperConfiguration(),
             // TODO: static::KEY_MARKETING_CONSENT => static::DEFAULT_MARKETING_CONSENT?
         ];
+    }
+
+    public static function getSchema(): SchemaInterface
+    {
+        $schema = new ContainerSchema();
+        $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
+
+        $schema->addProperty(RelayInterface::KEY_ASYNC, new InheritableBooleanSchema());
+        $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new InheritableBooleanSchema());
+
+        $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, new StringSchema(static::DEFAULT_ENABLE_DATA_PROVIDERS));
+        $schema->addProperty(static::KEY_GATE, new CustomSchema(EvaluationSchema::TYPE));
+        $schema->addProperty(static::KEY_DATA, new CustomSchema(DataMapperSchema::TYPE));
+
+        return $schema;
     }
 }

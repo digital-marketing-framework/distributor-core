@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
@@ -21,4 +22,5 @@ interface RouteRegistryInterface extends PluginRegistryInterface
      * @return array<mixed>
      */
     public function getRouteDefaultConfigurations(): array;
+    public function getRouteSchema(): SchemaInterface;
 }

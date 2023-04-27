@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Plugin\PluginInterface;
@@ -31,4 +32,5 @@ interface RouteInterface extends PluginInterface
     public function addContext(ContextInterface $context): void;
 
     public static function getDefaultConfiguration(): array;
+    public static function getSchema(): SchemaInterface;
 }

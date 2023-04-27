@@ -2,7 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\Route\RouteSchema;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 
@@ -47,5 +49,10 @@ trait RouteRegistryTrait
             $result[$key] = $class::getDefaultConfiguration();
         }
         return $result;
+    }
+
+    public function getRouteSchema(): SchemaInterface
+    {
+        return new RouteSchema($this);
     }
 }

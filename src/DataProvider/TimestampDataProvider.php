@@ -2,6 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class TimestampDataProvider extends DataProvider
@@ -33,5 +36,14 @@ class TimestampDataProvider extends DataProvider
             static::KEY_FIELD => static::DEFAULT_FIELD,
             static::KEY_FORMAT => static::DEFAULT_FORMAT,
         ];
+    }
+
+    public static function getSchema(): SchemaInterface
+    {
+        /** @var ContainerSchema $schema */
+        $schema = parent::getSchema();
+        $schema->addProperty(static::KEY_FIELD, new StringSchema(static::DEFAULT_FIELD));
+        $schema->addProperty(static::KEY_FORMAT, new StringSchema(static::DEFAULT_FORMAT));
+        return $schema;
     }
 }

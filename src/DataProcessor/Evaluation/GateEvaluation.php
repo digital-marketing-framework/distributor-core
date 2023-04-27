@@ -2,6 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProcessor\Evaluation;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Core\DataProcessor\Evaluation\Evaluation;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
@@ -119,5 +122,13 @@ class GateEvaluation extends Evaluation
             static::KEY_KEY => static::DEFAULT_KEY,
             static::KEY_PASS => static::DEFAULT_PASS,
         ];
+    }
+
+    public static function getSchema(): SchemaInterface
+    {
+        $schema = new ContainerSchema();
+        $schema->addProperty(static::KEY_KEY, new StringSchema(static::DEFAULT_KEY));
+        $schema->addProperty(static::KEY_PASS, new StringSchema(static::DEFAULT_PASS));
+        return $schema;
     }
 }

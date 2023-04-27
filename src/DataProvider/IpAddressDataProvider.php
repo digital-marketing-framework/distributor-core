@@ -2,6 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class IpAddressDataProvider extends DataProvider
@@ -27,5 +30,13 @@ class IpAddressDataProvider extends DataProvider
         return parent::getDefaultConfiguration() + [
             static::KEY_FIELD => static::DEFAULT_FIELD,
         ];
+    }
+
+    public static function getSchema(): SchemaInterface
+    {
+        /** @var ContainerSchema $schema */
+        $schema = parent::getSchema();
+        $schema->addProperty(static::KEY_FIELD, new StringSchema(static::DEFAULT_FIELD));
+        return $schema;
     }
 }

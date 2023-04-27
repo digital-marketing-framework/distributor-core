@@ -2,7 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProvider\DataProviderSchema;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 
@@ -37,5 +39,10 @@ trait DataProviderRegistryTrait
             $result[$key] = $class::getDefaultConfiguration();
         }
         return $result;
+    }
+
+    public function getDataProviderSchema(): SchemaInterface
+    {
+        return new DataProviderSchema($this);
     }
 }

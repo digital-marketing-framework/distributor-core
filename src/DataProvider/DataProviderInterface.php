@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Plugin\PluginInterface;
 
@@ -12,4 +13,5 @@ interface DataProviderInterface extends PluginInterface
     public function addData(): void;
 
     public static function getDefaultConfiguration(): array;
+    public static function getSchema(): SchemaInterface;
 }

@@ -2,6 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -112,5 +115,14 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
             static::KEY_MUST_EXIST => static::DEFAULT_MUST_EXIST,
             static::KEY_MUST_BE_EMPTY => static::DEFAULT_MUST_BE_EMPTY,
         ];
+    }
+
+    public static function getSchema(): SchemaInterface
+    {
+        $schema = new ContainerSchema();
+        $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
+        $schema->addProperty(static::KEY_MUST_EXIST, new BooleanSchema(static::DEFAULT_MUST_EXIST));
+        $schema->addProperty(static::KEY_MUST_BE_EMPTY, new BooleanSchema(static::DEFAULT_MUST_BE_EMPTY));
+        return $schema;
     }
 }
