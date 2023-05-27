@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
@@ -37,26 +38,18 @@ class Registry extends CoreRegistry implements RegistryInterface
         return $this->createObject(Relay::class, [$this]);
     }
 
-    public function getDistributorDefaultConfiguration(): array
-    {
-        $defaultDistributorConfiguration = Relay::getDefaultConfiguration();
-        $defaultDistributorConfiguration[SubmissionConfigurationInterface::KEY_DATA_PROVIDERS] = $this->getDataProviderDefaultConfigurations();
-        $defaultDistributorConfiguration[SubmissionConfigurationInterface::KEY_ROUTES] = $this->getRouteDefaultConfigurations();
-        return $defaultDistributorConfiguration;
-    }
-
-    public function addDefaultConfiguration(array &$configuration): void
-    {
-        parent::addDefaultConfiguration($configuration);
-        $configuration[SubmissionConfigurationInterface::KEY_DISTRIBUTOR] = $this->getDistributorDefaultConfiguration();
-    }
-
     public function addConfigurationSchema(SchemaDocument $schemaDocument): void
     {
         parent::addConfigurationSchema($schemaDocument);
 
         $distributorSchema = new ContainerSchema();
-        $distributorSchema->addProperty(SubmissionConfiguration::KEY_ROUTES, $this->getRouteSchema());
+
+        $distributorSchema->addProperty('async', new BooleanSchema(false));
+        $distributorSchema->addProperty('disableStorage', new BooleanSchema(false));
+
+        $routeListSchema = $this->getRoutesSchema($schemaDocument);
+        $distributorSchema->addProperty(SubmissionConfiguration::KEY_ROUTES, $routeListSchema);
+
         $distributorSchema->addProperty(SubmissionConfiguration::KEY_DATA_PROVIDERS, $this->getDataProviderSchema());
 
         $schemaDocument->getMainSchema()->addProperty(SubmissionConfigurationInterface::KEY_DISTRIBUTOR, $distributorSchema);

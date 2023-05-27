@@ -82,12 +82,10 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         try {
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
 
-            $routeName = $this->queueDataFactory->getJobRoute($job);
-            $pass = $this->queueDataFactory->getJobRoutePass($job);
-
-            $route = $this->registry->getRoute($routeName, $submission, $pass);
+            $index = $this->queueDataFactory->getJobIndex($job);
+            $route = $this->registry->getRoute($submission, $index);
             if ($route === null) {
-                throw new DigitalMarketingFrameworkException('route "' . $routeName . '" not found');
+                throw new DigitalMarketingFrameworkException(sprintf('route with index "%d" not found', $index));
             }
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders());
@@ -108,13 +106,11 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         $routes = $this->registry->getRoutes($submission);
         $distributorConfiguration = $submission->getConfiguration()->getDistributorConfiguration();
 
-        foreach ($routes as $route) {
+        foreach ($routes as $index => $route) {
             if (!$route->enabled()) {
                 continue;
             }
 
-            $routeName = $route->getKeyword();
-            $pass = $route->getPass();
             $async = $route->async() ?? $distributorConfiguration[static::KEY_ASYNC] ?? static::DEFAULT_ASYNC;
             $disableStorage = $route->disableStorage() ?? $distributorConfiguration[static::KEY_DISABLE_STORAGE] ?? static::DEFAULT_DISABLE_STORAGE;
 
@@ -126,7 +122,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             $status = $async ? QueueInterface::STATUS_QUEUED : QueueInterface::STATUS_PENDING;
             $queue = $disableStorage ? $this->temporaryQueue : $this->persistentQueue;
 
-            $job = $this->queueDataFactory->convertSubmissionToJob($submission, $routeName, $pass, $status);
+            $job = $this->queueDataFactory->convertSubmissionToJob($submission, $index, $status);
             $queue->addJob($job);
             if (!$async) {
                 if ($disableStorage) {

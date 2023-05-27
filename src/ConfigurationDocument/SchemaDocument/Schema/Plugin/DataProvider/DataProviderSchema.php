@@ -2,24 +2,16 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProvider;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\PluginSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
-use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 
-class DataProviderSchema extends PluginSchema
+class DataProviderSchema extends ContainerSchema
 {
-    public function addDataProvider(string $keyword, SchemaInterface $schema): void
+    public const VALUE_SET_ROUTE_KEYWORDS = 'dataProvider/all';
+
+    public function addItem(string $keyword, SchemaInterface $schema): void
     {
+        $this->valueSets[static::VALUE_SET_ROUTE_KEYWORDS][] = $keyword;
         $this->addProperty($keyword, $schema);
-    }
-
-    protected function getPluginInterface(): string
-    {
-        return DataProviderInterface::class;
-    }
-
-    protected function processPlugin(string $keyword, string $class): void
-    {
-        $this->addDataProvider($keyword, $class::getSchema());
     }
 }

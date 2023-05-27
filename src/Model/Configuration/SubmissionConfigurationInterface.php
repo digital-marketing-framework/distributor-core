@@ -14,13 +14,14 @@ interface SubmissionConfigurationInterface extends ConfigurationInterface
 
     public function getDistributorConfiguration(): array;
 
-    public function getWithRoutePassOverride(string $key, string $route, int $pass, $default = null): mixed;
-
-    public function dataProviderExists(string $dataProviderName): bool;
     public function getDataProviderConfiguration(string $dataProviderName): array;
 
-    public function routePassExists(string $routeName, int $pass): bool;
-    public function getRoutePassCount(string $routeName): int;
-    public function getRoutePassConfiguration(string $routeName, int $pass): array;
-    public function getRoutePassLabel(string $routeName, int $pass): string;
+    /**
+     * @return array<array<int,string|int>>
+     * array<int,array{keyword: string, pass: int, name: string, configuration: array<mixed>}>
+     */
+    public function getRoutePasses(): array;
+    public function getRoutePassData(int $index): array;
+    public function getRoutePassConfiguration(int $index): array;
+    public function getRoutePassLabel(int $index): string;
 }

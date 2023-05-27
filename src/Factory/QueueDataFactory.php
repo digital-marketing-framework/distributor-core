@@ -14,15 +14,8 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 
 class QueueDataFactory implements QueueDataFactoryInterface
 {
-    const KEY_ROUTE = 'route';
-    const DEFAULT_ROUTE = 'undefined';
-
-    const KEY_PASS = 'pass';
-    const DEFAULT_PASS = 0;
-
+    const KEY_INDEX = 'index';
     const KEY_SUBMISSION = 'submission';
-    const DEFAULT_SUBMISSION = [];
-
     const DEFAULT_LABEL = 'undefined';
 
     public function __construct(
@@ -50,65 +43,66 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $this->getSubmissionDataHash($this->getJobSubmissionData($job));
     }
 
-    protected function getSubmissionDataLabel(array $submissionData, string $route, int $pass, string $hash = ''): string
+    protected function getSubmissionDataLabel(array $submissionData, int $index, string $hash = ''): string
     {
         if (!$hash) {
             $hash = $this->getSubmissionDataHash($submissionData);
         }
         try {
             $submission = $this->unpack($submissionData);
-            return $this->getSubmissionLabel($submission, $route, $pass, $hash);
+            return $this->getSubmissionLabel($submission, $index, $hash);
         } catch (DigitalMarketingFrameworkException) {
             return static::DEFAULT_LABEL;
         }
     }
 
-    public function getSubmissionLabel(SubmissionDataSetInterface $submission, string $route, int $pass, string $hash = ''): string
+    public function getSubmissionLabel(SubmissionDataSetInterface $submission, int $index, string $hash = ''): string
     {
-        if (!$hash) {
+        if ($hash === '') {
             $hash = $this->getSubmissionHash($submission);
         }
         return GeneralUtility::shortenHash($hash)
-            . '#' . $submission->getConfiguration()->getRoutePassLabel($route, $pass);
+            . '#' . $submission->getConfiguration()->getRoutePassLabel($index);
     }
 
     public function getJobLabel(JobInterface $job): string
     {
         return $this->getSubmissionDataLabel(
             $this->getJobSubmissionData($job),
-            $this->getJobRoute($job),
-            $this->getJobRoutePass($job),
+            $this->getJobIndex($job),
             $job->getHash()
         );
     }
 
     protected function getJobSubmissionData(JobInterface $job): array
     {
-        return $job->getData()[static::KEY_SUBMISSION] ?? static::DEFAULT_SUBMISSION;
+        $jobData = $job->getData();
+        if (!isset($jobData[static::KEY_SUBMISSION])) {
+            throw new DigitalMarketingFrameworkException('job does not seem to have submission data');
+        }
+        return $jobData[static::KEY_SUBMISSION];
     }
 
-    public function getJobRoutePass(JobInterface $job): int
+    public function getJobIndex(JobInterface $job): int
     {
-        return $job->getData()[static::KEY_PASS] ?? static::DEFAULT_PASS;
+        $jobData = $job->getData();
+        if (!isset($jobData[static::KEY_INDEX])) {
+            throw new DigitalMarketingFrameworkException('job does not seem to have a route index');
+        }
+        return $jobData[static::KEY_INDEX];
     }
 
-    public function getJobRoute(JobInterface $job): string
-    {
-        return $job->getData()[static::KEY_ROUTE] ?? static::DEFAULT_ROUTE;
-    }
-
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $route, int $pass, int $status = QueueInterface::STATUS_QUEUED): JobInterface
+    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, int $index, int $status = QueueInterface::STATUS_QUEUED): JobInterface
     {
         $submissionData = $this->pack($submission);
         $job = $this->createJob();
         $job->setStatus($status);
         $job->setData([
-            static::KEY_ROUTE => $route,
-            static::KEY_PASS => $pass,
+            static::KEY_INDEX => $index,
             static::KEY_SUBMISSION => $submissionData,
         ]);
         $job->setHash($this->getSubmissionDataHash($submissionData));
-        $job->setLabel($this->getSubmissionLabel($submission, $route, $pass, $job->getHash()));
+        $job->setLabel($this->getSubmissionLabel($submission, $index, $job->getHash()));
         return $job;
     }
 

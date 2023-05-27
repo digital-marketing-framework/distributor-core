@@ -11,23 +11,20 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\P
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\DataProcessor\DataProcessor;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
-use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
+use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
 
-abstract class Route extends Plugin implements RouteInterface, DataProcessorAwareInterface
+abstract class Route extends ConfigurablePlugin implements RouteInterface, DataProcessorAwareInterface
 {
-    use ConfigurationTrait;
     use DataProcessorAwareTrait;
 
     protected const DEFAULT_ASYNC = InheritableBooleanSchema::VALUE_INHERIT;
@@ -36,18 +33,18 @@ abstract class Route extends Plugin implements RouteInterface, DataProcessorAwar
     protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
     protected const DEFAULT_ENABLE_DATA_PROVIDERS = '*';
 
-    public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" in pass %d.';
-    public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" in pass %d.';
-    public const MESSAGE_DISPATCHER_NOT_FOUND = 'No dispatcher found for route "%s" in pass %d.';
+    public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with index %d.';
+    public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with index %d.';
+    public const MESSAGE_DISPATCHER_NOT_FOUND = 'No dispatcher found for route "%s" with index %d.';
 
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
         protected SubmissionDataSetInterface $submission,
-        protected int $pass,
+        protected int $index,
     ) {
         parent::__construct($keyword, $registry);
-        $this->configuration = $this->submission->getConfiguration()->getRoutePassConfiguration($this->getKeyword(), $this->pass);
+        $this->configuration = $this->submission->getConfiguration()->getRoutePassConfiguration($this->index);
     }
 
     protected function buildData(): DataInterface
@@ -82,9 +79,9 @@ abstract class Route extends Plugin implements RouteInterface, DataProcessorAwar
         );
     }
 
-    public function getPass(): int
+    public function getIndex(): int
     {
-        return $this->pass;
+        return $this->index;
     }
 
     public function enabled(): bool
@@ -116,19 +113,19 @@ abstract class Route extends Plugin implements RouteInterface, DataProcessorAwar
     public function process(): bool
     {
         if (!$this->processGate()) {
-            $this->logger->debug(sprintf(static::MESSAGE_GATE_FAILED, $this->getKeyword(), $this->pass));
+            $this->logger->debug(sprintf(static::MESSAGE_GATE_FAILED, $this->getKeyword(), $this->index));
             return false;
         }
 
         $data = $this->buildData();
 
         if (GeneralUtility::isEmpty($data)) {
-            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->pass));
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->index));
         }
 
         $dataDispatcher = $this->getDispatcher();
         if (!$dataDispatcher) {
-            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DISPATCHER_NOT_FOUND, $this->getKeyword(), $this->pass));
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DISPATCHER_NOT_FOUND, $this->getKeyword(), $this->index));
         }
 
         $dataDispatcher->send($data->toArray());
@@ -136,19 +133,6 @@ abstract class Route extends Plugin implements RouteInterface, DataProcessorAwar
     }
 
     abstract protected function getDispatcher(): ?DataDispatcherInterface;
-
-    public static function getDefaultConfiguration(): array
-    {
-        return [
-            static::KEY_ENABLED => static::DEFAULT_ENABLED,
-            RelayInterface::KEY_ASYNC => static::DEFAULT_ASYNC,
-            RelayInterface::KEY_DISABLE_STORAGE => static::DEFAULT_DISABLE_STORAGE,
-            static::KEY_ENABLE_DATA_PROVIDERS => static::DEFAULT_ENABLE_DATA_PROVIDERS,
-            static::KEY_GATE => DataProcessor::getDefaultEvaluationConfiguration(),
-            static::KEY_DATA => DataProcessor::getDefaultDataMapperConfiguration(),
-            // TODO: static::KEY_MARKETING_CONSENT => static::DEFAULT_MARKETING_CONSENT?
-        ];
-    }
 
     public static function getSchema(): SchemaInterface
     {
@@ -161,6 +145,8 @@ abstract class Route extends Plugin implements RouteInterface, DataProcessorAwar
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, new StringSchema(static::DEFAULT_ENABLE_DATA_PROVIDERS));
         $schema->addProperty(static::KEY_GATE, new CustomSchema(EvaluationSchema::TYPE));
         $schema->addProperty(static::KEY_DATA, new CustomSchema(DataMapperSchema::TYPE));
+
+        // TODO gdpr should not be handled in the gate. we need a dedicated service for that
 
         return $schema;
     }

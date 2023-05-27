@@ -2,10 +2,10 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Plugin;
 
-use DigitalMarketingFramework\Core\Plugin\Plugin as CorePlugin;
+use DigitalMarketingFramework\Core\Plugin\ConfigurablePlugin as CoreConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class Plugin extends CorePlugin
+abstract class ConfigurablePlugin extends CoreConfigurablePlugin
 {
     public function __construct(
         string $keyword,

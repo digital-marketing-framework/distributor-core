@@ -16,7 +16,7 @@ trait DataProviderRegistryTrait
     {
         $this->registerPlugin(DataProviderInterface::class, $class, $additionalArguments, $keyword);
     }
-    
+
     public function getDataProvider(string $keyword, SubmissionDataSetInterface $submission): ?DataProviderInterface
     {
         return $this->getPlugin($keyword, DataProviderInterface::class, [$submission]);
@@ -32,17 +32,12 @@ trait DataProviderRegistryTrait
         $this->deletePlugin($keyword, DataProviderInterface::class);
     }
 
-    public function getDataProviderDefaultConfigurations(): array
-    {
-        $result = [];
-        foreach ($this->pluginClasses[DataProviderInterface::class] ?? [] as $key => $class) {
-            $result[$key] = $class::getDefaultConfiguration();
-        }
-        return $result;
-    }
-
     public function getDataProviderSchema(): SchemaInterface
     {
-        return new DataProviderSchema($this);
+        $schema = new DataProviderSchema();
+        foreach ($this->pluginClasses[DataProviderInterface::class] ?? [] as $key => $class) {
+            $schema->addItem($key, $class::getSchema());
+        }
+        return $schema;
     }
 }

@@ -2,12 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
-use DigitalMarketingFramework\Core\Plugin\PluginInterface;
+use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 
-interface RouteInterface extends PluginInterface
+interface RouteInterface extends ConfigurablePluginInterface
 {
     public const KEY_ENABLED = 'enabled';
     public const DEFAULT_ENABLED = false;
@@ -17,7 +16,7 @@ interface RouteInterface extends PluginInterface
 
     public const KEY_DATA = 'data';
 
-    public function getPass(): int;
+    public function getIndex(): int;
 
     public function enabled(): bool;
     public function async(): ?bool;
@@ -30,7 +29,4 @@ interface RouteInterface extends PluginInterface
     public function process(): bool;
 
     public function addContext(ContextInterface $context): void;
-
-    public static function getDefaultConfiguration(): array;
-    public static function getSchema(): SchemaInterface;
 }

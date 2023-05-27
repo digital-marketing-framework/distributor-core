@@ -2,24 +2,21 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\Route;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\PluginSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
-use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SwitchSchema;
 
-class RouteSchema extends PluginSchema
+class RouteSchema extends SwitchSchema
 {
-    public function addRoute(string $keyword, SchemaInterface $schema): void
+    public const TYPE = 'ROUTE';
+
+    public function __construct(mixed $defaultValue = null)
     {
-        $this->addProperty($keyword, $schema);
+        parent::__construct($defaultValue);
+        $this->addProperty('pass', new StringSchema());
     }
 
-    protected function getPluginInterface(): string
+    protected function getSwitchName(): string
     {
-        return RouteInterface::class;
-    }
-
-    protected function processPlugin(string $keyword, string $class): void
-    {
-        $this->addRoute($keyword, $class::getSchema());
+        return 'route';
     }
 }

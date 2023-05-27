@@ -10,17 +10,13 @@ use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 interface RouteRegistryInterface extends PluginRegistryInterface
 {
     public function registerRoute(string $class, array $additionalArguments = [], string $keyword = ''): void;
-    
+
     /**
      * @return array<RouteInterface>
      */
     public function getRoutes(SubmissionDataSetInterface $submission): array;
-    public function getRoute(string $keyword, SubmissionDataSetInterface $submission, int $pass): ?RouteInterface;
+    public function getRoute(SubmissionDataSetInterface $submission, int $index): ?RouteInterface;
     public function deleteRoute(string $keyword): void;
-    
-    /**
-     * @return array<mixed>
-     */
-    public function getRouteDefaultConfigurations(): array;
+
     public function getRouteSchema(): SchemaInterface;
 }

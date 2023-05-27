@@ -13,7 +13,6 @@ interface DataProviderRegistryInterface extends PluginRegistryInterface
     public function getDataProvider(string $keyword, SubmissionDataSetInterface $submission): ?DataProviderInterface;
     public function getDataProviders(SubmissionDataSetInterface $submission): array;
     public function deleteDataProvider(string $keyword): void;
-    
-    public function getDataProviderDefaultConfigurations(): array;
+
     public function getDataProviderSchema(): SchemaInterface;
 }
