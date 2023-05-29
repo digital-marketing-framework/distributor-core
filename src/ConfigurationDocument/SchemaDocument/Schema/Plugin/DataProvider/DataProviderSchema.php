@@ -11,7 +11,7 @@ class DataProviderSchema extends ContainerSchema
 
     public function addItem(string $keyword, SchemaInterface $schema): void
     {
-        $this->valueSets[static::VALUE_SET_ROUTE_KEYWORDS][] = $keyword;
+        $this->addValueToValueSet(static::VALUE_SET_ROUTE_KEYWORDS, $keyword);
         $this->addProperty($keyword, $schema);
     }
 }

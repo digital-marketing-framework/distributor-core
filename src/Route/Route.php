@@ -143,7 +143,11 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new InheritableBooleanSchema());
 
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, new StringSchema(static::DEFAULT_ENABLE_DATA_PROVIDERS));
-        $schema->addProperty(static::KEY_GATE, new CustomSchema(EvaluationSchema::TYPE));
+
+        $gateSchema = new CustomSchema(EvaluationSchema::TYPE);
+        $gateSchema->getRenderingDefinition()->setNavigationItem(true);
+        $schema->addProperty(static::KEY_GATE, $gateSchema);
+
         $schema->addProperty(static::KEY_DATA, new CustomSchema(DataMapperSchema::TYPE));
 
         // TODO gdpr should not be handled in the gate. we need a dedicated service for that

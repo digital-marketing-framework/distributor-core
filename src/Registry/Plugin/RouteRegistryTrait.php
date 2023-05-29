@@ -6,7 +6,6 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\C
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ListSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\SchemaDocument;
-use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\Route\RouteSchema;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -87,6 +86,9 @@ trait RouteRegistryTrait
         $schemaDocument->addCustomType($routeSchema, RouteSchema::TYPE);
 
         $routeListSchema = new ListSchema(new CustomSchema(RouteSchema::TYPE));
+        // TODO rather let the list fetch the value from the item underneath itself
+        //      though this will be complicated because the underlying item is a switch container
+        $routeListSchema->getValueSchema()->getRenderingDefinition()->setLabel('ROUTE');
         $routeListDefaultValue = $this->getRouteListDefaultValue($schemaDocument);
         $routeListSchema->setDefaultValue($routeListDefaultValue);
 
