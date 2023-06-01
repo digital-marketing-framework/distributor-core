@@ -32,18 +32,13 @@ class CookieDataProvider extends DataProvider
         }
     }
 
-    public static function getDefaultConfiguration(): array
-    {
-        return parent::getDefaultConfiguration() + [
-            static::KEY_COOKIE_FIELD_MAP => static::DEFAULT_COOKIE_FIELD_MAP,
-        ];
-    }
-
     public static function getSchema(): SchemaInterface
     {
         /** @var ContainerSchema $schema */
         $schema = parent::getSchema();
-        $schema->addProperty(static::KEY_COOKIE_FIELD_MAP, new MapSchema(new StringSchema()));
+        $cookieMapSchema = new MapSchema(new StringSchema());
+        $cookieMapSchema->getRenderingDefinition()->setNavigationItem(false);
+        $schema->addProperty(static::KEY_COOKIE_FIELD_MAP, $cookieMapSchema);
         return $schema;
     }
 }

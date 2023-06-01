@@ -32,18 +32,13 @@ class RequestVariablesDataProvider extends DataProvider
         }
     }
 
-    public static function getDefaultConfiguration(): array
-    {
-        return parent::getDefaultConfiguration() + [
-            static::KEY_VARIABLE_FIELD_MAP => static::DEFAULT_VARIABLE_FIELD_MAP,
-        ];
-    }
-
     public static function getSchema(): SchemaInterface
     {
         /** @var ContainerSchema $schema */
         $schema = parent::getSchema();
-        $schema->addProperty(static::KEY_VARIABLE_FIELD_MAP, new MapSchema(new StringSchema()));
+        $variableMapSchema = new MapSchema(new StringSchema('fieldName'), new StringSchema('variableName'));
+        $variableMapSchema->getRenderingDefinition()->setNavigationItem(false);
+        $schema->addProperty(static::KEY_VARIABLE_FIELD_MAP, $variableMapSchema);
         return $schema;
     }
 }

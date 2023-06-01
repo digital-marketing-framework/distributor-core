@@ -144,9 +144,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, new StringSchema(static::DEFAULT_ENABLE_DATA_PROVIDERS));
 
-        $gateSchema = new CustomSchema(EvaluationSchema::TYPE);
-        $gateSchema->getRenderingDefinition()->setNavigationItem(true);
-        $schema->addProperty(static::KEY_GATE, $gateSchema);
+        $schema->addProperty(static::KEY_GATE, new CustomSchema(EvaluationSchema::TYPE));
 
         $schema->addProperty(static::KEY_DATA, new CustomSchema(DataMapperSchema::TYPE));
 

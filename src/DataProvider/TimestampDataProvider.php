@@ -30,14 +30,6 @@ class TimestampDataProvider extends DataProvider
         }
     }
 
-    public static function getDefaultConfiguration(): array
-    {
-        return parent::getDefaultConfiguration() + [
-            static::KEY_FIELD => static::DEFAULT_FIELD,
-            static::KEY_FORMAT => static::DEFAULT_FORMAT,
-        ];
-    }
-
     public static function getSchema(): SchemaInterface
     {
         /** @var ContainerSchema $schema */

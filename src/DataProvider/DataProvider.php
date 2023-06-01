@@ -6,15 +6,12 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\B
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\Helper\ConfigurationTrait;
+use DigitalMarketingFramework\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class DataProvider extends Plugin implements DataProviderInterface
+abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface
 {
-    use ConfigurationTrait;
-
     const KEY_ENABLED = 'enabled';
     const DEFAULT_ENABLED = false;
 
@@ -25,7 +22,7 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
     const DEFAULT_MUST_BE_EMPTY = true;
 
     public function __construct(
-        string $keyword, 
+        string $keyword,
         RegistryInterface $registry,
         protected SubmissionDataSetInterface $submission
     ) {
@@ -106,15 +103,6 @@ abstract class DataProvider extends Plugin implements DataProviderInterface
         if ($this->enabled()) {
             $this->processContext($context);
         }
-    }
-
-    public static function getDefaultConfiguration(): array
-    {
-        return [
-            static::KEY_ENABLED => static::DEFAULT_ENABLED,
-            static::KEY_MUST_EXIST => static::DEFAULT_MUST_EXIST,
-            static::KEY_MUST_BE_EMPTY => static::DEFAULT_MUST_BE_EMPTY,
-        ];
     }
 
     public static function getSchema(): SchemaInterface

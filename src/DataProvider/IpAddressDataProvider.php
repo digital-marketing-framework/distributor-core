@@ -25,13 +25,6 @@ class IpAddressDataProvider extends DataProvider
         }
     }
 
-    public static function getDefaultConfiguration(): array
-    {
-        return parent::getDefaultConfiguration() + [
-            static::KEY_FIELD => static::DEFAULT_FIELD,
-        ];
-    }
-
     public static function getSchema(): SchemaInterface
     {
         /** @var ContainerSchema $schema */
