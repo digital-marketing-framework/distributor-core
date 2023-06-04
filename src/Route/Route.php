@@ -137,6 +137,8 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     public static function getSchema(): SchemaInterface
     {
         $schema = new ContainerSchema();
+        $schema->getRenderingDefinition()->setNavigationItem(false);
+
         $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
 
         $schema->addProperty(RelayInterface::KEY_ASYNC, new InheritableBooleanSchema());
@@ -144,7 +146,9 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, new StringSchema(static::DEFAULT_ENABLE_DATA_PROVIDERS));
 
-        $schema->addProperty(static::KEY_GATE, new CustomSchema(EvaluationSchema::TYPE));
+        $gateSchema = new CustomSchema(EvaluationSchema::TYPE);
+        $gateSchema->getRenderingDefinition()->setLabel('Gate');
+        $schema->addProperty(static::KEY_GATE, $gateSchema);
 
         $schema->addProperty(static::KEY_DATA, new CustomSchema(DataMapperSchema::TYPE));
 

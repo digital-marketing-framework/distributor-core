@@ -88,7 +88,6 @@ trait RouteRegistryTrait
         $routeListSchema = new ListSchema(new CustomSchema(RouteSchema::TYPE));
         // TODO rather let the list fetch the value from the item underneath itself
         //      though this will be complicated because the underlying item is a switch container
-        $routeListSchema->getValueSchema()->getRenderingDefinition()->setLabel('ROUTE');
         $routeListDefaultValue = $this->getRouteListDefaultValue($schemaDocument);
         $routeListSchema->setDefaultValue($routeListDefaultValue);
 

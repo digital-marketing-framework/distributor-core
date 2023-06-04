@@ -9,7 +9,6 @@ use DigitalMarketingFramework\Core\DataProcessor\Evaluation\Evaluation;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 
 class GateEvaluation extends Evaluation
@@ -21,7 +20,7 @@ class GateEvaluation extends Evaluation
     public const DEFAULT_PASS = 'any';
 
     public const KEY_KEYS_EVALUATED = 'keysEvaluated';
-    
+
     public const PASS_ANY = 'any';
     public const PASS_ALL = 'all';
 
@@ -76,7 +75,7 @@ class GateEvaluation extends Evaluation
         // TODO is it necessary to remove the context value again? the parent context should not be affected anyway
         //      maybe write a test like { 1.key = foo, 2.somethingThatWouldBeUsingContextKey }
         unset($this->context[static::KEY_KEYS_EVALUATED][$hash]);
-        
+
         return $result;
     }
 
@@ -114,14 +113,6 @@ class GateEvaluation extends Evaluation
             }
             return $this->evaluateSinglePass($key, $pass);
         }
-    }
-
-    public static function getDefaultConfiguration(): array
-    {
-        return parent::getDefaultConfiguration() + [
-            static::KEY_KEY => static::DEFAULT_KEY,
-            static::KEY_PASS => static::DEFAULT_PASS,
-        ];
     }
 
     public static function getSchema(): SchemaInterface
