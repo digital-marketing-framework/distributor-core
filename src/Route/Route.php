@@ -5,11 +5,11 @@ namespace DigitalMarketingFramework\Distributor\Core\Route;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\DataMapperSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\EvaluationSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
@@ -31,7 +31,6 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     protected const DEFAULT_DISABLE_STORAGE = InheritableBooleanSchema::VALUE_INHERIT;
 
     protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
-    protected const DEFAULT_ENABLE_DATA_PROVIDERS = '*';
 
     public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with index %d.';
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with index %d.';
@@ -101,9 +100,8 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public function getEnabledDataProviders(): array
     {
-        return GeneralUtility::castValueToArray(
-            $this->getConfig(static::KEY_ENABLE_DATA_PROVIDERS)
-        );
+        $config = $this->getConfig(static::KEY_ENABLE_DATA_PROVIDERS);
+        return RestrictedTermsSchema::getAllowedTerms($config);
     }
 
     public function addContext(ContextInterface $context): void
@@ -144,7 +142,10 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $schema->addProperty(RelayInterface::KEY_ASYNC, new InheritableBooleanSchema());
         $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new InheritableBooleanSchema());
 
-        $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, new StringSchema(static::DEFAULT_ENABLE_DATA_PROVIDERS));
+        $enableDataProviders = new RestrictedTermsSchema('/distributor/dataProviders');
+        $enableDataProviders->getTypeSchema()->getRenderingDefinition()->setLabel(static::KEY_ENABLE_DATA_PROVIDERS);
+        $enableDataProviders->getRenderingDefinition()->setSkipHeader(true);
+        $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, $enableDataProviders);
 
         $gateSchema = new CustomSchema(EvaluationSchema::TYPE);
         $gateSchema->getRenderingDefinition()->setLabel('Gate');

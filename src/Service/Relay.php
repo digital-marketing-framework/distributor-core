@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Service;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
@@ -62,18 +63,9 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         $dataProviders = $this->registry->getDataProviders($submission);
         foreach ($dataProviders as $dataProvider) {
             $keyword = $dataProvider->getKeyword();
-
-            // check blacklist
-            if (in_array('!' . $keyword, $enabledDataProviders)) {
-                continue;
+            if (RestrictedTermsSchema::isTermAllowed($enabledDataProviders, $keyword)) {
+                $dataProvider->addData();
             }
-
-            // check whitelist
-            if (!in_array('*', $enabledDataProviders) && !in_array($keyword, $enabledDataProviders)) {
-                continue;
-            }
-
-            $dataProvider->addData();
         }
     }
 

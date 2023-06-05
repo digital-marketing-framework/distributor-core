@@ -11,12 +11,7 @@ class RouteSchema extends SwitchSchema
 
     public function __construct(mixed $defaultValue = null)
     {
-        parent::__construct($defaultValue);
+        parent::__construct('route', $defaultValue);
         $this->addProperty('pass', new StringSchema());
-    }
-
-    protected function getSwitchName(): string
-    {
-        return 'route';
     }
 }
