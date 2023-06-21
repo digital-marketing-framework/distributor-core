@@ -46,15 +46,6 @@ trait RouteRegistryTrait
         $this->deletePlugin($keyword, RouteInterface::class);
     }
 
-    public function getRouteDefaultConfigurations(): array
-    {
-        $result = [];
-        foreach ($this->pluginClasses[RouteInterface::class] ?? [] as $key => $class) {
-            $result[$key] = $class::getDefaultConfiguration();
-        }
-        return $result;
-    }
-
     public function getRouteSchema(): SchemaInterface
     {
         $routeSchema = new RouteSchema();

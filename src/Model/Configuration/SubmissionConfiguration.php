@@ -4,7 +4,6 @@ namespace DigitalMarketingFramework\Distributor\Core\Model\Configuration;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Configuration\Configuration;
-use DigitalMarketingFramework\Core\Utility\ConfigurationUtility;
 
 class SubmissionConfiguration extends Configuration implements SubmissionConfigurationInterface
 {

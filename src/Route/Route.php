@@ -34,7 +34,6 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with index %d.';
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with index %d.';
-    public const MESSAGE_DISPATCHER_NOT_FOUND = 'No dispatcher found for route "%s" with index %d.';
 
     public function __construct(
         string $keyword,
@@ -122,15 +121,11 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         }
 
         $dataDispatcher = $this->getDispatcher();
-        if (!$dataDispatcher) {
-            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DISPATCHER_NOT_FOUND, $this->getKeyword(), $this->index));
-        }
-
         $dataDispatcher->send($data->toArray());
         return true;
     }
 
-    abstract protected function getDispatcher(): ?DataDispatcherInterface;
+    abstract protected function getDispatcher(): DataDispatcherInterface;
 
     public static function getSchema(): SchemaInterface
     {
