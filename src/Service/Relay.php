@@ -115,7 +115,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             $queue = $disableStorage ? $this->temporaryQueue : $this->persistentQueue;
 
             $job = $this->queueDataFactory->convertSubmissionToJob($submission, $index, $status);
-            $queue->addJob($job);
+            $job = $queue->addJob($job);
             if (!$async) {
                 if ($disableStorage) {
                     $syncTemporaryJobs[] = $job;
