@@ -11,11 +11,10 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 class RequestVariablesDataProvider extends DataProvider
 {
     const KEY_VARIABLE_FIELD_MAP = 'variableFieldMap';
-    const DEFAULT_VARIABLE_FIELD_MAP = [];
 
     protected function processContext(ContextInterface $context): void
     {
-        $variables = array_keys($this->getConfig(static::KEY_VARIABLE_FIELD_MAP));
+        $variables = array_keys($this->getMapConfig(static::KEY_VARIABLE_FIELD_MAP));
         foreach ($variables as $variable) {
             $this->submission->getContext()->copyRequestVariableFromContext($context, $variable);
         }
@@ -23,7 +22,7 @@ class RequestVariablesDataProvider extends DataProvider
 
     protected function process(): void
     {
-        $variableFieldMap = $this->getConfig(static::KEY_VARIABLE_FIELD_MAP);
+        $variableFieldMap = $this->getMapConfig(static::KEY_VARIABLE_FIELD_MAP);
         foreach ($variableFieldMap as $variable => $field) {
             $value = $this->submission->getContext()->getRequestVariable($variable);
             if ($value !== null) {

@@ -132,13 +132,14 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $schema = new ContainerSchema();
         $schema->getRenderingDefinition()->setNavigationItem(false);
 
-        $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
+        $enabledProperty = $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
+        $enabledProperty->setWeight(10);
 
         $schema->addProperty(RelayInterface::KEY_ASYNC, new InheritableBooleanSchema());
         $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new InheritableBooleanSchema());
 
-        $enableDataProviders = new RestrictedTermsSchema('/distributor/dataProviders');
-        $enableDataProviders->getTypeSchema()->getRenderingDefinition()->setLabel(static::KEY_ENABLE_DATA_PROVIDERS);
+        $enableDataProviders = new RestrictedTermsSchema('/distributor/dataProviders/*');
+        $enableDataProviders->getTypeSchema()->getRenderingDefinition()->setLabel('Enable Data Providers');
         $enableDataProviders->getRenderingDefinition()->setSkipHeader(true);
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, $enableDataProviders);
 

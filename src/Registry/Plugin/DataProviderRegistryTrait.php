@@ -35,7 +35,7 @@ trait DataProviderRegistryTrait
     public function getDataProviderSchema(): SchemaInterface
     {
         $schema = new DataProviderSchema();
-        foreach ($this->pluginClasses[DataProviderInterface::class] ?? [] as $key => $class) {
+        foreach ($this->getAllPluginClasses(DataProviderInterface::class) as $key => $class) {
             $schema->addItem($key, $class::getSchema());
         }
         return $schema;

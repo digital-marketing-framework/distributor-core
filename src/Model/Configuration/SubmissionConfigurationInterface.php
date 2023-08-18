@@ -10,7 +10,6 @@ interface SubmissionConfigurationInterface extends ConfigurationInterface
 
     public const KEY_DATA_PROVIDERS = 'dataProviders';
     public const KEY_ROUTES = 'routes';
-    public const KEY_ROUTE_PASSES = 'passes';
 
     public function getDistributorConfiguration(): array;
 

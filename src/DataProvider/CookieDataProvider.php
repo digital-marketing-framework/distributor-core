@@ -15,7 +15,7 @@ class CookieDataProvider extends DataProvider
 
     protected function processContext(ContextInterface $context): void
     {
-        $cookies = array_keys($this->getConfig(static::KEY_COOKIE_FIELD_MAP));
+        $cookies = array_keys($this->getMapConfig(static::KEY_COOKIE_FIELD_MAP));
         foreach ($cookies as $cookie) {
             $this->submission->getContext()->copyCookieFromContext($context, $cookie);
         }
@@ -23,7 +23,7 @@ class CookieDataProvider extends DataProvider
 
     protected function process(): void
     {
-        $cookieFieldMap = $this->getConfig(static::KEY_COOKIE_FIELD_MAP);
+        $cookieFieldMap = $this->getMapConfig(static::KEY_COOKIE_FIELD_MAP);
         foreach ($cookieFieldMap as $cookie => $field) {
             $value = $this->submission->getContext()->getCookie($cookie);
             if ($value !== null) {

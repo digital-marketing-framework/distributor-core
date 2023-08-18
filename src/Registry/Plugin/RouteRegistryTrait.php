@@ -5,8 +5,10 @@ namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ListSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SwitchSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
+use DigitalMarketingFramework\Core\Utility\ListUtility;
 use DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\Route\RouteSchema;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
@@ -49,26 +51,11 @@ trait RouteRegistryTrait
     public function getRouteSchema(): SchemaInterface
     {
         $routeSchema = new RouteSchema();
-        foreach ($this->pluginClasses[RouteInterface::class] ?? [] as $key => $class) {
+        foreach ($this->getAllPluginClasses(RouteInterface::class) as $key => $class) {
             $schema = $class::getSchema();
             $routeSchema->addItem($key, $schema);
         }
         return $routeSchema;
-    }
-
-    protected function getRouteListDefaultValue(SchemaDocument $schemaDocument): array
-    {
-        $defaultValue = [];
-        foreach ($this->pluginClasses[RouteInterface::class] ?? [] as $key => $class) {
-            $defaultValue[] = [
-                'type' => $key,
-                'pass' => '',
-                'config' => [
-                    $key => $schemaDocument->getDefaultValue($class::getSchema()),
-                ]
-            ];
-        }
-        return $defaultValue;
     }
 
     protected function getRoutesSchema(SchemaDocument $schemaDocument): SchemaInterface
@@ -77,10 +64,7 @@ trait RouteRegistryTrait
         $schemaDocument->addCustomType($routeSchema, RouteSchema::TYPE);
 
         $routeListSchema = new ListSchema(new CustomSchema(RouteSchema::TYPE));
-        // TODO rather let the list fetch the value from the item underneath itself
-        //      though this will be complicated because the underlying item is a switch container
-        $routeListDefaultValue = $this->getRouteListDefaultValue($schemaDocument);
-        $routeListSchema->setDefaultValue($routeListDefaultValue);
+        $routeListSchema->setDynamicOrder(true);
 
         return $routeListSchema;
     }

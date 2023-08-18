@@ -2,8 +2,10 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Model\Configuration;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SwitchSchema;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Configuration\Configuration;
+use DigitalMarketingFramework\Core\Utility\ListUtility;
 
 class SubmissionConfiguration extends Configuration implements SubmissionConfigurationInterface
 {
@@ -19,7 +21,7 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
 
     protected function getRouteConfiguration(): array
     {
-        return $this->getDistributorConfiguration()[static::KEY_ROUTES];
+        return ListUtility::flatten($this->getDistributorConfiguration()[static::KEY_ROUTES] ?? []);
     }
 
     /**
@@ -31,11 +33,11 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
         $result = [];
         $passCountPerRoute = [];
         foreach ($this->getRouteConfiguration() as $routeConfiguration) {
-            $keyword = $routeConfiguration['type'];
+            $keyword = SwitchSchema::getSwitchType($routeConfiguration);
+            $config = SwitchSchema::getSwitchConfiguration($routeConfiguration);
+            $name = $routeConfiguration['name'] ?? '';
             $pass = $passCountPerRoute[$keyword] ?? 0;
             $passCountPerRoute[$keyword] = $pass + 1;
-            $name = $routeConfiguration['name'] ?? '';
-            $config = $routeConfiguration['config'][$keyword] ?? [];
             $result[] = [
                 'keyword' => $keyword,
                 'pass' => $pass,
