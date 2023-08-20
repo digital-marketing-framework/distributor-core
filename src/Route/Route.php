@@ -11,6 +11,7 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\P
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\EvaluationSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\DataProcessor\DataProcessor;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
@@ -127,6 +128,32 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     abstract protected function getDispatcher(): DataDispatcherInterface;
 
+    protected static function getDefaultPassthroughFields(): bool
+    {
+        return false;
+    }
+
+    protected static function getDefaultFields(): array
+    {
+        return [];
+    }
+
+    protected static function getDataDefaultValue(): array
+    {
+        $dataDefaultValue = [];
+
+        if (static::getDefaultPassthroughFields()) {
+            $dataDefaultValue = DataProcessor::dataMapperSchemaDefaultValuePassthroughFields($dataDefaultValue);
+        }
+
+        $fields = static::getDefaultFields();
+        if (!empty($fields)) {
+            $dataDefaultValue = DataProcessor::dataMapperSchemaDefaultValueFieldMap($fields, $dataDefaultValue);
+        }
+
+        return $dataDefaultValue;
+    }
+
     public static function getSchema(): SchemaInterface
     {
         $schema = new ContainerSchema();
@@ -147,7 +174,12 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $gateSchema->getRenderingDefinition()->setLabel('Gate');
         $schema->addProperty(static::KEY_GATE, $gateSchema);
 
-        $schema->addProperty(static::KEY_DATA, new CustomSchema(DataMapperSchema::TYPE));
+        $dataSchema = new CustomSchema(DataMapperSchema::TYPE);
+        $dataDefault = static::getDataDefaultValue();
+        if (!empty($dataDefault)) {
+            $dataSchema->setDefaultValue($dataDefault);
+        }
+        $schema->addProperty(static::KEY_DATA, $dataSchema);
 
         // TODO gdpr should not be handled in the gate. we need a dedicated service for that
 
