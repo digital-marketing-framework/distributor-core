@@ -5,10 +5,8 @@ namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ListSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SwitchSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
-use DigitalMarketingFramework\Core\Utility\ListUtility;
 use DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\Route\RouteSchema;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
@@ -30,17 +28,16 @@ trait RouteRegistryTrait
     public function getRoutes(SubmissionDataSetInterface $submission): array
     {
         $routes = [];
-        foreach (array_keys($submission->getConfiguration()->getRoutePasses()) as $index) {
-            $routes[] = $this->getRoute($submission, $index);
+        foreach ($submission->getConfiguration()->getRouteIds() as $routeId) {
+            $routes[] = $this->getRoute($submission, $routeId);
         }
         return $routes;
     }
 
-    public function getRoute(SubmissionDataSetInterface $submission, int $index): ?RouteInterface
+    public function getRoute(SubmissionDataSetInterface $submission, string $routeId): ?RouteInterface
     {
-        $routeData = $submission->getConfiguration()->getRoutePassData($index);
-        $keyword = $routeData['keyword'];
-        return $this->getPlugin($keyword, RouteInterface::class, [$submission, $index]);
+        $keyword = $submission->getConfiguration()->getRouteKeyword($routeId);
+        return $this->getPlugin($keyword, RouteInterface::class, [$submission, $routeId]);
     }
 
     public function deleteRoute(string $keyword): void

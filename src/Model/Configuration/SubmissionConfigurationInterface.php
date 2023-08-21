@@ -15,12 +15,8 @@ interface SubmissionConfigurationInterface extends ConfigurationInterface
 
     public function getDataProviderConfiguration(string $dataProviderName): array;
 
-    /**
-     * @return array<array<int,string|int>>
-     * array<int,array{keyword: string, pass: int, name: string, configuration: array<mixed>}>
-     */
-    public function getRoutePasses(): array;
-    public function getRoutePassData(int $index): array;
-    public function getRoutePassConfiguration(int $index): array;
-    public function getRoutePassLabel(int $index): string;
+    public function getRouteIds(): array;
+    public function getRouteConfiguration(string $routeId): ?array;
+    public function getRouteKeyword(string $routeId): string;
+    public function getRouteLabel(string $routeId): string;
 }

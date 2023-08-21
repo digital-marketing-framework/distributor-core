@@ -4,6 +4,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
+use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 
 interface RouteInterface extends ConfigurablePluginInterface
@@ -16,7 +17,10 @@ interface RouteInterface extends ConfigurablePluginInterface
 
     public const KEY_DATA = 'data';
 
-    public function getIndex(): int;
+    public function getRouteId(): string;
+
+    public function buildData(): DataInterface;
+    public function processGate(): bool;
 
     public function enabled(): bool;
     public function async(): ?bool;

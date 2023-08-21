@@ -6,6 +6,8 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\S
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Configuration\Configuration;
 use DigitalMarketingFramework\Core\Utility\ListUtility;
+use DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\Route\RouteSchema;
+use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 
 class SubmissionConfiguration extends Configuration implements SubmissionConfigurationInterface
 {
@@ -19,83 +21,58 @@ class SubmissionConfiguration extends Configuration implements SubmissionConfigu
         return $this->getDistributorConfiguration()[static::KEY_DATA_PROVIDERS][$dataProviderName] ?? [];
     }
 
-    protected function getRouteConfiguration(): array
+    public function getRouteIds(): array
     {
-        return ListUtility::flatten($this->getDistributorConfiguration()[static::KEY_ROUTES] ?? []);
+        return array_keys($this->getDistributorConfiguration()[static::KEY_ROUTES] ?? []);
     }
 
-    /**
-     * @return array<array<int,string|int>>
-     * array<int,array{keyword: string, pass: int, name: string, configuration: array<mixed>}>
-     */
-    public function getRoutePasses(): array
+    protected function getRouteListItem(string $routeId): array
     {
-        $result = [];
-        $passCountPerRoute = [];
-        foreach ($this->getRouteConfiguration() as $routeConfiguration) {
-            $keyword = SwitchSchema::getSwitchType($routeConfiguration);
-            $config = SwitchSchema::getSwitchConfiguration($routeConfiguration);
-            $name = $routeConfiguration['name'] ?? '';
-            $pass = $passCountPerRoute[$keyword] ?? 0;
-            $passCountPerRoute[$keyword] = $pass + 1;
-            $result[] = [
-                'keyword' => $keyword,
-                'pass' => $pass,
-                'name' => $name,
-                'configuration' => $config,
-            ];
+        $routeList = $this->getDistributorConfiguration()[static::KEY_ROUTES] ?? [];
+        if (!isset($routeList[$routeId])) {
+            throw new DigitalMarketingFrameworkException(sprintf('route with ID %s not found', $routeId));
         }
-        return $result;
+        return $routeList[$routeId];
     }
 
-    public function getRoutePassCount(string $routeName = ''): int
+    public function getRouteConfiguration(string $routeId): array
     {
-        $count = 0;
-        foreach ($this->getRoutePasses() as $routeData) {
-            if ($routeName === '' || $routeData['keyword'] === $routeName) {
-                $count++;
+        $routeItem = $this->getRouteListItem($routeId);
+        $routeConfiguration = ListUtility::getItemValue($routeItem);
+        return SwitchSchema::getSwitchConfiguration($routeConfiguration);
+    }
+
+    public function getRouteKeyword(string $routeId): string
+    {
+        $routeItem = $this->getRouteListItem($routeId);
+        $routeConfiguration = ListUtility::getItemValue($routeItem);
+        return SwitchSchema::getSwitchType($routeConfiguration);
+    }
+
+    public function getRouteLabel(string $routeId): string
+    {
+        $routeName = $this->getRouteKeyword($routeId);
+
+        $routePassCount = 0;
+        $routePassIndex = 0;
+        foreach ($this->getRouteIds() as $currentRouteId) {
+            if ($this->getRouteKeyword($currentRouteId) === $routeName) {
+                $routePassCount++;
+            }
+            if ($routeId === $currentRouteId) {
+                $routePassIndex = $routePassCount;
             }
         }
-        return $count;
-    }
 
-    public function getRoutePassLabel(int $index): string
-    {
-        $routeDataList = $this->getRoutePasses();
-        if (!isset($routeDataList[$index])) {
-            throw new DigitalMarketingFrameworkException(sprintf('route configuration for index %d not found', $index));
+        if ($routePassCount === 1) {
+            return $routeName;
         }
-        $routeData = $routeDataList[$index];
-        $routeName = $routeData['keyword'];
-        $passCount = $this->getRoutePassCount($routeName);
-        $label = $routeName;
-        if ($passCount > 1) {
-            $label .= '#' . ($routeData['name'] ?: ($routeData['pass'] + 1));
+
+        $routeConfig = ListUtility::getItemValue($this->getRouteListItem($routeId));
+        if ($routeConfig[RouteSchema::KEY_PASS] !== '') {
+            return $routeName . '#' . $routeConfig[RouteSchema::KEY_PASS];
         }
-        return $label;
-    }
 
-    public function getRoutePassData(int $index): array
-    {
-        $routeDataList = $this->getRoutePasses();
-        if (!isset($routeDataList[$index])) {
-            throw new DigitalMarketingFrameworkException(sprintf('route configuration for index %s not found', $index));
-        }
-        return $routeDataList[$index];
-    }
-
-    public function getRouteName(int $index): string
-    {
-        return $this->getRoutePassData($index)['keyword'];
-    }
-
-    public function getRoutePass(int $index): int
-    {
-        return $this->getRoutePassData($index)['pass'];
-    }
-
-    public function getRoutePassConfiguration(int $index): array
-    {
-        return $this->getRoutePassData($index)['configuration'];
+        return $routeName . '#' . $routePassIndex;
     }
 }

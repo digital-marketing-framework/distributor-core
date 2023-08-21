@@ -74,10 +74,10 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         try {
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
 
-            $index = $this->queueDataFactory->getJobIndex($job);
-            $route = $this->registry->getRoute($submission, $index);
+            $routeId = $this->queueDataFactory->getJobRouteId($job);
+            $route = $this->registry->getRoute($submission, $routeId);
             if ($route === null) {
-                throw new DigitalMarketingFrameworkException(sprintf('route with index "%d" not found', $index));
+                throw new DigitalMarketingFrameworkException(sprintf('route with ID "%s" not found', $routeId));
             }
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders());
@@ -98,7 +98,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         $routes = $this->registry->getRoutes($submission);
         $distributorConfiguration = $submission->getConfiguration()->getDistributorConfiguration();
 
-        foreach ($routes as $index => $route) {
+        foreach ($routes as $route) {
             if (!$route->enabled()) {
                 continue;
             }
@@ -114,7 +114,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             $status = $async ? QueueInterface::STATUS_QUEUED : QueueInterface::STATUS_PENDING;
             $queue = $disableStorage ? $this->temporaryQueue : $this->persistentQueue;
 
-            $job = $this->queueDataFactory->convertSubmissionToJob($submission, $index, $status);
+            $job = $this->queueDataFactory->convertSubmissionToJob($submission, $route->getRouteId(), $status);
             $job = $queue->addJob($job);
             if (!$async) {
                 if ($disableStorage) {

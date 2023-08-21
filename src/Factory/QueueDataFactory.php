@@ -14,7 +14,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 
 class QueueDataFactory implements QueueDataFactoryInterface
 {
-    const KEY_INDEX = 'index';
+    const KEY_ROUTE_ID = 'routeId';
     const KEY_SUBMISSION = 'submission';
     const DEFAULT_LABEL = 'undefined';
 
@@ -43,33 +43,33 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $this->getSubmissionDataHash($this->getJobSubmissionData($job));
     }
 
-    protected function getSubmissionDataLabel(array $submissionData, int $index, string $hash = ''): string
+    protected function getSubmissionDataLabel(array $submissionData, string $routeId, string $hash = ''): string
     {
         if (!$hash) {
             $hash = $this->getSubmissionDataHash($submissionData);
         }
         try {
             $submission = $this->unpack($submissionData);
-            return $this->getSubmissionLabel($submission, $index, $hash);
+            return $this->getSubmissionLabel($submission, $routeId, $hash);
         } catch (DigitalMarketingFrameworkException) {
             return static::DEFAULT_LABEL;
         }
     }
 
-    public function getSubmissionLabel(SubmissionDataSetInterface $submission, int $index, string $hash = ''): string
+    public function getSubmissionLabel(SubmissionDataSetInterface $submission, string $routeId, string $hash = ''): string
     {
         if ($hash === '') {
             $hash = $this->getSubmissionHash($submission);
         }
         return GeneralUtility::shortenHash($hash)
-            . '#' . $submission->getConfiguration()->getRoutePassLabel($index);
+            . '#' . $submission->getConfiguration()->getRouteLabel($routeId);
     }
 
     public function getJobLabel(JobInterface $job): string
     {
         return $this->getSubmissionDataLabel(
             $this->getJobSubmissionData($job),
-            $this->getJobIndex($job),
+            $this->getJobRouteId($job),
             $job->getHash()
         );
     }
@@ -83,26 +83,26 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $jobData[static::KEY_SUBMISSION];
     }
 
-    public function getJobIndex(JobInterface $job): int
+    public function getJobRouteId(JobInterface $job): string
     {
         $jobData = $job->getData();
-        if (!isset($jobData[static::KEY_INDEX])) {
-            throw new DigitalMarketingFrameworkException('job does not seem to have a route index');
+        if (!isset($jobData[static::KEY_ROUTE_ID])) {
+            throw new DigitalMarketingFrameworkException('job does not seem to have a route id');
         }
-        return $jobData[static::KEY_INDEX];
+        return $jobData[static::KEY_ROUTE_ID];
     }
 
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, int $index, int $status = QueueInterface::STATUS_QUEUED): JobInterface
+    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $routeId, int $status = QueueInterface::STATUS_QUEUED): JobInterface
     {
         $submissionData = $this->pack($submission);
         $job = $this->createJob();
         $job->setStatus($status);
         $job->setData([
-            static::KEY_INDEX => $index,
+            static::KEY_ROUTE_ID => $routeId,
             static::KEY_SUBMISSION => $submissionData,
         ]);
         $job->setHash($this->getSubmissionDataHash($submissionData));
-        $job->setLabel($this->getSubmissionLabel($submission, $index, $job->getHash()));
+        $job->setLabel($this->getSubmissionLabel($submission, $routeId, $job->getHash()));
         return $job;
     }
 

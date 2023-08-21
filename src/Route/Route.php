@@ -33,20 +33,20 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
-    public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with index %d.';
-    public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with index %d.';
+    public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with ID %s.';
+    public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with ID %s.';
 
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
         protected SubmissionDataSetInterface $submission,
-        protected int $index,
+        protected string $routeId,
     ) {
         parent::__construct($keyword, $registry);
-        $this->configuration = $this->submission->getConfiguration()->getRoutePassConfiguration($this->index);
+        $this->configuration = $this->submission->getConfiguration()->getRouteConfiguration($this->routeId);
     }
 
-    protected function buildData(): DataInterface
+    public function buildData(): DataInterface
     {
         return $this->dataProcessor->processDataMapper(
             $this->getConfig(static::KEY_DATA),
@@ -63,7 +63,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         );
     }
 
-    protected function processGate(): bool
+    public function processGate(): bool
     {
         if (!$this->enabled()) {
             return false;
@@ -78,9 +78,9 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         );
     }
 
-    public function getIndex(): int
+    public function getRouteId(): string
     {
-        return $this->index;
+        return $this->routeId;
     }
 
     public function enabled(): bool
@@ -111,14 +111,14 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     public function process(): bool
     {
         if (!$this->processGate()) {
-            $this->logger->debug(sprintf(static::MESSAGE_GATE_FAILED, $this->getKeyword(), $this->index));
+            $this->logger->debug(sprintf(static::MESSAGE_GATE_FAILED, $this->getKeyword(), $this->routeId));
             return false;
         }
 
         $data = $this->buildData();
 
         if (GeneralUtility::isEmpty($data)) {
-            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->index));
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->routeId));
         }
 
         $dataDispatcher = $this->getDispatcher();

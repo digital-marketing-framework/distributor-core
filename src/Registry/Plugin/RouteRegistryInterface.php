@@ -15,7 +15,7 @@ interface RouteRegistryInterface extends PluginRegistryInterface
      * @return array<RouteInterface>
      */
     public function getRoutes(SubmissionDataSetInterface $submission): array;
-    public function getRoute(SubmissionDataSetInterface $submission, int $index): ?RouteInterface;
+    public function getRoute(SubmissionDataSetInterface $submission, string $routeId): ?RouteInterface;
     public function deleteRoute(string $keyword): void;
 
     public function getRouteSchema(): SchemaInterface;
