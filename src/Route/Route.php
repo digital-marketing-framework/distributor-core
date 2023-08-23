@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
@@ -162,12 +163,18 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $enabledProperty = $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
         $enabledProperty->setWeight(10);
 
-        $schema->addProperty(RelayInterface::KEY_ASYNC, new InheritableBooleanSchema());
-        $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new InheritableBooleanSchema());
+        $asyncSchema = new InheritableBooleanSchema();
+        $asyncSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
+        $schema->addProperty(RelayInterface::KEY_ASYNC, $asyncSchema);
+
+        $disableStorageSchema = new InheritableBooleanSchema();
+        $disableStorageSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
+        $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, $disableStorageSchema);
 
         $enableDataProviders = new RestrictedTermsSchema('/distributor/dataProviders/*');
         $enableDataProviders->getTypeSchema()->getRenderingDefinition()->setLabel('Enable Data Providers');
         $enableDataProviders->getRenderingDefinition()->setSkipHeader(true);
+        $enableDataProviders->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, $enableDataProviders);
 
         $gateSchema = new CustomSchema(EvaluationSchema::TYPE);

@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
@@ -109,8 +110,14 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     {
         $schema = new ContainerSchema();
         $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
-        $schema->addProperty(static::KEY_MUST_EXIST, new BooleanSchema(static::DEFAULT_MUST_EXIST));
-        $schema->addProperty(static::KEY_MUST_BE_EMPTY, new BooleanSchema(static::DEFAULT_MUST_BE_EMPTY));
+
+        $mustExistSchema = new BooleanSchema(static::DEFAULT_MUST_EXIST);
+        $mustExistSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
+        $schema->addProperty(static::KEY_MUST_EXIST, $mustExistSchema);
+
+        $mustBeEmptySchema = new BooleanSchema(static::DEFAULT_MUST_BE_EMPTY);
+        $mustBeEmptySchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
+        $schema->addProperty(static::KEY_MUST_BE_EMPTY, $mustBeEmptySchema);
         return $schema;
     }
 }
