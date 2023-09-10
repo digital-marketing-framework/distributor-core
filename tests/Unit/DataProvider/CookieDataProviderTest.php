@@ -8,6 +8,10 @@ class CookieDataProviderTest extends AbstractDataProviderTest
 {
     protected const DATA_PROVIDER_CLASS = CookieDataProvider::class;
 
+    protected const DEFAULT_CONFIG = parent::DEFAULT_CONFIG + [
+        CookieDataProvider::KEY_COOKIE_FIELD_MAP => CookieDataProvider::DEFAULT_COOKIE_FIELD_MAP,
+    ];
+
     /** @test */
     public function doesNotDoAnythingIfDisabled(): void
     {
@@ -31,7 +35,7 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
             'cookieFieldMap' => [
-                'cookieName1' => 'fieldName1',
+                'cookieItemId1' => $this->createMapItem('cookieName1', 'fieldName1', 'cookieItemId1', 10),
             ],
         ]);
         $this->globalContext->expects($this->once())->method('getCookie')->willReturn(null);
@@ -51,8 +55,8 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
             'cookieFieldMap' => [
-                'cookieName1' => 'fieldName1',
-                'cookieName2' => 'fieldName2',
+                'cookieItemId1' => $this->createMapItem('cookieName1', 'fieldName1', 'cookieItemId1', 10),
+                'cookieItemId2' => $this->createMapItem('cookieName2', 'fieldName2', 'cookieItemId2', 20),
             ],
         ]);
         $this->globalContext->expects($this->any())->method('getCookie')->willReturnMap([
@@ -83,7 +87,7 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
             'cookieFieldMap' => [
-                'cookieName1' => 'fieldName1',
+                'cookieItemId1' => $this->createMapItem('cookieName1', 'fieldName1', 'cookieItemId1', 10),
             ],
         ]);
         $this->globalContext->expects($this->once())->method('getCookie')->willReturnMap([

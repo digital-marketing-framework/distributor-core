@@ -4,22 +4,33 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
 use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
+use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
 
 trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 {
-    protected function createJob($data, $genericRouteConfig, $pass = 0, $config = [], $context = []): JobInterface
+    use ListMapTestTrait;
+
+    protected function createJob(array $data, array $routeConfigs, array $config = [], array $context = [], string $jobRouteId = 'routeId1'): JobInterface
     {
         $data = [
-            QueueDataFactory::KEY_ROUTE => 'generic',
-            QueueDataFactory::KEY_PASS => $pass,
+            QueueDataFactory::KEY_ROUTE_ID => $jobRouteId,
             QueueDataFactory::KEY_SUBMISSION => [
                 'data' => $data,
                 'configuration' => $config,
                 'context' => $context,
             ]
         ];
-        $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['distributor']['routes']['generic'] = $genericRouteConfig;
+        $weight = 10;
+        foreach ($routeConfigs as $routeId => $routeConfig) {
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['distributor']['routes'][$routeId] = $this->createListItem([
+                'type' => 'generic',
+                'config' => [
+                    'generic' => $routeConfig,
+                ],
+            ], $routeId, $weight);
+            $weight += 10;
+        }
         return new Job(data:$data);
     }
 }

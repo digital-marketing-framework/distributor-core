@@ -8,6 +8,11 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
 {
     protected const DATA_PROVIDER_CLASS = TimestampDataProvider::class;
 
+    protected const DEFAULT_CONFIG = parent::DEFAULT_CONFIG + [
+        TimestampDataProvider::KEY_FIELD => TimestampDataProvider::DEFAULT_FIELD,
+        TimestampDataProvider::KEY_FORMAT => TimestampDataProvider::DEFAULT_FORMAT,
+    ];
+
     /** @test */
     public function doesNotDoAnythingIfDisabled(): void
     {
@@ -65,7 +70,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
 
         $this->createDataProvider();
-        
+
         $this->subject->addContext($this->globalContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
@@ -85,7 +90,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
 
         $this->createDataProvider();
-        
+
         $this->subject->addContext($this->globalContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 

@@ -10,8 +10,8 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class CookieDataProvider extends DataProvider
 {
-    protected const KEY_COOKIE_FIELD_MAP = 'cookieFieldMap';
-    protected const DEFAULT_COOKIE_FIELD_MAP = [];
+    public const KEY_COOKIE_FIELD_MAP = 'cookieFieldMap';
+    public const DEFAULT_COOKIE_FIELD_MAP = [];
 
     protected function processContext(ContextInterface $context): void
     {

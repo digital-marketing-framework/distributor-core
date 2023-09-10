@@ -11,13 +11,13 @@ use DigitalMarketingFramework\Distributor\Core\Route\Route;
 class SpiedOnGenericRoute extends Route
 {
     public function __construct(
-        string $keyword, 
+        string $keyword,
         RegistryInterface $registry,
         SubmissionDataSetInterface $submission,
-        int $pass,
+        string $routeId,
         public RouteSpyInterface $routeSpy,
     ) {
-        parent::__construct($keyword, $registry, $submission, $pass);
+        parent::__construct($keyword, $registry, $submission, $routeId);
     }
 
     public function addContext(ContextInterface $context): void
@@ -25,7 +25,7 @@ class SpiedOnGenericRoute extends Route
         $this->routeSpy->addContext($context);
     }
 
-    protected function getDispatcher(): ?DataDispatcherInterface
+    protected function getDispatcher(): DataDispatcherInterface
     {
         return $this->routeSpy;
     }

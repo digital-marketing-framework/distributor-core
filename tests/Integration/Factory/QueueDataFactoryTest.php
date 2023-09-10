@@ -7,6 +7,7 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\Value\FileValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
 use DigitalMarketingFramework\Core\Model\File\FileInterface;
+use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\TestCase;
  */
 class QueueDataFactoryTest extends TestCase
 {
+    use ListMapTestTrait;
+
     protected ConfigurationDocumentManagerInterface&MockObject $configurationDocumentManager;
 
     protected QueueDataFactory $subject;
@@ -34,11 +37,11 @@ class QueueDataFactoryTest extends TestCase
         $this->subject = new QueueDataFactory($this->configurationDocumentManager);
     }
 
-    protected function routePassProvider(): array
+    protected function routeIdProvider(): array
     {
         return [
-            ['route1', 0],
-            ['route2', 5],
+            'routeId1',
+            'routeId2',
         ];
     }
 
@@ -77,8 +80,56 @@ class QueueDataFactoryTest extends TestCase
     protected function packConfigurationProvider(): array
     {
         return [
-            [[], []],
-            [['confKey1' => 'confValue1'], ['confKey1' => 'confValue1']],
+            [
+                [ // config
+                    'distributor' => [
+                        'routes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'pass' => '',
+                                'config' => [
+                                    'route1' => [
+                                        'confKey1' => 'confValue1',
+                                    ],
+                                ],
+                            ], 'routeId1', 10),
+                            'routeId2' => $this->createListItem([
+                                'type' => 'route1',
+                                'pass' => '',
+                                'config' => [
+                                    'route1' => [
+                                        'confKey2' => 'confValue2',
+                                    ],
+                                ],
+                            ], 'routeId2', 20),
+                        ],
+                    ],
+                ],
+                [ // packed config
+                    'distributor' => [
+                        'routes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'pass' => '',
+                                'config' => [
+                                    'route1' => [
+                                        'confKey1' => 'confValue1',
+                                    ],
+                                ],
+                            ], 'routeId1', 10),
+                            'routeId2' => $this->createListItem([
+                                'type' => 'route1',
+                                'pass' => '',
+                                'config' => [
+                                    'route1' => [
+                                        'confKey2' => 'confValue2',
+                                    ],
+                                ],
+                            ], 'routeId2', 20),
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -97,16 +148,14 @@ class QueueDataFactoryTest extends TestCase
         foreach ($this->packDataProvider() as list($data, $packedData)) {
             foreach ($this->packConfigurationProvider() as list($configuration, $packedConfiguration)) {
                 foreach ($this->packContextProvider() as list($context, $packedContext)) {
-                    foreach ($this->routePassProvider() as list($route, $pass)) {
+                    foreach ($this->routeIdProvider() as $routeId) {
                         $result[] = [
                             $data,
                             [$configuration],
                             $context,
-                            $route,
-                            $pass,
+                            $routeId,
                             [
-                                'route' => $route,
-                                'pass' => $pass,
+                                'routeId' => $routeId,
                                 'submission' => [
                                     'data' => $packedData,
                                     'configuration' => $packedConfiguration,
@@ -125,10 +174,10 @@ class QueueDataFactoryTest extends TestCase
      * @dataProvider packProvider
      * @test
      */
-    public function pack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData): void
+    public function pack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);
-        $job = $this->subject->convertSubmissionToJob($submission, $route, $pass);
+        $job = $this->subject->convertSubmissionToJob($submission, $routeId);
         $this->assertEquals($jobData, $job->getData());
     }
 
@@ -137,7 +186,7 @@ class QueueDataFactoryTest extends TestCase
      * @dataProvider packProvider
      * @test
      */
-    public function unpack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData): void
+    public function unpack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
     {
         $job = new Job();
         $job->setData($jobData);
@@ -153,10 +202,10 @@ class QueueDataFactoryTest extends TestCase
      * @dataProvider packProvider
      * @test
      */
-    public function packUnpack(array $data, array $configuration, array $context, string $route, int $pass, array $jobData): void
+    public function packUnpack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);
-        $job = $this->subject->convertSubmissionToJob($submission, $route, $pass);
+        $job = $this->subject->convertSubmissionToJob($submission, $routeId);
         $this->assertEquals($jobData, $job->getData());
 
         /** @var SubmissionDataSetInterface $result */

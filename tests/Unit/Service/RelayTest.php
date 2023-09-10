@@ -7,6 +7,7 @@ use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
+use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 class RelayTest extends TestCase
 {
+    use ListMapTestTrait;
+
     protected RegistryInterface&MockObject $registry;
 
     protected LoggerInterface&MockObject $logger;
@@ -52,6 +55,10 @@ class RelayTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->jobs = [];
+        $this->routeConfigs = [];
+        $this->routes = [];
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->context = $this->createMock(ContextInterface::class);
@@ -88,29 +95,33 @@ class RelayTest extends TestCase
         $this->submission->method('getConfiguration')->willReturn($this->submissionConfiguration);
     }
 
-    protected function addRoute(string $keyword, array $passes, bool $enabled = true): void
+    protected function addRoute(string $keyword, string $id, int $weight, array $config, bool $enabled = true): void
     {
-        $this->routeConfigs[$keyword] = $passes;
-        foreach ($passes as $pass => $passConfig) {
-            $route = $this->createMock(RouteInterface::class);
-            $route->method('getKeyword')->willReturn($keyword);
-            $route->method('getPass')->willReturn($pass);
-            $route->method('enabled')->willReturn($enabled);
-            $route->method('async')->willReturn($passConfig['async'] ?? null);
-            $route->method('disableStorage')->willReturn($passConfig['disableStorage'] ?? null);
-            $this->routes[] = $route;
+        $this->routeConfigs[$id] = [
+            'uuid' => $id,
+            'weight' => $weight,
+            'value' => $config,
+        ];
 
-            $job = $this->createMock(JobInterface::class);
-            $this->jobs[$keyword . ':' . $pass] = $job;
-        }
+        $route = $this->createMock(RouteInterface::class);
+        $route->method('getKeyword')->willReturn($keyword);
+        $route->method('getRouteId')->willReturn($id);
+        $route->method('enabled')->willReturn($enabled);
+        $route->method('async')->willReturn($config['async'] ?? null);
+        $route->method('disableStorage')->willReturn($config['disableStorage'] ?? null);
+        $this->routes[] = $route;
+
+        $job = $this->createMock(JobInterface::class);
+        $this->jobs[$id] = $job;
     }
 
     /** @test */
     public function processSyncOneRouteOnePassWithStorage(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => false,
+            'disableStorage' => false,
         ]);
 
         $this->logger->expects($this->never())->method('error');
@@ -119,7 +130,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -127,8 +138,9 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']]
-            );
+                [$this->jobs['routeId1']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -138,7 +150,7 @@ class RelayTest extends TestCase
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route1:0'],
+                $this->jobs['routeId1'],
             ]);
 
         $this->temporaryQueueProcessor
@@ -152,8 +164,9 @@ class RelayTest extends TestCase
     public function processSyncOneRouteOnePassWithoutStorage(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => true]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => false,
+            'disableStorage' => true,
         ]);
 
         $this->logger->expects($this->never())->method('error');
@@ -162,7 +175,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -174,8 +187,9 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']]
-            );
+                [$this->jobs['routeId1']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -185,7 +199,7 @@ class RelayTest extends TestCase
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route1:0'],
+                $this->jobs['routeId1'],
             ]);
 
         $this->subject->process($this->submission);
@@ -195,8 +209,9 @@ class RelayTest extends TestCase
     public function processAsyncOneRouteOnePassWithStorage(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => true, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => true,
+            'disableStorage' => false,
         ]);
 
         $this->logger->expects($this->never())->method('error');
@@ -205,7 +220,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_QUEUED]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_QUEUED]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -213,8 +228,9 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']]
-            );
+                [$this->jobs['routeId1']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -235,9 +251,13 @@ class RelayTest extends TestCase
     public function processSyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => false],
-            ['async' => false, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => false,
+            'disableStorage' => false,
+        ]);
+        $this->addRoute('route1', 'routeId2', 20, [
+            'async' => false,
+            'disableStorage' => false,
         ]);
 
         $this->logger->expects($this->never())->method('error');
@@ -246,8 +266,8 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_PENDING],
+                [$this->submission, 'routeId2', QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -255,9 +275,10 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']],
-                [$this->jobs['route1:1']]
-            );
+                [$this->jobs['routeId1']],
+                [$this->jobs['routeId2']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -267,8 +288,8 @@ class RelayTest extends TestCase
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route1:0'],
-                $this->jobs['route1:1'],
+                $this->jobs['routeId1'],
+                $this->jobs['routeId2'],
             ]);
 
         $this->temporaryQueueProcessor
@@ -282,9 +303,13 @@ class RelayTest extends TestCase
     public function processAsyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => true, 'disableStorage' => false],
-            ['async' => true, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => true,
+            'disableStorage' => false,
+        ]);
+        $this->addRoute('route1', 'routeId2', 20, [
+            'async' => true,
+            'disableStorage' => false,
         ]);
 
         $this->logger->expects($this->never())->method('error');
@@ -293,8 +318,8 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_QUEUED],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_QUEUED]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_QUEUED],
+                [$this->submission, 'routeId2', QueueInterface::STATUS_QUEUED]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -302,9 +327,10 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']],
-                [$this->jobs['route1:1']]
-            );
+                [$this->jobs['routeId1']],
+                [$this->jobs['routeId2']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -325,9 +351,13 @@ class RelayTest extends TestCase
     public function processSyncAndAsyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => false],
-            ['async' => true, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => false,
+            'disableStorage' => false,
+        ]);
+        $this->addRoute('route1', 'routeId2', 20, [
+            'async' => true,
+            'disableStorage' => false,
         ]);
 
         $this->logger->expects($this->never())->method('error');
@@ -336,8 +366,8 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_QUEUED]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_PENDING],
+                [$this->submission, 'routeId2', QueueInterface::STATUS_QUEUED]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -345,9 +375,10 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']],
-                [$this->jobs['route1:1']]
-            );
+                [$this->jobs['routeId1']],
+                [$this->jobs['routeId2']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -357,7 +388,7 @@ class RelayTest extends TestCase
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route1:0'],
+                $this->jobs['routeId1'],
             ]);
 
         $this->temporaryQueueProcessor
@@ -371,8 +402,9 @@ class RelayTest extends TestCase
     public function processAsyncWithoutStorageLogsErrorConvertsToSync(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => true, 'disableStorage' => true],
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => true,
+            'disableStorage' => true,
         ]);
 
         $this->logger->expects($this->once())->method('error')->with('Async submissions without storage are not possible. Using sync submission instead.');
@@ -381,7 +413,7 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -393,8 +425,9 @@ class RelayTest extends TestCase
             ->expects($this->exactly(1))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']],
-            );
+                [$this->jobs['routeId1']],
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -404,7 +437,7 @@ class RelayTest extends TestCase
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route1:0'],
+                $this->jobs['routeId1'],
             ]);
 
         $this->subject->process($this->submission);
@@ -414,13 +447,21 @@ class RelayTest extends TestCase
     public function processMixedSyncMixedStorageMultipleRoutesWithMultiplePasses(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => false],
-            ['async' => true, 'disableStorage' => false],
+        $this->addRoute('route1', 'routeId1', 10 , [
+            'async' => false,
+            'disableStorage' => false,
         ]);
-        $this->addRoute('route2', [
-            ['async' => false, 'disableStorage' => true],
-            ['async' => true, 'disableStorage' => true], // should be converted to be sync
+        $this->addRoute('route1', 'routeId2', 20 , [
+            'async' => true,
+            'disableStorage' => false,
+        ]);
+        $this->addRoute('route2', 'routeId3', 30 , [
+            'async' => false,
+            'disableStorage' => true,
+        ]);
+        $this->addRoute('route2', 'routeId4', 40 , [
+            'async' => true,
+            'disableStorage' => true, // should be converted to be sync
         ]);
 
         $this->logger->expects($this->once())->method('error')->with('Async submissions without storage are not possible. Using sync submission instead.');
@@ -429,10 +470,10 @@ class RelayTest extends TestCase
             ->expects($this->exactly(4))
             ->method('convertSubmissionToJob')
             ->withConsecutive(
-                [$this->submission, 'route1', 0, QueueInterface::STATUS_PENDING],
-                [$this->submission, 'route1', 1, QueueInterface::STATUS_QUEUED],
-                [$this->submission, 'route2', 0, QueueInterface::STATUS_PENDING],
-                [$this->submission, 'route2', 1, QueueInterface::STATUS_PENDING]
+                [$this->submission, 'routeId1', QueueInterface::STATUS_PENDING],
+                [$this->submission, 'routeId2', QueueInterface::STATUS_QUEUED],
+                [$this->submission, 'routeId3', QueueInterface::STATUS_PENDING],
+                [$this->submission, 'routeId4', QueueInterface::STATUS_PENDING]
             )
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
@@ -440,31 +481,33 @@ class RelayTest extends TestCase
             ->expects($this->exactly(2))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route1:0']],
-                [$this->jobs['route1:1']]
-            );
+                [$this->jobs['routeId1']],
+                [$this->jobs['routeId2']]
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->temporaryQueue
             ->expects($this->exactly(2))
             ->method('addJob')
             ->withConsecutive(
-                [$this->jobs['route2:0']],
-                [$this->jobs['route2:1']],
-            );
+                [$this->jobs['routeId3']],
+                [$this->jobs['routeId4']],
+            )
+            ->willReturnCallback(function(JobInterface $job) { return $job; });
 
         $this->persistentQueueProcessor
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route1:0'],
+                $this->jobs['routeId1'],
             ]);
 
         $this->temporaryQueueProcessor
             ->expects($this->once())
             ->method('processJobs')
             ->with([
-                $this->jobs['route2:0'],
-                $this->jobs['route2:1'],
+                $this->jobs['routeId3'],
+                $this->jobs['routeId4'],
             ]);
 
         $this->subject->process($this->submission);
@@ -474,8 +517,9 @@ class RelayTest extends TestCase
     public function disabledRouteAsyncWithStorageDoesNotCreateAJobAndIsNotProcessed(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => true, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => true,
+            'disableStorage' => false,
         ], enabled:false);
 
         $this->logger->expects($this->never())->method('error');
@@ -493,8 +537,9 @@ class RelayTest extends TestCase
     public function disabledRouteSyncWithStorageDoesNotCreateAJobAndIsNotProcessed(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => false]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => false,
+            'disableStorage' => false,
         ], enabled:false);
 
         $this->logger->expects($this->never())->method('error');
@@ -512,8 +557,9 @@ class RelayTest extends TestCase
     public function disabledRouteSyncWithoutStorageDoesNotCreateAJobAndIsNotProcessed(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', [
-            ['async' => false, 'disableStorage' => true]
+        $this->addRoute('route1', 'routeId1', 10, [
+            'async' => false,
+            'disableStorage' => true,
         ], enabled:false);
 
         $this->logger->expects($this->never())->method('error');

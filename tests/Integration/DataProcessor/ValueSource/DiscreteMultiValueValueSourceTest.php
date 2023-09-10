@@ -4,11 +4,11 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProce
 
 use DigitalMarketingFramework\Core\Tests\Integration\DataProcessor\ValueSource\MultiValueValueSourceTest;
 use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
-use DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProcessorRegistryTestTrait;
+use DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProcessor\DataProcessorPluginTestTrait;
 
 class DiscreteMultiValueValueSourceTest extends MultiValueValueSourceTest
 {
-    use DataProcessorRegistryTestTrait;
+    use DataProcessorPluginTestTrait;
 
     protected const KEYWORD = 'discreteMultiValue';
 

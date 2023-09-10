@@ -13,14 +13,14 @@ use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface
 {
-    const KEY_ENABLED = 'enabled';
-    const DEFAULT_ENABLED = false;
+    public const KEY_ENABLED = 'enabled';
+    public const DEFAULT_ENABLED = false;
 
-    const KEY_MUST_EXIST = 'mustExist';
-    const DEFAULT_MUST_EXIST = false;
+    public const KEY_MUST_EXIST = 'mustExist';
+    public const DEFAULT_MUST_EXIST = false;
 
-    const KEY_MUST_BE_EMPTY= 'mustBeEmpty';
-    const DEFAULT_MUST_BE_EMPTY = true;
+    public const KEY_MUST_BE_EMPTY = 'mustBeEmpty';
+    public const DEFAULT_MUST_BE_EMPTY = true;
 
     public function __construct(
         string $keyword,

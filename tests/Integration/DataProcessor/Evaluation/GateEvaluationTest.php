@@ -2,111 +2,162 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProcessor\Evaluation;
 
+use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Tests\Integration\DataProcessor\Evaluation\EvaluationTest;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\Evaluation\GateEvaluation;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
-use DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProcessorRegistryTestTrait;
-use DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProcessor\Evaluation\GateEvaluationTest as GateEvaluationUnitTest;
+use DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProcessor\DataProcessorPluginTestTrait;
 
 class GateEvaluationTest extends EvaluationTest
 {
-    use DataProcessorRegistryTestTrait;
+    use DataProcessorPluginTestTrait;
 
     protected const KEYWORD = 'gate';
 
     public function setUp(): void
     {
         parent::setUp();
-        foreach (GateEvaluationUnitTest::GATE_CONFIGURATIONS as $gateConfiguration) {
-            $this->addGate(...$gateConfiguration);
-        }
+
+        // foreign gate that passes
+        $this->addSimpleGate('routeThatPasses', 'routeIdThatPasses', true);
+
+        // foreign gate that does not pass
+        $this->addSimpleGate('routeThatDoesNotPass', 'routeIdThatDoesNotPass', false);
+
+        // direct loop gate
+        $this->addGateConfig('routeLoopA1', 'routeIdLoopA1', true, [
+            'type' => 'gate',
+            'config' => [
+                'gate' => [
+                    GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopA2',
+                ]
+            ],
+        ]);
+        $this->addGateConfig('routeLoopA2', 'routeIdLoopA2', true, [
+            'type' => 'gate',
+            'config' => [
+                'gate' => [
+                    GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopA1',
+                ]
+            ],
+        ]);
+
+        // indirect loop gate
+        $this->addGateConfig('routeLoopB1', 'routeIdLoopB1', true, [
+            'type' => 'gate',
+            'config' => [
+                'gate' => [
+                    GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopB2',
+                ]
+            ],
+        ]);
+        $this->addGateConfig('routeLoopB2', 'routeIdLoopB2', true, [
+            'type' => 'gate',
+            'config' => [
+                'gate' => [
+                    GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopB3',
+                ]
+            ],
+        ]);
+        $this->addGateConfig('routeLoopB3', 'routeIdLoopB3', true, [
+            'type' => 'gate',
+            'config' => [
+                'gate' => [
+                    GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopB1',
+                ]
+            ],
+        ]);
     }
 
-    protected function addGate(string $routeName, int $pass, bool $succeeds): void
+    protected function addGateConfig(string $routeName, string $routeId, bool $enabled, array $gateConfig = []): void
     {
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES][$routeName][SubmissionConfiguration::KEY_ROUTE_PASSES][$pass] = [
-            RouteInterface::KEY_ENABLED => $succeeds,
-        ];
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES]['gated' . ucfirst($routeName)][SubmissionConfiguration::KEY_ROUTE_PASSES][$pass] = [
-            RouteInterface::KEY_ENABLED => true,
-            RouteInterface::KEY_GATE => $this->getEvaluationConfiguration([], $succeeds ? 'true' : 'false'),
-        ];
+        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES][$routeId] = static::createListItem([
+            'type' => $routeName,
+            'config' => [
+                $routeName => [
+                    RouteInterface::KEY_ENABLED => $enabled,
+                    RouteInterface::KEY_GATE => $gateConfig,
+                ],
+            ],
+        ], $routeId);
     }
 
-    public function gateProvider(): array
+    protected function addSimpleGate(string $routeName, string $routeId, bool $succeeds): void
     {
-        return GateEvaluationUnitTest::GATE_TEST_CASES;
+        $this->addGateConfig($routeName, $routeId, $succeeds);
+        $gateType = $succeeds ? 'true' : 'false';
+        $this->addGateConfig($routeName, 'gated' . ucfirst($routeId), true, [
+            'type' => $gateType,
+            'config' => [
+                $gateType => [],
+            ],
+        ]);
     }
 
-    protected function runGate(string $routeName, int|string|null $pass, bool $expectedResult): void
+    public function falseTrueProvider(): array
     {
-        $config = [
-            GateEvaluation::KEY_KEY => $routeName, 
+        return [
+            [false],
+            [true],
         ];
-        if ($pass !== null) {
-            $config[GateEvaluation::KEY_PASS] = $pass;
-        }
-        $result = $this->processEvaluation($config);
-        $this->assertEquals($expectedResult, $result);
     }
 
     /**
+     * @dataProvider falseTrueProvider
      * @test
-     * @dataProvider gateProvider
      */
-    public function gate(string $routeName, int|string|null $pass, bool $expectedResult): void
+    public function gatePasses(bool $useGate): void
     {
-        $this->runGate($routeName, $pass, $expectedResult);
-        $this->runGate('gated' . ucfirst($routeName), $pass, $expectedResult);
-    }
-
-    /** @test */
-    public function recursiveGateSucceds(): void
-    {
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES]['recursiveGate'][SubmissionConfiguration::KEY_ROUTE_PASSES][0] = [
-            RouteInterface::KEY_ENABLED => true,
-            RouteInterface::KEY_GATE => $this->getEvaluationConfiguration([GateEvaluation::KEY_KEY => 'routeGateSucceeds', GateEvaluation::KEY_PASS], 'gate'),
-        ];
+        $routeId = $useGate ? 'gatedRouteIdThatPasses' : 'routeIdThatPasses';
         $config = [
-            GateEvaluation::KEY_KEY => 'recursiveGate',
-            GateEvaluation::KEY_PASS => 0,
+            GateEvaluation::KEY_ROUTE_ID => $routeId,
         ];
         $result = $this->processEvaluation($config);
         $this->assertTrue($result);
     }
 
-    /** @test */
-    public function recursiveGateFails(): void
+    /**
+     * @dataProvider falseTrueProvider
+     * @test
+     */
+    public function gateDoesNotPass(bool $useGate): void
     {
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES]['recursiveGate'][SubmissionConfiguration::KEY_ROUTE_PASSES][0] = [
-            RouteInterface::KEY_ENABLED => true,
-            RouteInterface::KEY_GATE => $this->getEvaluationConfiguration([GateEvaluation::KEY_KEY => 'routeGateDoesNotSucceed', GateEvaluation::KEY_PASS], 'gate'),
-        ];
+        $routeId = $useGate ? 'gatedRouteIdThatDoesNotPass' : 'routeIdThatDoesNotPass';
         $config = [
-            GateEvaluation::KEY_KEY => 'recursiveGate',
-            GateEvaluation::KEY_PASS => 0,
+            GateEvaluation::KEY_ROUTE_ID => $routeId,
         ];
         $result = $this->processEvaluation($config);
         $this->assertFalse($result);
     }
 
     /** @test */
-    public function recursiveGateWithLoop(): void
+    public function gateDoesNotExist(): void
     {
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES]['gate1'][SubmissionConfiguration::KEY_ROUTE_PASSES][0] = [
-            RouteInterface::KEY_ENABLED => true,
-            RouteInterface::KEY_GATE => $this->getEvaluationConfiguration([GateEvaluation::KEY_KEY => 'gate2', GateEvaluation::KEY_PASS], 'gate'),
-        ];
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES]['gate2'][SubmissionConfiguration::KEY_ROUTE_PASSES][0] = [
-            RouteInterface::KEY_ENABLED => true,
-            RouteInterface::KEY_GATE => $this->getEvaluationConfiguration([GateEvaluation::KEY_KEY => 'gate1', GateEvaluation::KEY_PASS], 'gate'),
-        ];
         $config = [
-            GateEvaluation::KEY_KEY => 'gate1',
-            GateEvaluation::KEY_PASS => 0,
+            GateEvaluation::KEY_ROUTE_ID => 'routeIdThatDoesNotExist',
         ];
-        $this->expectExceptionMessage('Gate dependency loop found for key gate1.0!');
+        $this->expectException(DigitalMarketingFrameworkException::class);
+        $this->processEvaluation($config);
+    }
+
+    /** @test */
+    public function directLoopGetsDetected(): void
+    {
+        $config = [
+            GateEvaluation::KEY_ROUTE_ID => 'routeLoopA1',
+        ];
+        $this->expectException(DigitalMarketingFrameworkException::class);
+        $this->processEvaluation($config);
+    }
+
+    /** @test */
+    public function indirectLoopGetsDetected(): void
+    {
+        $config = [
+            GateEvaluation::KEY_ROUTE_ID => 'routeLoopB1',
+        ];
+        $this->expectException(DigitalMarketingFrameworkException::class);
         $this->processEvaluation($config);
     }
 }

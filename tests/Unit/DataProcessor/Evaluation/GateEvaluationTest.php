@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProcessor\Evaluation;
 
+use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Tests\Unit\DataProcessor\Evaluation\EvaluationTest;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\Evaluation\GateEvaluation;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
@@ -12,115 +13,98 @@ class GateEvaluationTest extends EvaluationTest
     protected const CLASS_NAME = GateEvaluation::class;
     protected const KEYWORD = 'gate';
 
-    public const GATE_CONFIGURATIONS = [
-        ['routeGateSucceeds', 0, true],
-        ['routeGateDoesNotSucceed', 0, false],
-        
-        ['routeAllPassesSucceed', 0, true],
-        ['routeAllPassesSucceed', 1, true],
-
-        ['routeNoPassesSucceed', 0, false],
-        ['routeNoPassesSucceed', 1, false],
-
-        ['routeSomePassesSucceed', 0, true],
-        ['routeSomePassesSucceed', 1, false],
-
-        ['routeSomePassesSucceed2', 0, false],
-        ['routeSomePassesSucceed2', 1, true],
-    ];
-
-    public const GATE_TEST_CASES = [
-        // routeName, routePass, expected
-        ['routeGateSucceeds',       null, true],
-        ['routeGateSucceeds',       '0',   true],
-        ['routeGateSucceeds',       'any', true],
-        ['routeGateSucceeds',       'all', true],
-        
-        ['routeGateDoesNotSucceed', null, false],
-        ['routeGateDoesNotSucceed', '0',   false],
-        ['routeGateDoesNotSucceed', 'any', false],
-        ['routeGateDoesNotSucceed', 'all', false],
-
-        ['routeAllPassesSucceed',   null,  true],
-        ['routeAllPassesSucceed',   '0',   true],
-        ['routeAllPassesSucceed',   '1',   true],
-        ['routeAllPassesSucceed',   'any', true],
-        ['routeAllPassesSucceed',   'all', true],
-
-        ['routeNoPassesSucceed',    null,  false],
-        ['routeNoPassesSucceed',    '0',   false],
-        ['routeNoPassesSucceed',    '1',   false],
-        ['routeNoPassesSucceed',    'any', false],
-        ['routeNoPassesSucceed',    'all', false],
-
-        ['routeSomePassesSucceed',  null,  true],
-        ['routeSomePassesSucceed',  '0',   true],
-        ['routeSomePassesSucceed',  '1',   false],
-        ['routeSomePassesSucceed',  'any', true],
-        ['routeSomePassesSucceed',  'all', false],
-
-        ['routeSomePassesSucceed2', null,  true],
-        ['routeSomePassesSucceed2', '1',   true],
-        ['routeSomePassesSucceed2', '0',   false],
-        ['routeSomePassesSucceed2', 'any', true],
-        ['routeSomePassesSucceed2', 'all', false],
-    ];
-
-    public function setUp(): void
+    protected function setupDataProcessor(): void
     {
-        parent::setUp();
         $this->dataProcessor->method('processEvaluation')->willReturnCallback(function(array $config) {
             return $config['mockedResult'] ?? false;
         });
-        foreach (static::GATE_CONFIGURATIONS as $gateConfiguration) {
-            $this->addGate(...$gateConfiguration);
-        }
     }
 
-    protected function addGate(string $routeName, int $pass, bool $succeeds): void
+    protected function addGate(string $routeName, string $routeId, bool $succeeds): void
     {
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES][$routeName][SubmissionConfiguration::KEY_ROUTE_PASSES][$pass] = [
-            RouteInterface::KEY_ENABLED => $succeeds,
-        ];
-        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES]['gated' . ucfirst($routeName)][SubmissionConfiguration::KEY_ROUTE_PASSES][$pass] = [
-            RouteInterface::KEY_ENABLED => true,
-            RouteInterface::KEY_GATE => ['mockedResult' => $succeeds]
-        ];
+        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES][$routeId] = static::createListItem([
+            'type' => $routeName,
+            'config' => [
+                $routeName => [
+                    RouteInterface::KEY_ENABLED => $succeeds,
+                ],
+            ],
+        ], $routeId);
+        $gatedRouteId = 'gated' . ucfirst($routeId);
+        $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES][$gatedRouteId] = static::createListItem([
+            'type' => $routeName,
+            'config' => [
+                $routeName => [
+                    RouteInterface::KEY_ENABLED => true,
+                    RouteInterface::KEY_GATE => ['mockedResult' => $succeeds]
+                ],
+            ],
+        ], $gatedRouteId);
     }
 
-    public function gateProvider(): array
-    {
-        return static::GATE_TEST_CASES;
-    }
-
-    protected function runGate(string $routeName, int|string|null $pass, bool $expectedResult): void
+    protected function processGateEvaluation(string $routeId, ?bool $expectedResult): void
     {
         $config = [
-            GateEvaluation::KEY_KEY => $routeName, 
+            GateEvaluation::KEY_ROUTE_ID => $routeId,
         ];
-        if ($pass !== null) {
-            $config[GateEvaluation::KEY_PASS] = $pass;
-        }
         $result = $this->processEvaluation($config);
-        $this->assertEquals($expectedResult, $result);
+        if ($expectedResult !== null) {
+            $this->assertEquals($expectedResult, $result);
+        }
     }
 
-    /**
-     * @test
-     * @dataProvider gateProvider
-     */
-    public function gate(string $routeName, int|string|null $pass, bool $expectedResult): void
+    protected function processGateEvaluationWithBothEnabledAndGateConfig(string $routeId, bool $expectedResult): void
     {
-        $this->runGate($routeName, $pass, $expectedResult);
-        $this->runGate('gated' . ucfirst($routeName), $pass, $expectedResult);
+        $this->processGateEvaluation($routeId, $expectedResult);
+        $this->processGateEvaluation('gated' . ucfirst($routeId), $expectedResult);
     }
 
     /** @test */
-    public function recursiveLoopWillBeDetected(): void
+    public function gatePasses(): void
     {
+        $this->setupDataProcessor();
+        $this->addGate('route1', 'routeId1', true);
+        $this->processGateEvaluationWithBothEnabledAndGateConfig('routeId1', true);
+    }
+
+    /** @test */
+    public function gateDoesNotPass(): void
+    {
+        $this->setupDataProcessor();
+        $this->addGate('route1', 'routeId1', false);
+        $this->processGateEvaluationWithBothEnabledAndGateConfig('routeId1', false);
+    }
+
+    /** @test */
+    public function gateDoesNotExist(): void
+    {
+        $this->setupDataProcessor();
+        $this->expectException(DigitalMarketingFrameworkException::class);
+        $this->processGateEvaluation('routeId1', false);
+    }
+
+    /** @test */
+    public function gateLoopContextApplied(): void
+    {
+        $this->dataProcessor->expects($this->exactly(1))->method('processEvaluation')->willReturnCallback(function(array $config, $context) {
+            $this->assertTrue($context[GateEvaluation::KEY_ROUTE_IDS_EVALUATED]['gatedRouteId1']);
+            return $config['mockedResult'] ?? false;
+        });
+        $this->addGate('route1', 'routeId1', true);
+        $this->processGateEvaluation('gatedRouteId1', null);
+    }
+
+    /** @test */
+    public function gateLoopIsDetected(): void
+    {
+        $this->setupDataProcessor();
+        $this->addGate('route1', 'routeId1', true);
         $context = $this->getContext();
-        $context[GateEvaluation::KEY_KEYS_EVALUATED] = ['routeName1.0' => true];
-        $this->expectExceptionMessage('Gate dependency loop found for key routeName1.0!');
-        $this->processEvaluation([GateEvaluation::KEY_KEY => 'routeName1', GateEvaluation::KEY_PASS => '0'], $context);
+        $context[GateEvaluation::KEY_ROUTE_IDS_EVALUATED]['gatedRouteId1'] = true;
+        $config = [
+            GateEvaluation::KEY_ROUTE_ID => 'gatedRouteId1',
+        ];
+        $this->expectException(DigitalMarketingFrameworkException::class);
+        $this->processEvaluation($config, $context);
     }
 }

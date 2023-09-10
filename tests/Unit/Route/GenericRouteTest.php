@@ -3,7 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
 use DigitalMarketingFramework\Core\DataProcessor\Evaluation\EvaluationInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
@@ -22,6 +22,12 @@ use PHPUnit\Framework\TestCase;
 
 class GenericRouteTest extends TestCase
 {
+    protected const DEFAULT_CONFIG = [
+        'enabled' => false,
+        'gate' => [],
+        'data' => [],
+    ];
+
     protected RegistryInterface&MockObject $registry;
 
     protected DataProcessorInterface&MockObject $dataProcessor;
@@ -38,7 +44,7 @@ class GenericRouteTest extends TestCase
 
     protected SubmissionConfigurationInterface&MockObject $submissionConfiguration;
 
-    protected WriteableContextInterface&MockObject $submissionContext;
+    protected WriteableContext $submissionContext;
 
     protected GenericRoute $subject;
 
@@ -54,29 +60,33 @@ class GenericRouteTest extends TestCase
 
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
-        $this->submissionContext = $this->createMock(WriteableContextInterface::class);
+        $this->submissionContext = new WriteableContext();
         $this->submission = $this->createMock(SubmissionDataSetInterface::class);
         $this->submission->expects($this->any())->method('getData')->willReturn($this->submissionData);
         $this->submission->expects($this->any())->method('getConfiguration')->willReturn($this->submissionConfiguration);
         $this->submission->expects($this->any())->method('getContext')->willReturn($this->submissionContext);
     }
 
-    protected function createRoute(string $keyword = 'myCustomKeyword', bool $useDispatcher = true, ?SubmissionDataSetInterface $submission = null): void
+    protected function createRoute(string $keyword = 'myCustomKeyword', string $routeId = 'myCustomKeywordId1', bool $useDispatcher = true, ?SubmissionDataSetInterface $submission = null): void
     {
         $this->subject = new GenericRoute(
             $keyword,
             $this->registry,
             $submission ?? $this->submission,
-            0,
+            $routeId,
             $useDispatcher ? $this->dataDispatcher : null
         );
         $this->subject->setLogger($this->logger);
         $this->subject->setDataProcessor($this->dataProcessor);
+        $this->subject->setDefaultConfiguration(static::DEFAULT_CONFIG);
     }
 
     /** @test */
     public function useCorrectKeyword(): void
     {
+        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+            'enabled' => true,
+        ]);
         $this->createRoute();
         $this->assertEquals('myCustomKeyword', $this->subject->getKeyword());
     }
@@ -84,21 +94,29 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function addContextShouldNotAddAnyContextByDefault(): void
     {
-        $submission = new SubmissionDataSet(['field1' => 'value1']);
+        $this->submissionData['field1'] = 'value1';
+        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+            'enabled' => true,
+        ]);
 
-        $this->createRoute(submission:$submission);
+        $this->createRoute();
+
+
         $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($submission->getContext()->toArray());
+        $this->assertEmpty($this->submissionContext->toArray());
     }
 
     /** @test */
     public function processPassGateFails(): void
     {
         $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(false);
-        $this->logger->expects($this->once())->method('debug')->with(sprintf(Route::MESSAGE_GATE_FAILED, 'myCustomKeyword', 0));
+        $this->logger->expects($this->once())->method('debug')->with(sprintf(Route::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
-        $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
             'enabled' => true,
+            'gate' => [
+                'gateConfigKey1' => 'gateConfigValue1',
+            ],
         ]);
 
         $this->createRoute();
@@ -110,38 +128,17 @@ class GenericRouteTest extends TestCase
     public function processPassEmptyInputDataWillCauseException(): void
     {
         $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
-        $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
             'enabled' => true,
-        ]);
-
-        $this->expectException(DigitalMarketingFrameworkException::class);
-        $this->expectExceptionMessage(sprintf(Route::MESSAGE_DATA_EMPTY, 'myCustomKeyword', 0));
-
-        $this->createRoute();
-        $this->subject->process();
-    }
-
-    /** @test */
-    public function processPassNoDispatcherWillCauseException(): void
-    {
-        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
-        $this->submissionData['field1'] = 'value1';
-
-        $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
-            'enabled' => true,
-            'fields' => [
-                'field1' => ['field' => 'field1'],
+            'gate' => [
+                'gateConfigKey1' => 'gateConfigValue1',
             ],
         ]);
 
-        $this->dataProcessor->expects($this->once())->method('processDataMapper')->willReturn(new Data([
-            'field1' => 'processedValue1',
-        ]));
-
         $this->expectException(DigitalMarketingFrameworkException::class);
-        $this->expectExceptionMessage(sprintf(Route::MESSAGE_DISPATCHER_NOT_FOUND, 'myCustomKeyword', 0));
+        $this->expectExceptionMessage(sprintf(Route::MESSAGE_DATA_EMPTY, 'myCustomKeyword', 'myCustomKeywordId1'));
 
-        $this->createRoute(useDispatcher:false);
+        $this->createRoute();
         $this->subject->process();
     }
 
@@ -152,8 +149,11 @@ class GenericRouteTest extends TestCase
         $this->submissionData['field1'] = 'value1';
         $this->submissionData['field2'] = 'value2';
 
-        $this->submissionConfiguration->expects($this->once())->method('getRoutePassConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
             'enabled' => true,
+            'gate' => [
+                'gateConfigKey1' => 'gateConfigValue1',
+            ],
             'fields' => [
                 'processedField1' => 'someConfig',
                 'processedField2' => 'someOtherConfig',
@@ -167,7 +167,7 @@ class GenericRouteTest extends TestCase
 
         $this->dataDispatcher->expects($this->once())->method('send')->with([
             'processedField1' => 'processedValue1',
-            'processedField2' => 'processedValue2'
+            'processedField2' => 'processedValue2',
         ]);
 
         $this->createRoute();

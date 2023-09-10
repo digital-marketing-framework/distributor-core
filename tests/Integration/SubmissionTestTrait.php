@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -9,6 +10,8 @@ use DigitalMarketingFramework\Distributor\Core\Service\Relay;
 
 trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
 {
+    use ListMapTestTrait;
+
     protected array $submissionData = [];
 
     protected array $submissionConfiguration = [];
@@ -38,9 +41,15 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
         return new SubmissionDataSet($this->submissionData, $this->submissionConfiguration, $this->submissionContext);
     }
 
-    protected function addRouteConfiguration(string $name, array $configuration, int $index = 0): void
+    protected function addRouteConfiguration(string $routeName, string $routeId, int $weight, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_ROUTES][$name] = $configuration;
+        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_ROUTES][$routeId] = $this->createListItem([
+            'type' => $routeName,
+            'pass' => '',
+            'config' => [
+                $routeName => $configuration,
+            ],
+        ], $routeId, $weight);
     }
 
     protected function addDataProviderConfiguration(string $name, array $configuration, int $index = 0): void

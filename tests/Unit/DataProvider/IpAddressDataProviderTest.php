@@ -8,6 +8,10 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
 {
     protected const DATA_PROVIDER_CLASS = IpAddressDataProvider::class;
 
+    protected const DEFAULT_CONFIG = parent::DEFAULT_CONFIG + [
+        IpAddressDataProvider::KEY_FIELD => IpAddressDataProvider::DEFAULT_FIELD,
+    ];
+
     /** @test */
     public function doesNotDoAnythingIfDisabled(): void
     {

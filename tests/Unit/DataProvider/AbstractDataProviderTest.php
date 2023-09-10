@@ -9,6 +9,8 @@ use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
+use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -18,7 +20,15 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractDataProviderTest extends TestCase
 {
+    use ListMapTestTrait;
+
     protected const DATA_PROVIDER_CLASS = '';
+
+    protected const DEFAULT_CONFIG = [
+        DataProvider::KEY_ENABLED => DataProvider::DEFAULT_ENABLED,
+        DataProvider::KEY_MUST_EXIST => DataProvider::DEFAULT_MUST_EXIST,
+        DataProvider::KEY_MUST_BE_EMPTY => DataProvider::DEFAULT_MUST_BE_EMPTY,
+    ];
 
     protected RegistryInterface&MockObject $registry;
 
@@ -53,9 +63,13 @@ abstract class AbstractDataProviderTest extends TestCase
         $this->submissionConfiguration->method('getDataProviderConfiguration')->with($keyword)->willReturn($config);
     }
 
-    protected function createDataProvider(string $keyword = 'myCustomKeyword', array $additionalArguments = []): void
+    protected function createDataProvider(string $keyword = 'myCustomKeyword', array $additionalArguments = [], ?array $defaultConfig = null): void
     {
+        if ($defaultConfig === null) {
+            $defaultConfig = static::DEFAULT_CONFIG;
+        }
         $class = static::DATA_PROVIDER_CLASS;
         $this->subject = new $class($keyword, $this->registry, $this->submission, ...$additionalArguments);
+        $this->subject->setDefaultConfiguration($defaultConfig);
     }
 }

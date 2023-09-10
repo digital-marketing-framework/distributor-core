@@ -8,6 +8,10 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
 {
     protected const DATA_PROVIDER_CLASS = RequestVariablesDataProvider::class;
 
+    protected const DEFAULT_CONFIG = parent::DEFAULT_CONFIG + [
+        RequestVariablesDataProvider::KEY_VARIABLE_FIELD_MAP => [],
+    ];
+
     /** @test */
     public function doesNotDoAnythingIfDisabled(): void
     {
@@ -31,7 +35,7 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
             'variableFieldMap' => [
-                'requestVariableName1' => 'fieldName1',
+                'requestVariableItemId1' => $this->createMapItem('requestVariableName1', 'fieldName1', 'requestVariableItemId1', 10),
             ],
         ]);
         $this->globalContext->expects($this->once())->method('getRequestVariable')->willReturn(null);
@@ -51,8 +55,8 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
             'variableFieldMap' => [
-                'requestVariableName1' => 'fieldName1',
-                'requestVariableName2' => 'fieldName2',
+                'requestVariableItemId1' => $this->createMapItem('requestVariableName1', 'fieldName1', 'requestVariableItemId1', 10),
+                'requestVariableItemId2' => $this->createMapItem('requestVariableName2', 'fieldName2', 'requestVariableItemId2', 20),
             ],
         ]);
         $this->globalContext->expects($this->any())->method('getRequestVariable')->willReturnMap([
@@ -83,7 +87,7 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
             'variableFieldMap' => [
-                'requestVariableName1' => 'fieldName1',
+                'requestVariableItemId1' => $this->createMapItem('requestVariableName1', 'fieldName1', 'requestVariableItemId1', 10),
             ],
         ]);
         $this->globalContext->expects($this->once())->method('getRequestVariable')->willReturnMap([
