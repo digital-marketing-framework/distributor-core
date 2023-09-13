@@ -2,7 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataDispatcher;
 
-use DigitalMarketingFramework\Core\Plugin\Plugin;
+use DigitalMarketingFramework\Distributor\Core\Plugin\Plugin;
 
 abstract class DataDispatcher extends Plugin implements DataDispatcherInterface
 {
