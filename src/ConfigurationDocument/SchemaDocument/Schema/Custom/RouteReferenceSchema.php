@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\ConfigurationDocument\SchemaDocument\Schema\Custom;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\StringSchema;
 
 class RouteReferenceSchema extends StringSchema
@@ -15,6 +16,6 @@ class RouteReferenceSchema extends StringSchema
             $this->allowedValues->addValue('', 'Select Route');
         }
         $this->allowedValues->addReference('/distributor/routes/*', label:'{value/type} {value/pass}');
-        $this->getRenderingDefinition()->setFormat('select');
+        $this->getRenderingDefinition()->setFormat(RenderingDefinitionInterface::FORMAT_SELECT);
     }
 }
