@@ -4,8 +4,6 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\DataProce
 
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Distributor\Core\DistributorCoreInitialization;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
 trait DataProcessorPluginTestTrait
 {

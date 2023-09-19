@@ -19,11 +19,13 @@ trait DataProviderRegistryTrait
 
     public function getDataProvider(string $keyword, SubmissionDataSetInterface $submission): ?DataProviderInterface
     {
+        /** @var ?DataProviderInterface */
         return $this->getPlugin($keyword, DataProviderInterface::class, [$submission]);
     }
 
     public function getDataProviders(SubmissionDataSetInterface $submission): array
     {
+        /** @var array<DataProviderInterface> */
         return $this->getAllPlugins(DataProviderInterface::class, [$submission]);
     }
 
@@ -38,6 +40,7 @@ trait DataProviderRegistryTrait
         foreach ($this->getAllPluginClasses(DataProviderInterface::class) as $key => $class) {
             $schema->addItem($key, $class::getSchema());
         }
+
         return $schema;
     }
 }

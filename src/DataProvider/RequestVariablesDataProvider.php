@@ -10,7 +10,7 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class RequestVariablesDataProvider extends DataProvider
 {
-    const KEY_VARIABLE_FIELD_MAP = 'variableFieldMap';
+    public const KEY_VARIABLE_FIELD_MAP = 'variableFieldMap';
 
     protected function processContext(ContextInterface $context): void
     {
@@ -38,6 +38,7 @@ class RequestVariablesDataProvider extends DataProvider
         $variableMapSchema = new MapSchema(new StringSchema('fieldName'), new StringSchema('variableName'));
         $variableMapSchema->getRenderingDefinition()->setNavigationItem(false);
         $schema->addProperty(static::KEY_VARIABLE_FIELD_MAP, $variableMapSchema);
+
         return $schema;
     }
 }

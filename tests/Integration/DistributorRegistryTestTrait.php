@@ -2,8 +2,8 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
-use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
+use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Core\Tests\Integration\RegistryTestTrait;
 use DigitalMarketingFramework\Distributor\Core\DistributorCoreInitialization;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;

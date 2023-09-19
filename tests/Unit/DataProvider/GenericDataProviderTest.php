@@ -8,6 +8,10 @@ class GenericDataProviderTest extends AbstractDataProviderTest
 {
     protected const DATA_PROVIDER_CLASS = GenericDataProvider::class;
 
+    /**
+     * @param array<string,mixed> $contextToAdd
+     * @param array<string,mixed> $fieldsToAdd
+     */
     protected function createGenericDataProvider(string $keyword = 'myCustomKeyword', array $contextToAdd = [], array $fieldsToAdd = []): void
     {
         $this->createDataProvider($keyword, [$contextToAdd, $fieldsToAdd]);
@@ -37,10 +41,10 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ]);
 
         $this->createGenericDataProvider(
-            contextToAdd:[
+            contextToAdd: [
                 'contextField1' => 'contextValue1',
             ],
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1',
             ]
         );
@@ -66,7 +70,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->submissionData['field1'] = 'value1';
 
         $this->createGenericDataProvider(
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1b',
                 'field2' => 'value2b',
             ]
@@ -92,7 +96,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->submissionData['field1'] = '';
 
         $this->createGenericDataProvider(
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1b',
                 'field2' => 'value2b',
             ]
@@ -119,7 +123,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->submissionData['field1'] = 'value1';
 
         $this->createGenericDataProvider(
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1b',
                 'field2' => 'value2b',
             ]
@@ -143,7 +147,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ]);
 
         $this->createGenericDataProvider(
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1',
             ]
         );
@@ -166,7 +170,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ]);
 
         $this->createGenericDataProvider(
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1',
             ]
         );
@@ -190,7 +194,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->submissionData['field2'] = '';
 
         $this->createGenericDataProvider(
-            fieldsToAdd:[
+            fieldsToAdd: [
                 'field1' => 'value1b',
                 'field2' => 'value2b',
                 'field3' => 'value3b',

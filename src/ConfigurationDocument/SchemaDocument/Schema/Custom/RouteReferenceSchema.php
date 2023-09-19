@@ -15,7 +15,8 @@ class RouteReferenceSchema extends StringSchema
         if (!$required) {
             $this->allowedValues->addValue('', 'Select Route');
         }
-        $this->allowedValues->addReference('/distributor/routes/*', label:'{value/type} {value/pass}');
+
+        $this->allowedValues->addReference('/distributor/routes/*', label: '{value/type} {value/pass}');
         $this->getRenderingDefinition()->setFormat(RenderingDefinitionInterface::FORMAT_SELECT);
     }
 }

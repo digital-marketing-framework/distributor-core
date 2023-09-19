@@ -14,9 +14,11 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 
 class QueueDataFactory implements QueueDataFactoryInterface
 {
-    const KEY_ROUTE_ID = 'routeId';
-    const KEY_SUBMISSION = 'submission';
-    const DEFAULT_LABEL = 'undefined';
+    public const KEY_ROUTE_ID = 'routeId';
+
+    public const KEY_SUBMISSION = 'submission';
+
+    public const DEFAULT_LABEL = 'undefined';
 
     public function __construct(
         protected ConfigurationDocumentManagerInterface $configurationDocumentManager,
@@ -28,6 +30,9 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return new Job();
     }
 
+    /**
+     * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $submissionData
+     */
     protected function getSubmissionDataHash(array $submissionData): string
     {
         return GeneralUtility::calculateHash($submissionData);
@@ -43,13 +48,18 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $this->getSubmissionDataHash($this->getJobSubmissionData($job));
     }
 
+    /**
+     * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $submissionData
+     */
     protected function getSubmissionDataLabel(array $submissionData, string $routeId, string $hash = ''): string
     {
-        if (!$hash) {
+        if ($hash === '') {
             $hash = $this->getSubmissionDataHash($submissionData);
         }
+
         try {
             $submission = $this->unpack($submissionData);
+
             return $this->getSubmissionLabel($submission, $routeId, $hash);
         } catch (DigitalMarketingFrameworkException) {
             return static::DEFAULT_LABEL;
@@ -61,6 +71,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
         if ($hash === '') {
             $hash = $this->getSubmissionHash($submission);
         }
+
         return GeneralUtility::shortenHash($hash)
             . '#' . $submission->getConfiguration()->getRouteLabel($routeId);
     }
@@ -74,12 +85,16 @@ class QueueDataFactory implements QueueDataFactoryInterface
         );
     }
 
+    /**
+     * @return array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>}
+     */
     protected function getJobSubmissionData(JobInterface $job): array
     {
         $jobData = $job->getData();
         if (!isset($jobData[static::KEY_SUBMISSION])) {
             throw new DigitalMarketingFrameworkException('job does not seem to have submission data');
         }
+
         return $jobData[static::KEY_SUBMISSION];
     }
 
@@ -89,6 +104,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
         if (!isset($jobData[static::KEY_ROUTE_ID])) {
             throw new DigitalMarketingFrameworkException('job does not seem to have a route id');
         }
+
         return $jobData[static::KEY_ROUTE_ID];
     }
 
@@ -103,6 +119,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
         ]);
         $job->setHash($this->getSubmissionDataHash($submissionData));
         $job->setLabel($this->getSubmissionLabel($submission, $routeId, $job->getHash()));
+
         return $job;
     }
 
@@ -111,6 +128,9 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $this->unpack($this->getJobSubmissionData($job));
     }
 
+    /**
+     * @return array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>}
+     */
     protected function pack(SubmissionDataSetInterface $submission): array
     {
         return [
@@ -121,25 +141,32 @@ class QueueDataFactory implements QueueDataFactoryInterface
     }
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
+     *
      * @throws DigitalMarketingFrameworkException
      */
     protected function validatePackage(array $data): void
     {
-        if (!$data || !is_array($data) || empty($data)) {
+        if ($data === []) {
             throw new DigitalMarketingFrameworkException('job data is empty');
         }
+
         if (!isset($data['data']) || !is_array($data['data'])) {
             throw new DigitalMarketingFrameworkException('job has no valid submission data');
         }
+
         if (!isset($data['configuration']) || !is_array($data['configuration'])) {
             throw new DigitalMarketingFrameworkException('job has no valid submission configuration');
         }
+
         if (!isset($data['context']) || !is_array($data['context'])) {
             throw new DigitalMarketingFrameworkException('job has no valid submission context');
         }
     }
 
+    /**
+     * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $data
+     */
     protected function unpack(array $data): SubmissionDataSetInterface
     {
         $this->validatePackage($data);

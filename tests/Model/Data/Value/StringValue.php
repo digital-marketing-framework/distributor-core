@@ -11,27 +11,22 @@ use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
  */
 class StringValue extends Value
 {
-    public $value;
-
-    public function __construct(string $value = '')
+    public function __construct(public string $value = '')
     {
-        $this->value = $value;
     }
 
     public function __toString(): string
     {
-        return (string)$this->value;
+        return $this->value;
     }
 
     public function pack(): array
     {
-        return [(string)$this->value];
+        return ['value' => $this->value];
     }
 
     public static function unpack(array $packed): ValueInterface
     {
-        $field = new StringValue();
-        $field->value = $packed[0];
-        return $field;
+        return new StringValue($packed['value']);
     }
 }

@@ -7,8 +7,17 @@ use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInte
 
 interface DataDispatcherRegistryInterface extends PluginRegistryInterface
 {
+    /**
+     * @param array<mixed> $additionalArguments
+     */
     public function registerDataDispatcher(string $class, array $additionalArguments = [], string $keyword = ''): void;
+
+    /**
+     * @return array<DataDispatcherInterface>
+     */
     public function getDataDispatchers(): array;
+
     public function getDataDispatcher(string $keyword): ?DataDispatcherInterface;
+
     public function deleteDataDispatcher(string $keyword): void;
 }

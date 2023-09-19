@@ -9,7 +9,9 @@ use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 interface DataProviderInterface extends ConfigurablePluginInterface
 {
     public function enabled(): bool;
+
     public function addContext(ContextInterface $context): void;
+
     public function addData(): void;
 
     public static function getSchema(): SchemaInterface;

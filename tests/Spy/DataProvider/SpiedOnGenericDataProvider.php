@@ -10,8 +10,8 @@ use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 class SpiedOnGenericDataProvider extends DataProvider
 {
     public function __construct(
-        string $keyword, 
-        RegistryInterface $registry, 
+        string $keyword,
+        RegistryInterface $registry,
         SubmissionDataSetInterface $submission,
         public DataProviderSpyInterface $spy
     ) {

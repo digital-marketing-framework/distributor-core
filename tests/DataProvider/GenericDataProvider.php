@@ -9,8 +9,12 @@ use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 class GenericDataProvider extends DataProvider
 {
+    /**
+     * @param array<string,mixed> $contextToAdd
+     * @param array<string,mixed> $fieldsToAdd
+     */
     public function __construct(
-        string $keyword, 
+        string $keyword,
         RegistryInterface $registry,
         SubmissionDataSetInterface $submission,
         protected array $contextToAdd = [],

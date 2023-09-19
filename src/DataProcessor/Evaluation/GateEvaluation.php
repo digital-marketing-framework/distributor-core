@@ -18,15 +18,21 @@ class GateEvaluation extends Evaluation
     public const KEY_ROUTE_IDS_EVALUATED = 'gateRouteIdsEvaluated';
 
     public const MESSAGE_LOOP_DETECTED = 'Gate dependency loop found for ID %s!';
+
     public const MESSAGE_ROUTE_NOT_FOUND = 'Route with ID %s not found!';
 
+    /**
+     * @return ?array<string,mixed>
+     */
     protected function getRouteConfiguration(string $routeId): ?array
     {
         $configuration = $this->context['configuration'] ?? null;
         if ($configuration instanceof ConfigurationInterface) {
             $configuration = SubmissionConfiguration::convert($configuration);
+
             return $configuration->getRouteConfiguration($routeId);
         }
+
         return null;
     }
 
@@ -35,6 +41,7 @@ class GateEvaluation extends Evaluation
         if (!isset($this->context[static::KEY_ROUTE_IDS_EVALUATED])) {
             $this->context[static::KEY_ROUTE_IDS_EVALUATED] = [];
         }
+
         if (isset($this->context[static::KEY_ROUTE_IDS_EVALUATED][$routeId])) {
             throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_LOOP_DETECTED, $routeId));
         }
@@ -63,6 +70,7 @@ class GateEvaluation extends Evaluation
         }
 
         unset($this->context[static::KEY_ROUTE_IDS_EVALUATED][$routeId]);
+
         return $result;
     }
 
@@ -70,6 +78,7 @@ class GateEvaluation extends Evaluation
     {
         $schema = new ContainerSchema();
         $schema->addProperty(static::KEY_ROUTE_ID, new RouteReferenceSchema());
+
         return $schema;
     }
 }

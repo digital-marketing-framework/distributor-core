@@ -10,9 +10,11 @@ use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 interface RouteInterface extends ConfigurablePluginInterface
 {
     public const KEY_ENABLED = 'enabled';
+
     public const DEFAULT_ENABLED = false;
 
     public const KEY_GATE = 'gate';
+
     public const DEFAULT_GATE = [];
 
     public const KEY_DATA = 'data';
@@ -20,11 +22,18 @@ interface RouteInterface extends ConfigurablePluginInterface
     public function getRouteId(): string;
 
     public function buildData(): DataInterface;
+
     public function processGate(): bool;
 
     public function enabled(): bool;
+
     public function async(): ?bool;
+
     public function disableStorage(): ?bool;
+
+    /**
+     * @return array<string>
+     */
     public function getEnabledDataProviders(): array;
 
     /**

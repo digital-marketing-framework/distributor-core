@@ -2,11 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
-use DigitalMarketingFramework\Core\ConfigurationResolver\Evaluation\EvaluationInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
-use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
@@ -44,7 +42,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     protected DataProviderInterface $subject;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(RegistryInterface::class);
         $this->globalContext = $this->createMock(ContextInterface::class);
@@ -58,16 +56,24 @@ abstract class AbstractDataProviderTest extends TestCase
         $this->submission->expects($this->any())->method('getContext')->willReturn($this->submissionContext);
     }
 
+    /**
+     * @param array<string,mixed> $config
+     */
     protected function setDataProviderConfiguration(array $config, string $keyword = 'myCustomKeyword'): void
     {
         $this->submissionConfiguration->method('getDataProviderConfiguration')->with($keyword)->willReturn($config);
     }
 
+    /**
+     * @param array<mixed> $additionalArguments
+     * @param ?array<string,mixed> $defaultConfig
+     */
     protected function createDataProvider(string $keyword = 'myCustomKeyword', array $additionalArguments = [], ?array $defaultConfig = null): void
     {
         if ($defaultConfig === null) {
             $defaultConfig = static::DEFAULT_CONFIG;
         }
+
         $class = static::DATA_PROVIDER_CLASS;
         $this->subject = new $class($keyword, $this->registry, $this->submission, ...$additionalArguments);
         $this->subject->setDefaultConfiguration($defaultConfig);

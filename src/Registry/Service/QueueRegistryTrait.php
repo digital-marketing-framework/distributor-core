@@ -9,6 +9,7 @@ use DigitalMarketingFramework\Core\Registry\RegistryException;
 trait QueueRegistryTrait
 {
     protected QueueInterface $persistentQueue;
+
     protected QueueInterface $nonPersistentQueue;
 
     public function getPersistentQueue(): QueueInterface
@@ -16,6 +17,7 @@ trait QueueRegistryTrait
         if (!isset($this->persistentQueue)) {
             throw new RegistryException('Persistent distributor job queue not defined.');
         }
+
         return $this->persistentQueue;
     }
 
@@ -29,6 +31,7 @@ trait QueueRegistryTrait
         if (!isset($this->nonPersistentQueue)) {
             $this->nonPersistentQueue = new NonPersistentQueue();
         }
+
         return $this->nonPersistentQueue;
     }
 

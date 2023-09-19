@@ -11,6 +11,7 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 class CookieDataProvider extends DataProvider
 {
     public const KEY_COOKIE_FIELD_MAP = 'cookieFieldMap';
+
     public const DEFAULT_COOKIE_FIELD_MAP = [];
 
     protected function processContext(ContextInterface $context): void
@@ -39,6 +40,7 @@ class CookieDataProvider extends DataProvider
         $cookieMapSchema = new MapSchema(new StringSchema());
         $cookieMapSchema->getRenderingDefinition()->setNavigationItem(false);
         $schema->addProperty(static::KEY_COOKIE_FIELD_MAP, $cookieMapSchema);
+
         return $schema;
     }
 }
