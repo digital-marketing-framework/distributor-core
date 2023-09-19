@@ -6,18 +6,19 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentMa
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\Value\FileValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
+use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\Model\File\FileInterface;
+use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
-use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers QueueDataFactory
+ * @covers \DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory
  */
 class QueueDataFactoryTest extends TestCase
 {
@@ -31,12 +32,15 @@ class QueueDataFactoryTest extends TestCase
     {
         parent::setUp();
         $this->configurationDocumentManager = $this->createMock(ConfigurationDocumentManagerInterface::class);
-        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(function(array $configuration) {
+        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(static function (array $configuration) {
             return [$configuration];
         });
         $this->subject = new QueueDataFactory($this->configurationDocumentManager);
     }
 
+    /**
+     * @return array<string>
+     */
     protected function routeIdProvider(): array
     {
         return [
@@ -45,13 +49,17 @@ class QueueDataFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<array{0:array<string,string|ValueInterface>,1:array<string,array{type:string,value:mixed}>}>
+     */
     protected function packDataProvider(): array
     {
         $file = $this->createMock(FileInterface::class);
-        $file->method('getName')->willReturn($arguments[0] ?? 'name1');
-        $file->method('getPublicUrl')->willReturn($arguments[1] ?? 'url1');
-        $file->method('getRelativePath')->willReturn($arguments[2] ?? 'path1');
-        $file->method('getMimeType')->willReturn($arguments[3] ?? 'type1');
+        $file->method('getName')->willReturn('name1');
+        $file->method('getPublicUrl')->willReturn('url1');
+        $file->method('getRelativePath')->willReturn('path1');
+        $file->method('getMimeType')->willReturn('type1');
+
         return [
             [[], []],
             [
@@ -59,9 +67,9 @@ class QueueDataFactoryTest extends TestCase
                     'field1' => 'value1',
                     'field2' => 'value2',
                     'field3' => new MultiValue(),
-                    'field4' => new MultiValue([5, 7, 17]),
+                    'field4' => new MultiValue(['5', '7', '17']),
                     'field5' => new DiscreteMultiValue(),
-                    'field6' => new DiscreteMultiValue([5, 7, 17]),
+                    'field6' => new DiscreteMultiValue(['5', '7', '17']),
                     'field7' => new FileValue($file),
                 ],
                 [
@@ -77,6 +85,9 @@ class QueueDataFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<array{0:array<string,mixed>,1:array<string,mixed>}>
+     */
     protected function packConfigurationProvider(): array
     {
         return [
@@ -133,6 +144,9 @@ class QueueDataFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<array{0:array<string,mixed>,1:array<string,mixed>}>
+     */
     protected function packContextProvider(): array
     {
         return [
@@ -141,13 +155,28 @@ class QueueDataFactoryTest extends TestCase
         ];
     }
 
-
+    /**
+     * @return array<array{
+     *   0:array<string,string|ValueInterface>,
+     *   1:array<int,array<string,mixed>>,
+     *   2:array<string,mixed>,
+     *   3:string,
+     *   4:array{
+     *     routeId:string,
+     *     submission:array{
+     *       data:array<string,array{type:string,value:mixed}>,
+     *       configuration:array<string,mixed>,
+     *       context:array<string,mixed>
+     *     }
+     *   }
+     * }>
+     */
     public function packProvider(): array
     {
         $result = [];
-        foreach ($this->packDataProvider() as list($data, $packedData)) {
-            foreach ($this->packConfigurationProvider() as list($configuration, $packedConfiguration)) {
-                foreach ($this->packContextProvider() as list($context, $packedContext)) {
+        foreach ($this->packDataProvider() as [$data, $packedData]) {
+            foreach ($this->packConfigurationProvider() as [$configuration, $packedConfiguration]) {
+                foreach ($this->packContextProvider() as [$context, $packedContext]) {
                     foreach ($this->routeIdProvider() as $routeId) {
                         $result[] = [
                             $data,
@@ -167,11 +196,25 @@ class QueueDataFactoryTest extends TestCase
                 }
             }
         }
+
         return $result;
     }
 
     /**
+     * @param array<string,string|ValueInterface> $data
+     * @param array<int,array<string,mixed>> $configuration
+     * @param array<string,mixed> $context
+     * @param array{
+     *     routeId:string,
+     *     submission:array{
+     *       data:array<string,array{type:string,value:mixed}>,
+     *       configuration:array<string,mixed>,
+     *       context:array<string,mixed>
+     *     }
+     *   } $jobData
+     *
      * @dataProvider packProvider
+     *
      * @test
      */
     public function pack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
@@ -182,14 +225,29 @@ class QueueDataFactoryTest extends TestCase
     }
 
     /**
+     * @param array<string,string|ValueInterface> $data
+     * @param array<int,array<string,mixed>> $configuration
+     * @param array<string,mixed> $context
+     * @param array{
+     *     routeId:string,
+     *     submission:array{
+     *       data:array<string,array{type:string,value:mixed}>,
+     *       configuration:array<string,mixed>,
+     *       context:array<string,mixed>
+     *     }
+     *   } $jobData
+     *
      * @throws DigitalMarketingFrameworkException
+     *
      * @dataProvider packProvider
+     *
      * @test
      */
     public function unpack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
     {
         $job = new Job();
         $job->setData($jobData);
+
         $submission = $this->subject->convertJobToSubmission($job);
 
         $this->assertEquals($data, $submission->getData()->toArray());
@@ -198,8 +256,22 @@ class QueueDataFactoryTest extends TestCase
     }
 
     /**
+     * @param array<string,string|ValueInterface> $data
+     * @param array<int,array<string,mixed>> $configuration
+     * @param array<string,mixed> $context
+     * @param array{
+     *     routeId:string,
+     *     submission:array{
+     *       data:array<string,array{type:string,value:mixed}>,
+     *       configuration:array<string,mixed>,
+     *       context:array<string,mixed>
+     *     }
+     *   } $jobData
+     *
      * @throws DigitalMarketingFrameworkException
+     *
      * @dataProvider packProvider
+     *
      * @test
      */
     public function packUnpack(array $data, array $configuration, array $context, string $routeId, array $jobData): void

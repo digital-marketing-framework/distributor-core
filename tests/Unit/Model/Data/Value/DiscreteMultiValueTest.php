@@ -7,5 +7,5 @@ use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiVal
 
 class DiscreteMultiValueTest extends MultiValueTest
 {
-    const FIELD_CLASS = DiscreteMultiValue::class;
+    public const FIELD_CLASS = DiscreteMultiValue::class;
 }

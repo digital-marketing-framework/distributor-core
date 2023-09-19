@@ -7,19 +7,23 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\B
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\Plugin\ConfigurablePlugin;
+use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface
 {
     public const KEY_ENABLED = 'enabled';
+
     public const DEFAULT_ENABLED = false;
 
     public const KEY_MUST_EXIST = 'mustExist';
+
     public const DEFAULT_MUST_EXIST = false;
 
     public const KEY_MUST_BE_EMPTY = 'mustBeEmpty';
+
     public const DEFAULT_MUST_BE_EMPTY = true;
 
     public function __construct(
@@ -32,6 +36,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     }
 
     abstract protected function processContext(ContextInterface $context): void;
+
     abstract protected function process(): void;
 
     /**
@@ -40,7 +45,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
      */
     public function enabled(): bool
     {
-        return (bool)$this->getConfig(static::KEY_ENABLED);
+        return (bool) $this->getConfig(static::KEY_ENABLED);
     }
 
     /**
@@ -53,7 +58,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         return $this->enabled();
     }
 
-    protected function appendToField($key, $value, $glue = "\n"): bool
+    protected function appendToField(string $key, string|ValueInterface $value, string $glue = "\n"): bool
     {
         $data = $this->submission->getData();
         if (
@@ -72,7 +77,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         return true;
     }
 
-    protected function setField($key, $value): bool
+    protected function setField(string $key, string|ValueInterface $value): bool
     {
         $data = $this->submission->getData();
         if (
@@ -81,6 +86,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         ) {
             return false;
         }
+
         if (
             $this->getConfig(static::KEY_MUST_BE_EMPTY)
             && $data->fieldExists($key)
@@ -88,7 +94,9 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         ) {
             return false;
         }
+
         $data[$key] = $value;
+
         return true;
     }
 
@@ -118,6 +126,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         $mustBeEmptySchema = new BooleanSchema(static::DEFAULT_MUST_BE_EMPTY);
         $mustBeEmptySchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(static::KEY_MUST_BE_EMPTY, $mustBeEmptySchema);
+
         return $schema;
     }
 }

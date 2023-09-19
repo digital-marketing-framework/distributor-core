@@ -11,11 +11,12 @@ use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 class GateEvaluationTest extends EvaluationTest
 {
     protected const CLASS_NAME = GateEvaluation::class;
+
     protected const KEYWORD = 'gate';
 
     protected function setupDataProcessor(): void
     {
-        $this->dataProcessor->method('processEvaluation')->willReturnCallback(function(array $config) {
+        $this->dataProcessor->method('processEvaluation')->willReturnCallback(static function (array $config) {
             return $config['mockedResult'] ?? false;
         });
     }
@@ -36,7 +37,7 @@ class GateEvaluationTest extends EvaluationTest
             'config' => [
                 $routeName => [
                     RouteInterface::KEY_ENABLED => true,
-                    RouteInterface::KEY_GATE => ['mockedResult' => $succeeds]
+                    RouteInterface::KEY_GATE => ['mockedResult' => $succeeds],
                 ],
             ],
         ], $gatedRouteId);
@@ -86,8 +87,9 @@ class GateEvaluationTest extends EvaluationTest
     /** @test */
     public function gateLoopContextApplied(): void
     {
-        $this->dataProcessor->expects($this->exactly(1))->method('processEvaluation')->willReturnCallback(function(array $config, $context) {
+        $this->dataProcessor->expects($this->exactly(1))->method('processEvaluation')->willReturnCallback(function (array $config, $context) {
             $this->assertTrue($context[GateEvaluation::KEY_ROUTE_IDS_EVALUATED]['gatedRouteId1']);
+
             return $config['mockedResult'] ?? false;
         });
         $this->addGate('route1', 'routeId1', true);

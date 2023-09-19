@@ -22,9 +22,10 @@ class GenericRoute extends Route
 
     protected function getDispatcher(): DataDispatcherInterface
     {
-        if ($this->dataDispatcher === null) {
+        if (!$this->dataDispatcher instanceof DataDispatcherInterface) {
             throw new DigitalMarketingFrameworkException('generic route has no data dispatcher');
         }
+
         return $this->dataDispatcher;
     }
 }

@@ -7,17 +7,16 @@ use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 class SpiedOnGenericDataDispatcher extends DataDispatcher
 {
-    public $spy;
-
-    public function __construct(string $keyword, RegistryInterface $registry, DataDispatcherSpyInterface $spy)
-    {
+    public function __construct(
+        string $keyword,
+        RegistryInterface $registry,
+        public DataDispatcherSpyInterface $spy
+    ) {
         parent::__construct($keyword, $registry);
-        $this->spy = $spy;
     }
 
-    public function send(array $data): bool
+    public function send(array $data): void
     {
         $this->spy->send($data);
-        return true;
     }
 }

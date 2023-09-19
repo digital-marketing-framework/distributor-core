@@ -15,7 +15,7 @@ class GateEvaluationTest extends EvaluationTest
 
     protected const KEYWORD = 'gate';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class GateEvaluationTest extends EvaluationTest
             'config' => [
                 'gate' => [
                     GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopA2',
-                ]
+                ],
             ],
         ]);
         $this->addGateConfig('routeLoopA2', 'routeIdLoopA2', true, [
@@ -39,7 +39,7 @@ class GateEvaluationTest extends EvaluationTest
             'config' => [
                 'gate' => [
                     GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopA1',
-                ]
+                ],
             ],
         ]);
 
@@ -49,7 +49,7 @@ class GateEvaluationTest extends EvaluationTest
             'config' => [
                 'gate' => [
                     GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopB2',
-                ]
+                ],
             ],
         ]);
         $this->addGateConfig('routeLoopB2', 'routeIdLoopB2', true, [
@@ -57,7 +57,7 @@ class GateEvaluationTest extends EvaluationTest
             'config' => [
                 'gate' => [
                     GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopB3',
-                ]
+                ],
             ],
         ]);
         $this->addGateConfig('routeLoopB3', 'routeIdLoopB3', true, [
@@ -65,11 +65,14 @@ class GateEvaluationTest extends EvaluationTest
             'config' => [
                 'gate' => [
                     GateEvaluation::KEY_ROUTE_ID => 'routeIdLoopB1',
-                ]
+                ],
             ],
         ]);
     }
 
+    /**
+     * @param array<string,mixed> $gateConfig
+     */
     protected function addGateConfig(string $routeName, string $routeId, bool $enabled, array $gateConfig = []): void
     {
         $this->configuration[0][SubmissionConfiguration::KEY_DISTRIBUTOR][SubmissionConfiguration::KEY_ROUTES][$routeId] = static::createListItem([
@@ -95,6 +98,9 @@ class GateEvaluationTest extends EvaluationTest
         ]);
     }
 
+    /**
+     * @return array<array{0:bool}>
+     */
     public function falseTrueProvider(): array
     {
         return [
@@ -105,6 +111,7 @@ class GateEvaluationTest extends EvaluationTest
 
     /**
      * @dataProvider falseTrueProvider
+     *
      * @test
      */
     public function gatePasses(bool $useGate): void
@@ -119,6 +126,7 @@ class GateEvaluationTest extends EvaluationTest
 
     /**
      * @dataProvider falseTrueProvider
+     *
      * @test
      */
     public function gateDoesNotPass(bool $useGate): void

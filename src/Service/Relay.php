@@ -14,13 +14,12 @@ use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
 
 class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterface
 {
     use LoggerAwareTrait;
     use ContextAwareTrait;
-
-    protected RegistryInterface $registry;
 
     protected QueueInterface $persistentQueue;
 
@@ -28,9 +27,8 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
 
     protected QueueDataFactoryInterface $queueDataFactory;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(protected RegistryInterface $registry)
     {
-        $this->registry = $registry;
         $this->persistentQueue = $registry->getPersistentQueue();
         $this->temporaryQueue = $registry->getNonPersistentQueue();
         $this->queueDataFactory = $registry->getQueueDataFactory();
@@ -39,7 +37,6 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
     protected function addContext(SubmissionDataSetInterface $submission): void
     {
         $dataProviders = $this->registry->getDataProviders($submission);
-        /** @var DataProviderInterface $dataProvider */
         foreach ($dataProviders as $dataProvider) {
             try {
                 $dataProvider->addContext($this->context);
@@ -58,6 +55,9 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
         }
     }
 
+    /**
+     * @param array<string> $enabledDataProviders
+     */
     protected function processDataProviders(SubmissionDataSetInterface $submission, array $enabledDataProviders = ['*']): void
     {
         $dataProviders = $this->registry->getDataProviders($submission);
@@ -76,13 +76,13 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
 
             $routeId = $this->queueDataFactory->getJobRouteId($job);
             $route = $this->registry->getRoute($submission, $routeId);
-            if ($route === null) {
+            if (!$route instanceof RouteInterface) {
                 throw new DigitalMarketingFrameworkException(sprintf('route with ID "%s" not found', $routeId));
             }
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders());
-            return $route->process();
 
+            return $route->process();
         } catch (DigitalMarketingFrameworkException $e) {
             $this->logger->error($e->getMessage());
             throw new QueueException($e->getMessage(), $e->getCode(), $e);
@@ -125,22 +125,14 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             }
         }
 
-        if (!empty($syncTemporaryJobs)) {
+        if ($syncTemporaryJobs !== []) {
             $processor = $this->registry->getQueueProcessor($this->temporaryQueue, $this);
             $processor->processJobs($syncTemporaryJobs);
         }
 
-        if (!empty($syncPersistentJobs)) {
+        if ($syncPersistentJobs !== []) {
             $processor = $this->registry->getQueueProcessor($this->persistentQueue, $this);
             $processor->processJobs($syncPersistentJobs);
         }
-    }
-
-    public static function getDefaultConfiguration(): array
-    {
-        return [
-            static::KEY_ASYNC => static::DEFAULT_ASYNC,
-            static::KEY_DISABLE_STORAGE => static::DEFAULT_DISABLE_STORAGE,
-        ];
     }
 }

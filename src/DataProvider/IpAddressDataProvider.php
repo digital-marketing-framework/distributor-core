@@ -9,8 +9,9 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class IpAddressDataProvider extends DataProvider
 {
-    const KEY_FIELD = 'field';
-    const DEFAULT_FIELD = 'ip_address';
+    public const KEY_FIELD = 'field';
+
+    public const DEFAULT_FIELD = 'ip_address';
 
     protected function processContext(ContextInterface $context): void
     {
@@ -30,6 +31,7 @@ class IpAddressDataProvider extends DataProvider
         /** @var ContainerSchema $schema */
         $schema = parent::getSchema();
         $schema->addProperty(static::KEY_FIELD, new StringSchema(static::DEFAULT_FIELD));
+
         return $schema;
     }
 }

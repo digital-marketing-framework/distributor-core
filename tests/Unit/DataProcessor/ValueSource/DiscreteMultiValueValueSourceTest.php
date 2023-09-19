@@ -9,6 +9,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiVal
 class DiscreteMultiValueValueSourceTest extends MultiValueValueSourceTest
 {
     protected const CLASS_NAME = DiscreteMultiValueValueSource::class;
+
     protected const KEYWORD = 'discreteMultiValue';
 
     protected const MULTI_VALUE_CLASS_NAME = DiscreteMultiValue::class;

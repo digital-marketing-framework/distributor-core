@@ -13,14 +13,15 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactory
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
 
-interface RegistryInterface extends 
-    CoreRegistryInterface, 
-    QueueRegistryInterface, 
-    QueueDataFactoryRegistryInterface, 
-    DataDispatcherRegistryInterface, 
-    DataProviderRegistryInterface, 
+interface RegistryInterface extends
+    CoreRegistryInterface,
+    QueueRegistryInterface,
+    QueueDataFactoryRegistryInterface,
+    DataDispatcherRegistryInterface,
+    DataProviderRegistryInterface,
     RouteRegistryInterface
 {
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface;
+
     public function getRelay(): RelayInterface;
 }

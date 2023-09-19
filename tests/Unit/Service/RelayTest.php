@@ -74,7 +74,7 @@ class RelayTest extends TestCase
         $this->registry->method('getNonPersistentQueue')->willReturn($this->temporaryQueue);
         $this->registry->method('getQueueDataFactory')->willReturn($this->queueDataFactory);
 
-        $this->registry->method('getRoutes')->willReturnCallback(function() {
+        $this->registry->method('getRoutes')->willReturnCallback(function () {
             return $this->routes;
         });
 
@@ -95,6 +95,9 @@ class RelayTest extends TestCase
         $this->submission->method('getConfiguration')->willReturn($this->submissionConfiguration);
     }
 
+    /**
+     * @param array<string,mixed> $config
+     */
     protected function addRoute(string $keyword, string $id, int $weight, array $config, bool $enabled = true): void
     {
         $this->routeConfigs[$id] = [
@@ -140,7 +143,9 @@ class RelayTest extends TestCase
             ->withConsecutive(
                 [$this->jobs['routeId1']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -189,7 +194,9 @@ class RelayTest extends TestCase
             ->withConsecutive(
                 [$this->jobs['routeId1']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -230,7 +237,9 @@ class RelayTest extends TestCase
             ->withConsecutive(
                 [$this->jobs['routeId1']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -278,7 +287,9 @@ class RelayTest extends TestCase
                 [$this->jobs['routeId1']],
                 [$this->jobs['routeId2']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -330,7 +341,9 @@ class RelayTest extends TestCase
                 [$this->jobs['routeId1']],
                 [$this->jobs['routeId2']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -378,7 +391,9 @@ class RelayTest extends TestCase
                 [$this->jobs['routeId1']],
                 [$this->jobs['routeId2']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -427,7 +442,9 @@ class RelayTest extends TestCase
             ->withConsecutive(
                 [$this->jobs['routeId1']],
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -447,19 +464,19 @@ class RelayTest extends TestCase
     public function processMixedSyncMixedStorageMultipleRoutesWithMultiplePasses(): void
     {
         $this->initSubmission();
-        $this->addRoute('route1', 'routeId1', 10 , [
+        $this->addRoute('route1', 'routeId1', 10, [
             'async' => false,
             'disableStorage' => false,
         ]);
-        $this->addRoute('route1', 'routeId2', 20 , [
+        $this->addRoute('route1', 'routeId2', 20, [
             'async' => true,
             'disableStorage' => false,
         ]);
-        $this->addRoute('route2', 'routeId3', 30 , [
+        $this->addRoute('route2', 'routeId3', 30, [
             'async' => false,
             'disableStorage' => true,
         ]);
-        $this->addRoute('route2', 'routeId4', 40 , [
+        $this->addRoute('route2', 'routeId4', 40, [
             'async' => true,
             'disableStorage' => true, // should be converted to be sync
         ]);
@@ -484,7 +501,9 @@ class RelayTest extends TestCase
                 [$this->jobs['routeId1']],
                 [$this->jobs['routeId2']]
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->temporaryQueue
             ->expects($this->exactly(2))
@@ -493,7 +512,9 @@ class RelayTest extends TestCase
                 [$this->jobs['routeId3']],
                 [$this->jobs['routeId4']],
             )
-            ->willReturnCallback(function(JobInterface $job) { return $job; });
+            ->willReturnCallback(static function (JobInterface $job) {
+                return $job;
+            });
 
         $this->persistentQueueProcessor
             ->expects($this->once())
@@ -520,7 +541,7 @@ class RelayTest extends TestCase
         $this->addRoute('route1', 'routeId1', 10, [
             'async' => true,
             'disableStorage' => false,
-        ], enabled:false);
+        ], enabled: false);
 
         $this->logger->expects($this->never())->method('error');
 
@@ -540,7 +561,7 @@ class RelayTest extends TestCase
         $this->addRoute('route1', 'routeId1', 10, [
             'async' => false,
             'disableStorage' => false,
-        ], enabled:false);
+        ], enabled: false);
 
         $this->logger->expects($this->never())->method('error');
 
@@ -560,7 +581,7 @@ class RelayTest extends TestCase
         $this->addRoute('route1', 'routeId1', 10, [
             'async' => false,
             'disableStorage' => true,
-        ], enabled:false);
+        ], enabled: false);
 
         $this->logger->expects($this->never())->method('error');
 

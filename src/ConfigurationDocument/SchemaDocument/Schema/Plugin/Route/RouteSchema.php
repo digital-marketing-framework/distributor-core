@@ -27,10 +27,10 @@ class RouteSchema extends SwitchSchema
         $passSchema->addValidation(
             new OrCondition([
                 new UniqueCondition('.', '../../../*/value/' . static::KEY_PASS),
-                new EmptyCondition('.')
+                new EmptyCondition('.'),
             ]),
-            message:'Route pass name must be unique',
-            strict:true
+            message: 'Route pass name must be unique',
+            strict: true
         );
 
         $this->addProperty(static::KEY_PASS, $passSchema);

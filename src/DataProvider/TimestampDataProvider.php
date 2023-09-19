@@ -9,11 +9,13 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class TimestampDataProvider extends DataProvider
 {
-    const KEY_FIELD = 'field';
-    const DEFAULT_FIELD = 'timestamp';
+    public const KEY_FIELD = 'field';
 
-    const KEY_FORMAT = 'format';
-    const DEFAULT_FORMAT = 'c';
+    public const DEFAULT_FIELD = 'timestamp';
+
+    public const KEY_FORMAT = 'format';
+
+    public const DEFAULT_FORMAT = 'c';
 
     protected function processContext(ContextInterface $context): void
     {
@@ -36,6 +38,7 @@ class TimestampDataProvider extends DataProvider
         $schema = parent::getSchema();
         $schema->addProperty(static::KEY_FIELD, new StringSchema(static::DEFAULT_FIELD));
         $schema->addProperty(static::KEY_FORMAT, new StringSchema(static::DEFAULT_FORMAT));
+
         return $schema;
     }
 }

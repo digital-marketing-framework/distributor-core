@@ -5,14 +5,12 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Route;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
-use DigitalMarketingFramework\Core\DataProcessor\Evaluation\EvaluationInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\Route;
@@ -48,7 +46,7 @@ class GenericRouteTest extends TestCase
 
     protected GenericRoute $subject;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(RegistryInterface::class);
         $this->globalContext = $this->createMock(ContextInterface::class);
@@ -100,7 +98,6 @@ class GenericRouteTest extends TestCase
         ]);
 
         $this->createRoute();
-
 
         $this->subject->addContext($this->globalContext);
         $this->assertEmpty($this->submissionContext->toArray());

@@ -8,5 +8,6 @@ use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface
 interface QueueDataFactoryRegistryInterface extends ConfigurationDocumentManagerRegistryInterface
 {
     public function getQueueDataFactory(): QueueDataFactoryInterface;
+
     public function setQueueDataFactory(QueueDataFactoryInterface $queueDataFactory): void;
 }

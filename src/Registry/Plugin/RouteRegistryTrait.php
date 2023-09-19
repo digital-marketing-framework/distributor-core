@@ -27,16 +27,20 @@ trait RouteRegistryTrait
      */
     public function getRoutes(SubmissionDataSetInterface $submission): array
     {
+        /** @var array<RouteInterface> */
         $routes = [];
         foreach ($submission->getConfiguration()->getRouteIds() as $routeId) {
             $routes[] = $this->getRoute($submission, $routeId);
         }
+
         return $routes;
     }
 
     public function getRoute(SubmissionDataSetInterface $submission, string $routeId): ?RouteInterface
     {
         $keyword = $submission->getConfiguration()->getRouteKeyword($routeId);
+
+        /** @var ?RouteInterface */
         return $this->getPlugin($keyword, RouteInterface::class, [$submission, $routeId]);
     }
 
@@ -52,6 +56,7 @@ trait RouteRegistryTrait
             $schema = $class::getSchema();
             $routeSchema->addItem($key, $schema);
         }
+
         return $routeSchema;
     }
 

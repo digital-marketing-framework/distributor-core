@@ -11,6 +11,12 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 {
     use ListMapTestTrait;
 
+    /**
+     * @param array<string,array{type:string,value:mixed}> $data
+     * @param array<string,array<string,mixed>> $routeConfigs
+     * @param array<string,mixed> $config
+     * @param array<string,mixed> $context
+     */
     protected function createJob(array $data, array $routeConfigs, array $config = [], array $context = [], string $jobRouteId = 'routeId1'): JobInterface
     {
         $data = [
@@ -19,7 +25,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
                 'data' => $data,
                 'configuration' => $config,
                 'context' => $context,
-            ]
+            ],
         ];
         $weight = 10;
         foreach ($routeConfigs as $routeId => $routeConfig) {
@@ -31,6 +37,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
             ], $routeId, $weight);
             $weight += 10;
         }
-        return new Job(data:$data);
+
+        return new Job(data: $data);
     }
 }

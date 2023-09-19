@@ -30,11 +30,13 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     use DataProcessorAwareTrait;
 
     protected const DEFAULT_ASYNC = InheritableBooleanSchema::VALUE_INHERIT;
+
     protected const DEFAULT_DISABLE_STORAGE = InheritableBooleanSchema::VALUE_INHERIT;
 
     protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
     public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with ID %s.';
+
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with ID %s.';
 
     public function __construct(
@@ -69,10 +71,12 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         if (!$this->enabled()) {
             return false;
         }
+
         $gate = $this->getConfig(static::KEY_GATE);
         if (empty($gate)) {
             return true;
         }
+
         return $this->dataProcessor->processEvaluation(
             $this->getConfig(static::KEY_GATE),
             $this->getDataProcessorContext()
@@ -86,7 +90,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public function enabled(): bool
     {
-        return (bool)$this->getConfig(static::KEY_ENABLED);
+        return (bool) $this->getConfig(static::KEY_ENABLED);
     }
 
     public function async(): ?bool
@@ -102,6 +106,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     public function getEnabledDataProviders(): array
     {
         $config = $this->getConfig(static::KEY_ENABLE_DATA_PROVIDERS);
+
         return RestrictedTermsSchema::getAllowedTerms($config);
     }
 
@@ -113,6 +118,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     {
         if (!$this->processGate()) {
             $this->logger->debug(sprintf(static::MESSAGE_GATE_FAILED, $this->getKeyword(), $this->routeId));
+
             return false;
         }
 
@@ -124,6 +130,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
         $dataDispatcher = $this->getDispatcher();
         $dataDispatcher->send($data->toArray());
+
         return true;
     }
 
@@ -134,11 +141,17 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         return false;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     protected static function getDefaultFields(): array
     {
         return [];
     }
 
+    /**
+     * @return array<array<string,mixed>>
+     */
     protected static function getDataDefaultValue(): array
     {
         $dataDefaultValue = [];
@@ -148,7 +161,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         }
 
         $fields = static::getDefaultFields();
-        if (!empty($fields)) {
+        if ($fields !== []) {
             $dataDefaultValue = DataProcessor::dataMapperSchemaDefaultValueFieldMap($fields, $dataDefaultValue);
         }
 
@@ -183,9 +196,10 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
         $dataSchema = new CustomSchema(DataMapperSchema::TYPE);
         $dataDefault = static::getDataDefaultValue();
-        if (!empty($dataDefault)) {
+        if ($dataDefault !== []) {
             $dataSchema->setDefaultValue($dataDefault);
         }
+
         $schema->addProperty(static::KEY_DATA, $dataSchema);
 
         // TODO gdpr should not be handled in the gate. we need a dedicated service for that

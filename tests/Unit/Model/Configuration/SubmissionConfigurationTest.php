@@ -55,6 +55,11 @@ class SubmissionConfigurationTest extends TestCase
         $this->assertEquals([], $result);
     }
 
+    /**
+     * @param array<string,mixed> $conf
+     *
+     * @return array{uuid:string,weight:int,value:array<string,mixed>}
+     */
     protected function getRouteConfig(array $conf, string $routeName, string $routeId, int $weight = 10, string $passName = ''): array
     {
         return $this->createListItem([

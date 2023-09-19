@@ -5,11 +5,11 @@ namespace DigitalMarketingFramework\Distributor\Core\Registry;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\SchemaDocument;
-use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
+use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
@@ -44,8 +44,8 @@ class Registry extends CoreRegistry implements RegistryInterface
 
         $distributorSchema = new ContainerSchema();
 
-        $distributorSchema->addProperty('async', new BooleanSchema(false));
-        $distributorSchema->addProperty('disableStorage', new BooleanSchema(false));
+        $distributorSchema->addProperty(RelayInterface::KEY_ASYNC, new BooleanSchema(RelayInterface::DEFAULT_ASYNC));
+        $distributorSchema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new BooleanSchema(RelayInterface::DEFAULT_DISABLE_STORAGE));
 
         $routeListSchema = $this->getRoutesSchema($schemaDocument);
         $distributorSchema->addProperty(SubmissionConfiguration::KEY_ROUTES, $routeListSchema);
