@@ -11,6 +11,9 @@ trait DataProcessorPluginTestTrait
     {
         parent::initRegistry();
         $initialization = new DistributorCoreInitialization();
-        $initialization->init(RegistryDomain::CORE, $this->registry);
+        $initialization->initMetaData($this->registry);
+        $initialization->initGlobalConfiguration(RegistryDomain::CORE, $this->registry);
+        $initialization->initServices(RegistryDomain::CORE, $this->registry);
+        $initialization->initPlugins(RegistryDomain::CORE, $this->registry);
     }
 }
