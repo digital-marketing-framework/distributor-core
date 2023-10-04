@@ -57,6 +57,7 @@ class GateEvaluation extends Evaluation
         if ($routeConfiguration === null) {
             throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_ROUTE_NOT_FOUND, $routeId));
         }
+
         $enabled = $routeConfiguration[RouteInterface::KEY_ENABLED] ?? RouteInterface::DEFAULT_ENABLED;
         $gate = $routeConfiguration[RouteInterface::KEY_GATE] ?? RouteInterface::DEFAULT_GATE;
 
