@@ -90,7 +90,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public function enabled(): bool
     {
-        return (bool) $this->getConfig(static::KEY_ENABLED);
+        return (bool)$this->getConfig(static::KEY_ENABLED);
     }
 
     public function async(): ?bool

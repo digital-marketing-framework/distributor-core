@@ -218,7 +218,7 @@ class QueueDataFactoryTest extends TestCase
         $submission = $this->subject->convertJobToSubmission($job);
         $this->assertTrue($submission->getData()->fieldExists('field1'));
         $this->assertInstanceOf(StringValue::class, $submission->getData()['field1']);
-        $this->assertEquals('value1', (string) $submission->getData()['field1']);
+        $this->assertEquals('value1', (string)$submission->getData()['field1']);
         $this->assertEquals(['value' => 'value1'], $submission->getData()['field1']->pack());
     }
 
