@@ -5,7 +5,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcher;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-class SpiedOnGenericDataDispatcher extends DataDispatcher
+class SpiedOnDataDispatcher extends DataDispatcher
 {
     public function __construct(
         string $keyword,
