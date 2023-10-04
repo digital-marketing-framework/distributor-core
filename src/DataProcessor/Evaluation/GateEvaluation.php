@@ -56,17 +56,17 @@ class GateEvaluation extends Evaluation
         $routeConfiguration = $this->getRouteConfiguration($routeId);
         if ($routeConfiguration === null) {
             throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_ROUTE_NOT_FOUND, $routeId));
-        } else {
-            $enabled = $routeConfiguration[RouteInterface::KEY_ENABLED] ?? RouteInterface::DEFAULT_ENABLED;
-            $gate = $routeConfiguration[RouteInterface::KEY_GATE] ?? RouteInterface::DEFAULT_GATE;
+        }
 
-            if (!$enabled) {
-                $result = false;
-            } elseif (empty($gate)) {
-                $result = true;
-            } else {
-                $result = $this->dataProcessor->processEvaluation($gate, $this->context->copy());
-            }
+        $enabled = $routeConfiguration[RouteInterface::KEY_ENABLED] ?? RouteInterface::DEFAULT_ENABLED;
+        $gate = $routeConfiguration[RouteInterface::KEY_GATE] ?? RouteInterface::DEFAULT_GATE;
+
+        if (!$enabled) {
+            $result = false;
+        } elseif (empty($gate)) {
+            $result = true;
+        } else {
+            $result = $this->dataProcessor->processEvaluation($gate, $this->context->copy());
         }
 
         unset($this->context[static::KEY_ROUTE_IDS_EVALUATED][$routeId]);

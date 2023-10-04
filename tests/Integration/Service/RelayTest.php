@@ -11,7 +11,7 @@ use DigitalMarketingFramework\Distributor\Core\Tests\Integration\DistributorRegi
 use DigitalMarketingFramework\Distributor\Core\Tests\Integration\JobTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Tests\Integration\SubmissionTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
-use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\SpiedOnGenericDataDispatcher;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\SpiedOnDataDispatcher;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\RouteSpyInterface;
@@ -63,7 +63,7 @@ class RelayTest extends TestCase
     protected function registerDataDispatcherSpy(): DataDispatcherSpyInterface&MockObject
     {
         $this->dataDispatcherSpy = $this->createMock(DataDispatcherSpyInterface::class);
-        $this->registry->registerDataDispatcher(SpiedOnGenericDataDispatcher::class, [$this->dataDispatcherSpy]);
+        $this->registry->registerDataDispatcher(SpiedOnDataDispatcher::class, [$this->dataDispatcherSpy]);
 
         return $this->dataDispatcherSpy;
     }

@@ -45,7 +45,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
      */
     public function enabled(): bool
     {
-        return (bool) $this->getConfig(static::KEY_ENABLED);
+        return (bool)$this->getConfig(static::KEY_ENABLED);
     }
 
     /**
