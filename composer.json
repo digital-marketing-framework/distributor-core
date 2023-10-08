@@ -1,15 +1,15 @@
 {
     "name": "digital-marketing-framework/distributor-core",
-    "description": "FormRelay is a data distribution framework.",
+    "description": "Digital Marketing Framework - Distributor",
     "license": "GPL-2.0-or-later",
     "type": "library",
     "keywords": [
+        "marketing",
         "framework",
-        "form",
         "data",
-        "submission",
         "relay",
-        "distribution"
+        "distribution",
+        "distributor"
     ],
     "authors": [
         {
