@@ -37,8 +37,8 @@ class DistributorCoreInitialization extends Initialization
 
     protected const SCHEMA_MIGRATIONS = [];
 
-    public function __construct()
+    public function __construct(string $packageAlias = '')
     {
-        parent::__construct('distributor-core', '1.0.0');
+        parent::__construct('distributor-core', '1.0.0', $packageAlias);
     }
 }
