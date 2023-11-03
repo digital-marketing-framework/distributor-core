@@ -21,7 +21,16 @@ class RouteSchema extends SwitchSchema
         $this->getRenderingDefinition()->setLabel('{type} {pass}');
 
         $passSchema = new StringSchema();
-        $passSchema->getRenderingDefinition()->addVisibilityCondition(new NotCondition(new UniqueCondition('../' . static::KEY_TYPE, '../../../*/value/' . static::KEY_TYPE)));
+        $passSchema->getRenderingDefinition()->addVisibilityCondition(
+            new OrCondition([
+                new NotCondition(
+                    new EmptyCondition('.')
+                ),
+                new NotCondition(
+                    new UniqueCondition('../' . static::KEY_TYPE, '../../../*/value/' . static::KEY_TYPE)
+                )
+            ])
+        );
 
         // TODO this condition does not work as intended: uniqueness should only apply to routes of the same type, but it's good enough for now
         $passSchema->addValidation(
