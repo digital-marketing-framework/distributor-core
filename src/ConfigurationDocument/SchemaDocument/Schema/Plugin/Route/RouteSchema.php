@@ -28,7 +28,7 @@ class RouteSchema extends SwitchSchema
                 ),
                 new NotCondition(
                     new UniqueCondition('../' . static::KEY_TYPE, '../../../*/value/' . static::KEY_TYPE)
-                )
+                ),
             ])
         );
 
