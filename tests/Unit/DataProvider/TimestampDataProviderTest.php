@@ -14,15 +14,15 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
     ];
 
     /** @test */
-    public function doesNotDoAnythingIfDisabled(): void
+    public function addsContextEvenIfDisabled(): void
     {
         $this->setDataProviderConfiguration(['enabled' => false]);
-        $this->globalContext->expects($this->never())->method('getTimestamp');
+        $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
 
         $this->createDataProvider();
 
         $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());

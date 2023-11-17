@@ -22,6 +22,18 @@ class TimestampDataProvider extends DataProvider
         $this->submission->getContext()->copyTimestampFromContext($context);
     }
 
+    public function addContext(ContextInterface $context): void
+    {
+        // NOTE For context management this data provider bypasses the enabled check.
+        //      This means it will add context to the submission even if the provider is disabled,
+        //      because the timestamp should always be part of the submission context.
+        //      We do this to ensure that the submission hash is unique.
+        //
+        //      This does not mean that the timestamp will actually be added to the form submission data.
+        //      Whether or not that happens still depends on the enabled status.
+        $this->processContext($context);
+    }
+
     protected function process(): void
     {
         $timestamp = $this->submission->getContext()->getTimestamp();
