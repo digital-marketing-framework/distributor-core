@@ -54,7 +54,8 @@ trait RouteRegistryTrait
         $routeSchema = new RouteSchema();
         foreach ($this->getAllPluginClasses(RouteInterface::class) as $key => $class) {
             $schema = $class::getSchema();
-            $routeSchema->addItem($key, $schema);
+            $label = $class::getLabel();
+            $routeSchema->addItem($key, $schema, $label);
         }
 
         return $routeSchema;

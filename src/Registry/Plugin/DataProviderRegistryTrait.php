@@ -38,7 +38,9 @@ trait DataProviderRegistryTrait
     {
         $schema = new DataProviderSchema();
         foreach ($this->getAllPluginClasses(DataProviderInterface::class) as $key => $class) {
-            $schema->addItem($key, $class::getSchema());
+            $subSchema = $class::getSchema();
+            $label = $class::getLabel();
+            $schema->addItem($key, $subSchema, $label);
         }
 
         return $schema;

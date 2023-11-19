@@ -117,6 +117,12 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     public static function getSchema(): SchemaInterface
     {
         $schema = new ContainerSchema();
+
+        $label = static::getLabel();
+        if ($label !== null) {
+            $schema->getRenderingDefinition()->setLabel($label);
+        }
+
         $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
 
         $mustExistSchema = new BooleanSchema(static::DEFAULT_MUST_EXIST);

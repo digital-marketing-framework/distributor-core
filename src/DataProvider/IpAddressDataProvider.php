@@ -34,4 +34,9 @@ class IpAddressDataProvider extends DataProvider
 
         return $schema;
     }
+
+    public static function getLabel(): ?string
+    {
+        return 'IP Address';
+    }
 }
