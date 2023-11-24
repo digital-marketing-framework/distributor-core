@@ -2,7 +2,6 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -22,6 +21,4 @@ interface DataProviderRegistryInterface extends PluginRegistryInterface
     public function getDataProviders(SubmissionDataSetInterface $submission): array;
 
     public function deleteDataProvider(string $keyword): void;
-
-    public function getDataProviderSchema(): SchemaInterface;
 }

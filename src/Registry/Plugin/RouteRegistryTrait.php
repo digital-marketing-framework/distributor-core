@@ -49,7 +49,7 @@ trait RouteRegistryTrait
         $this->deletePlugin($keyword, RouteInterface::class);
     }
 
-    public function getRouteSchema(): SchemaInterface
+    protected function getRouteSchema(): SchemaInterface
     {
         $routeSchema = new RouteSchema();
         foreach ($this->getAllPluginClasses(RouteInterface::class) as $key => $class) {

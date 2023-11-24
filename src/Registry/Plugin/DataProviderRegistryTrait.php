@@ -34,7 +34,7 @@ trait DataProviderRegistryTrait
         $this->deletePlugin($keyword, DataProviderInterface::class);
     }
 
-    public function getDataProviderSchema(): SchemaInterface
+    protected function getDataProviderSchema(): SchemaInterface
     {
         $schema = new DataProviderSchema();
         foreach ($this->getAllPluginClasses(DataProviderInterface::class) as $key => $class) {
