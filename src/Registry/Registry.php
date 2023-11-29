@@ -43,6 +43,7 @@ class Registry extends CoreRegistry implements RegistryInterface
         parent::addConfigurationSchema($schemaDocument);
 
         $distributorSchema = new ContainerSchema();
+        $distributorSchema->getRenderingDefinition()->setLabel('Form Relay');
 
         $distributorSchema->addProperty(RelayInterface::KEY_ASYNC, new BooleanSchema(RelayInterface::DEFAULT_ASYNC));
         $distributorSchema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new BooleanSchema(RelayInterface::DEFAULT_DISABLE_STORAGE));
