@@ -7,7 +7,6 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\Value\FileValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
-use DigitalMarketingFramework\Core\Model\File\FileInterface;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
@@ -54,12 +53,6 @@ class QueueDataFactoryTest extends TestCase
      */
     protected function packDataProvider(): array
     {
-        $file = $this->createMock(FileInterface::class);
-        $file->method('getName')->willReturn('name1');
-        $file->method('getPublicUrl')->willReturn('url1');
-        $file->method('getRelativePath')->willReturn('path1');
-        $file->method('getMimeType')->willReturn('type1');
-
         return [
             [[], []],
             [
@@ -70,7 +63,7 @@ class QueueDataFactoryTest extends TestCase
                     'field4' => new MultiValue(['5', '7', '17']),
                     'field5' => new DiscreteMultiValue(),
                     'field6' => new DiscreteMultiValue(['5', '7', '17']),
-                    'field7' => new FileValue($file),
+                    'field7' => new FileValue('path1', 'name1', 'url1', 'type1'),
                 ],
                 [
                     'field1' => ['type' => 'string', 'value' => 'value1'],
