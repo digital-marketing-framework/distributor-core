@@ -19,13 +19,11 @@ trait DataProviderRegistryTrait
 
     public function getDataProvider(string $keyword, SubmissionDataSetInterface $submission): ?DataProviderInterface
     {
-        /** @var ?DataProviderInterface */
         return $this->getPlugin($keyword, DataProviderInterface::class, [$submission]);
     }
 
     public function getDataProviders(SubmissionDataSetInterface $submission): array
     {
-        /** @var array<DataProviderInterface> */
         return $this->getAllPlugins(DataProviderInterface::class, [$submission]);
     }
 
