@@ -23,11 +23,10 @@ trait RouteRegistryTrait
     }
 
     /**
-     * @return array<int,RouteInterface>
+     * @return array<RouteInterface>
      */
     public function getRoutes(SubmissionDataSetInterface $submission): array
     {
-        /** @var array<RouteInterface> */
         $routes = [];
         foreach ($submission->getConfiguration()->getRouteIds() as $routeId) {
             $routes[] = $this->getRoute($submission, $routeId);
@@ -40,7 +39,6 @@ trait RouteRegistryTrait
     {
         $keyword = $submission->getConfiguration()->getRouteKeyword($routeId);
 
-        /** @var ?RouteInterface */
         return $this->getPlugin($keyword, RouteInterface::class, [$submission, $routeId]);
     }
 
@@ -49,7 +47,7 @@ trait RouteRegistryTrait
         $this->deletePlugin($keyword, RouteInterface::class);
     }
 
-    public function getRouteSchema(): SchemaInterface
+    protected function getRouteSchema(): SchemaInterface
     {
         $routeSchema = new RouteSchema();
         foreach ($this->getAllPluginClasses(RouteInterface::class) as $key => $class) {

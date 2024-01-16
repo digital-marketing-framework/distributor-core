@@ -16,13 +16,11 @@ trait DataDispatcherRegistryTrait
 
     public function getDataDispatchers(): array
     {
-        /** @var array<DataDispatcherInterface> */
         return $this->getAllPlugins(DataDispatcherInterface::class);
     }
 
     public function getDataDispatcher(string $keyword): ?DataDispatcherInterface
     {
-        /** @var ?DataDispatcherInterface */
         return $this->getPlugin($keyword, DataDispatcherInterface::class);
     }
 
