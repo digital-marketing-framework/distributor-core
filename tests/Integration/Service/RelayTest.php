@@ -90,16 +90,49 @@ class RelayTest extends TestCase
         return $spy;
     }
 
+    /**
+     * @param array<mixed> $dataMapperConfig
+     *
+     * @return array{type:string,config:array{dataMapper:array<mixed>}}
+     */
+    protected function getStreamConfiguration(array $dataMapperConfig): array
+    {
+        return [
+            'type' => 'dataMapper',
+            'config' => [
+                'dataMapper' => $dataMapperConfig,
+            ],
+        ];
+    }
+
+    /**
+     * @return array{type:string,config:array{dataMapper:array{passthroughField:array{enabled:bool}}}}
+     */
+    protected function getPassthroughStreamConfiguration(bool $enabled = true): array
+    {
+        return $this->getStreamConfiguration([
+            'data' => [
+                'passthroughFields' => [
+                    'enabled' => $enabled,
+                ],
+            ],
+        ]);
+    }
+
+    protected function configurePassthroughStream(string $streamId): void
+    {
+        $this->addStreamConfiguration($streamId . 'Name', $streamId, 0, $this->getPassthroughStreamConfiguration());
+    }
+
     /** @test */
     public function processSyncOneRouteOnePassWithStorage(): void
     {
         $this->setSubmissionAsync(false);
         $this->setStorageDisabled(false);
+        $this->configurePassthroughStream('passthroughStreamId1');
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId1', 10);
         $this->submissionData = [
             'field1' => 'value1',
@@ -132,11 +165,10 @@ class RelayTest extends TestCase
     {
         $this->setSubmissionAsync(false);
         $this->setStorageDisabled(true);
+        $this->configurePassthroughStream('passthroughStreamId1');
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId1', 10);
         $this->submissionData = [
             'field1' => 'value1',
@@ -169,11 +201,10 @@ class RelayTest extends TestCase
     {
         $this->setSubmissionAsync(true);
         $this->setStorageDisabled(false);
+        $this->configurePassthroughStream('passthroughStreamId1');
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId1', 10);
         $this->submissionData = [
             'field1' => 'value1',
@@ -236,11 +267,10 @@ class RelayTest extends TestCase
         $this->setSubmissionAsync($async);
         $this->setStorageDisabled($disableStorage);
         $this->submissionData = ['field1' => 'value1', 'field2' => 'value2'];
+        $this->configurePassthroughStream('passthroughStreamId1');
         $this->addRouteSpy([
             'enabled' => $routeEnabled,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId1', 10);
         $this->addDataProviderSpy([
             'enabled' => $dataProviderEnabled,
@@ -260,17 +290,14 @@ class RelayTest extends TestCase
     {
         $this->setSubmissionAsync(false);
         $this->setStorageDisabled(false);
+        $this->configurePassthroughStream('passthroughStreamId1');
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId1', 10);
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
         $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static function (JobInterface $job) {
@@ -292,17 +319,14 @@ class RelayTest extends TestCase
     {
         $this->setSubmissionAsync(true);
         $this->setStorageDisabled(false);
+        $this->configurePassthroughStream('passthroughStreamId1');
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId1', 10);
         $this->addRouteSpy([
             'enabled' => true,
-            'data' => [
-                'passthroughFields' => ['enabled' => true],
-            ],
+            'data' => 'passthroughStreamId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
         $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static function (JobInterface $job) {
@@ -330,10 +354,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'passthroughStreamId1',
                 ],
+            ],
+            [
+                'passthroughStreamId1' => $this->getPassthroughStreamConfiguration(),
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -379,6 +404,15 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'data' => 'streamId1',
+                ],
+                'routeId2' => [
+                    'enabled' => true,
+                    'data' => 'streamId2',
+                ],
+            ],
+            [
+                'streamId1' => $this->getStreamConfiguration([
                     'data' => [
                         'fieldMap' => [
                             'enabled' => true,
@@ -388,9 +422,8 @@ class RelayTest extends TestCase
                             ],
                         ],
                     ],
-                ],
-                'routeId2' => [
-                    'enabled' => true,
+                ]),
+                'streamId2' => $this->getStreamConfiguration([
                     'data' => [
                         'fieldMap' => [
                             'enabled' => true,
@@ -400,7 +433,7 @@ class RelayTest extends TestCase
                             ],
                         ],
                     ],
-                ],
+                ]),
             ],
             jobRouteId: $routeId
         );
@@ -421,10 +454,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => false,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ]
         );
         $this->routeSpy->expects($this->never())->method('send');
@@ -454,10 +488,11 @@ class RelayTest extends TestCase
                             ],
                         ],
                     ],
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ]
         );
         $this->routeSpy->expects($this->never())->method('send');
@@ -485,13 +520,14 @@ class RelayTest extends TestCase
                             ],
                         ],
                     ],
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
                 'routeId2' => [
                     'enabled' => true,
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -515,10 +551,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->willThrowException(new DigitalMarketingFrameworkException($errorMessage));
@@ -540,10 +577,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ],
             [
                 'distributor' => [
@@ -574,10 +612,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ],
             [
                 'distributor' => [
@@ -606,10 +645,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => false,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => true],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(),
             ],
             [
                 'distributor' => [
@@ -634,10 +674,11 @@ class RelayTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
-                    'data' => [
-                        'passthroughFields' => ['enabled' => false],
-                    ],
+                    'data' => 'streamId1',
                 ],
+            ],
+            [
+                'streamId1' => $this->getPassthroughStreamConfiguration(false),
             ]
         );
         $this->expectException(QueueException::class);

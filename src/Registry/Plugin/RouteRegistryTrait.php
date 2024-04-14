@@ -2,6 +2,8 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\FieldDefinition\FieldDefinition;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\FieldDefinition\FieldListDefinition;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ListSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
@@ -47,13 +49,27 @@ trait RouteRegistryTrait
         $this->deletePlugin($keyword, RouteInterface::class);
     }
 
-    protected function getRouteSchema(): SchemaInterface
+    protected function getRouteSchema(SchemaDocument $schemaDocument): SchemaInterface
     {
         $routeSchema = new RouteSchema();
         foreach ($this->getAllPluginClasses(RouteInterface::class) as $key => $class) {
             $schema = $class::getSchema();
             $label = $class::getLabel();
             $routeSchema->addItem($key, $schema, $label);
+
+            $fields = $class::getDefaultFields();
+            if ($fields !== []) {
+                $fieldListDefinition = new FieldListDefinition('distributor.out.defaults.' . $key);
+                foreach ($fields as $field) {
+                    if (!$field instanceof FieldDefinition) {
+                        $field = new FieldDefinition($field);
+                    }
+
+                    $fieldListDefinition->addField($field);
+                }
+
+                $schemaDocument->addFieldContext($fieldListDefinition->getName(), $fieldListDefinition);
+            }
         }
 
         return $routeSchema;
@@ -61,7 +77,7 @@ trait RouteRegistryTrait
 
     protected function getRoutesSchema(SchemaDocument $schemaDocument): SchemaInterface
     {
-        $routeSchema = $this->getRouteSchema();
+        $routeSchema = $this->getRouteSchema($schemaDocument);
         $schemaDocument->addCustomType($routeSchema, RouteSchema::TYPE);
 
         $routeListSchema = new ListSchema(new CustomSchema(RouteSchema::TYPE));

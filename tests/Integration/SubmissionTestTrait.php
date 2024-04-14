@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
@@ -46,6 +47,14 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     protected function getSubmission(): SubmissionDataSetInterface
     {
         return new SubmissionDataSet($this->submissionData, $this->submissionConfiguration, $this->submissionContext);
+    }
+
+    /**
+     * @param array<string,mixed> $configuration
+     */
+    protected function addStreamConfiguration(string $streamName, string $streamId, int $weight, array $configuration, int $index = 0): void
+    {
+        $this->submissionConfiguration[$index][ConfigurationInterface::KEY_STREAMS][$streamId] = $this->createMapItem($streamName, $configuration, $streamId, $weight);
     }
 
     /**

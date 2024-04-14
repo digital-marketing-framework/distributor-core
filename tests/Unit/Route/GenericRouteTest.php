@@ -23,7 +23,7 @@ class GenericRouteTest extends TestCase
     protected const DEFAULT_CONFIG = [
         'enabled' => false,
         'gate' => [],
-        'data' => [],
+        'data' => '',
     ];
 
     protected RegistryInterface&MockObject $registry;
@@ -133,7 +133,7 @@ class GenericRouteTest extends TestCase
         ]);
 
         $this->expectException(DigitalMarketingFrameworkException::class);
-        $this->expectExceptionMessage(sprintf(Route::MESSAGE_DATA_EMPTY, 'myCustomKeyword', 'myCustomKeywordId1'));
+        $this->expectExceptionMessage(sprintf(Route::MESSGE_NO_STREAM_DEFINED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
         $this->createRoute();
         $this->subject->process();
@@ -151,13 +151,15 @@ class GenericRouteTest extends TestCase
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
             ],
-            'fields' => [
-                'processedField1' => 'someConfig',
-                'processedField2' => 'someOtherConfig',
-            ],
+            'data' => 'streamId1',
         ]);
 
-        $this->dataProcessor->expects($this->once())->method('processDataMapper')->willReturn(new Data([
+        $this->submissionConfiguration->expects($this->once())->method('getStreamConfiguration')->with('streamId1')->willReturn([
+            'streamConfigKey1' => 'streamConfigValue1',
+            'streamConfigKey2' => 'streamConfigValue2',
+        ]);
+
+        $this->dataProcessor->expects($this->once())->method('processStream')->willReturn(new Data([
             'processedField1' => 'processedValue1',
             'processedField2' => 'processedValue2',
         ]));

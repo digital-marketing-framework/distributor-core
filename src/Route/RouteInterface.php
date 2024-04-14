@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\FieldDefinition\FieldDefinition;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
@@ -35,6 +36,13 @@ interface RouteInterface extends ConfigurablePluginInterface
      * @return array<string>
      */
     public function getEnabledDataProviders(): array;
+
+    public static function getDefaultPassthroughFields(): bool;
+
+    /**
+     * @return array<string|FieldDefinition>
+     */
+    public static function getDefaultFields(): array;
 
     /**
      * @throws DigitalMarketingFrameworkException

@@ -14,10 +14,11 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string,array{type:string,value:mixed}> $data
      * @param array<string,array<string,mixed>> $routeConfigs
+     * @param array<string,array<string,mixed>> $streamConfigs
      * @param array<string,mixed> $config
      * @param array<string,mixed> $context
      */
-    protected function createJob(array $data, array $routeConfigs, array $config = [], array $context = [], string $jobRouteId = 'routeId1'): JobInterface
+    protected function createJob(array $data, array $routeConfigs, array $streamConfigs = [], array $config = [], array $context = [], string $jobRouteId = 'routeId1'): JobInterface
     {
         $data = [
             QueueDataFactory::KEY_ROUTE_ID => $jobRouteId,
@@ -27,6 +28,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
                 'context' => $context,
             ],
         ];
+
         $weight = 10;
         foreach ($routeConfigs as $routeId => $routeConfig) {
             $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['distributor']['routes'][$routeId] = $this->createListItem([
@@ -35,6 +37,17 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
                     'generic' => $routeConfig,
                 ],
             ], $routeId, $weight);
+            $weight += 10;
+        }
+
+        $weight = 10;
+        foreach ($streamConfigs as $streamId => $streamConfig) {
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['streams'][$streamId] = $this->createMapItem(
+                $streamId . 'Name',
+                $streamConfig,
+                $streamId,
+                $weight
+            );
             $weight += 10;
         }
 

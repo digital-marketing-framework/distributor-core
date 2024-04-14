@@ -7,12 +7,11 @@ use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\B
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
+use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\StreamReferenceSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\DataMapperSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\EvaluationSchema;
 use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
-use DigitalMarketingFramework\Core\DataProcessor\DataProcessor;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
@@ -39,6 +38,10 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with ID %s.';
 
+    public const MESSGE_NO_STREAM_DEFINED = 'No data stream defined in route "%s" with ID %s.';
+
+    public const MESSAGE_NO_STREAM_CONFIG_FOUND = 'No data stream configuration found for stream ID "%s" in route "%s" with ID %s.';
+
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
@@ -51,11 +54,22 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public function buildData(): DataInterface
     {
-        return $this->dataProcessor->processDataMapper(
-            $this->getConfig(static::KEY_DATA),
+        $streamId = $this->getConfig(static::KEY_DATA);
+        if ($streamId === '') {
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSGE_NO_STREAM_DEFINED, $this->getKeyword(), $this->routeId));
+        }
+
+        $streamConfig = $this->submission->getConfiguration()->getStreamConfiguration($streamId);
+        if ($streamConfig === null) {
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_NO_STREAM_CONFIG_FOUND, $streamId, $this->getKeyword(), $this->routeId));
+        }
+
+        $context = $this->dataProcessor->createContext(
             $this->submission->getData(),
             $this->submission->getConfiguration()
         );
+
+        return $this->dataProcessor->processStream($streamConfig, $context);
     }
 
     protected function getDataProcessorContext(): DataProcessorContextInterface
@@ -136,36 +150,17 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     abstract protected function getDispatcher(): DataDispatcherInterface;
 
-    protected static function getDefaultPassthroughFields(): bool
+    /**
+     * TODO to be used for auto-generation of stream field configuration
+     */
+    public static function getDefaultPassthroughFields(): bool
     {
         return false;
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    protected static function getDefaultFields(): array
+    public static function getDefaultFields(): array
     {
         return [];
-    }
-
-    /**
-     * @return array<array<string,mixed>>
-     */
-    protected static function getDataDefaultValue(): array
-    {
-        $dataDefaultValue = [];
-
-        if (static::getDefaultPassthroughFields()) {
-            $dataDefaultValue = DataProcessor::dataMapperSchemaDefaultValuePassthroughFields($dataDefaultValue);
-        }
-
-        $fields = static::getDefaultFields();
-        if ($fields !== []) {
-            $dataDefaultValue = DataProcessor::dataMapperSchemaDefaultValueFieldMap($fields, $dataDefaultValue);
-        }
-
-        return $dataDefaultValue;
     }
 
     public static function getSchema(): SchemaInterface
@@ -194,12 +189,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $gateSchema->getRenderingDefinition()->setLabel('Gate');
         $schema->addProperty(static::KEY_GATE, $gateSchema);
 
-        $dataSchema = new CustomSchema(DataMapperSchema::TYPE);
-        $dataDefault = static::getDataDefaultValue();
-        if ($dataDefault !== []) {
-            $dataSchema->setDefaultValue($dataDefault);
-        }
-
+        $dataSchema = new CustomSchema(StreamReferenceSchema::TYPE);
         $schema->addProperty(static::KEY_DATA, $dataSchema);
 
         // TODO gdpr should not be handled in the gate. we need a dedicated service for that
