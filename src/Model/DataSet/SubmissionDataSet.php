@@ -7,14 +7,14 @@ use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 
 class SubmissionDataSet implements SubmissionDataSetInterface
 {
     protected DataInterface $data;
 
-    protected SubmissionConfigurationInterface $configuration;
+    protected DistributorConfigurationInterface $configuration;
 
     protected WriteableContextInterface $context;
 
@@ -26,7 +26,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
     public function __construct(array $data, array $configurationList = [], array $context = [])
     {
         $this->data = new Data($data);
-        $this->configuration = new SubmissionConfiguration($configurationList);
+        $this->configuration = new DistributorConfiguration($configurationList);
         $this->context = new WriteableContext($context);
     }
 
@@ -35,7 +35,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
         return $this->data;
     }
 
-    public function getConfiguration(): SubmissionConfigurationInterface
+    public function getConfiguration(): DistributorConfigurationInterface
     {
         return $this->configuration;
     }

@@ -2,35 +2,33 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\StreamReferenceSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\CustomSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Plugin\DataProcessor\EvaluationSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\DataMapperGroupReferenceSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Plugin\DataProcessor\ConditionSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
+use DigitalMarketingFramework\Core\Route\Route;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
+use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
-abstract class Route extends ConfigurablePlugin implements RouteInterface, DataProcessorAwareInterface
+abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRouteInterface, DataProcessorAwareInterface
 {
     use DataProcessorAwareTrait;
-
-    protected const DEFAULT_ASYNC = InheritableBooleanSchema::VALUE_INHERIT;
-
-    protected const DEFAULT_DISABLE_STORAGE = InheritableBooleanSchema::VALUE_INHERIT;
 
     protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
@@ -38,9 +36,9 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public const MESSAGE_DATA_EMPTY = 'No data generated for route "%s" with ID %s.';
 
-    public const MESSGE_NO_STREAM_DEFINED = 'No data stream defined in route "%s" with ID %s.';
+    public const MESSAGE_NO_DATA_MAPPER_GROUP_DEFINED = 'No data mapper group defined in route "%s" with ID %s.';
 
-    public const MESSAGE_NO_STREAM_CONFIG_FOUND = 'No data stream configuration found for stream ID "%s" in route "%s" with ID %s.';
+    public const MESSAGE_NO_DATA_MAPPER_GROUP_CONFIG_FOUND = 'No data mapper group configuration found for group ID "%s" in outbound route "%s" with ID %s.';
 
     public function __construct(
         string $keyword,
@@ -49,19 +47,31 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         protected string $routeId,
     ) {
         parent::__construct($keyword, $registry);
-        $this->configuration = $this->submission->getConfiguration()->getRouteConfiguration($this->routeId);
+        $this->configuration = $this->submission->getConfiguration()->getOutboundRouteConfiguration(static::getIntegrationName(), $this->routeId);
+    }
+
+    abstract public static function getIntegrationName(): string;
+
+    public static function getIntegrationLabel(): ?string
+    {
+        return null;
+    }
+
+    public static function getOutboundRouteListLabel(): ?string
+    {
+        return null;
     }
 
     public function buildData(): DataInterface
     {
-        $streamId = $this->getConfig(static::KEY_DATA);
-        if ($streamId === '') {
-            throw new DigitalMarketingFrameworkException(sprintf(static::MESSGE_NO_STREAM_DEFINED, $this->getKeyword(), $this->routeId));
+        $dataMapperGroupId = $this->getConfig(static::KEY_DATA);
+        if ($dataMapperGroupId === '') {
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_NO_DATA_MAPPER_GROUP_DEFINED, $this->getKeyword(), $this->routeId));
         }
 
-        $streamConfig = $this->submission->getConfiguration()->getStreamConfiguration($streamId);
-        if ($streamConfig === null) {
-            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_NO_STREAM_CONFIG_FOUND, $streamId, $this->getKeyword(), $this->routeId));
+        $dataMapperGroupConfig = $this->submission->getConfiguration()->getDataMapperGroupConfiguration($dataMapperGroupId);
+        if ($dataMapperGroupConfig === null) {
+            throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_NO_DATA_MAPPER_GROUP_CONFIG_FOUND, $dataMapperGroupId, $this->getKeyword(), $this->routeId));
         }
 
         $context = $this->dataProcessor->createContext(
@@ -69,7 +79,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
             $this->submission->getConfiguration()
         );
 
-        return $this->dataProcessor->processStream($streamConfig, $context);
+        return $this->dataProcessor->processDataMapperGroup($dataMapperGroupConfig, $context);
     }
 
     protected function getDataProcessorContext(): DataProcessorContextInterface
@@ -91,7 +101,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
             return true;
         }
 
-        return $this->dataProcessor->processEvaluation(
+        return $this->dataProcessor->processCondition(
             $this->getConfig(static::KEY_GATE),
             $this->getDataProcessorContext()
         );
@@ -109,12 +119,12 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
     public function async(): ?bool
     {
-        return InheritableBooleanSchema::convert($this->getConfig(RelayInterface::KEY_ASYNC));
+        return InheritableBooleanSchema::convert($this->getConfig(DistributorConfigurationInterface::KEY_ASYNC));
     }
 
-    public function disableStorage(): ?bool
+    public function enableStorage(): ?bool
     {
-        return InheritableBooleanSchema::convert($this->getConfig(RelayInterface::KEY_DISABLE_STORAGE));
+        return InheritableBooleanSchema::convert($this->getConfig(DistributorConfigurationInterface::KEY_ENABLE_STORAGE));
     }
 
     public function getEnabledDataProviders(): array
@@ -151,7 +161,7 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
     abstract protected function getDispatcher(): DataDispatcherInterface;
 
     /**
-     * TODO to be used for auto-generation of stream field configuration
+     * TODO to be used for auto-generation of data mapper field configuration
      */
     public static function getDefaultPassthroughFields(): bool
     {
@@ -173,11 +183,11 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
 
         $asyncSchema = new InheritableBooleanSchema();
         $asyncSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
-        $schema->addProperty(RelayInterface::KEY_ASYNC, $asyncSchema);
+        $schema->addProperty(DistributorConfigurationInterface::KEY_ASYNC, $asyncSchema);
 
-        $disableStorageSchema = new InheritableBooleanSchema();
-        $disableStorageSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
-        $schema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, $disableStorageSchema);
+        $enableStorageSchema = new InheritableBooleanSchema();
+        $enableStorageSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
+        $schema->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, $enableStorageSchema);
 
         $enableDataProviders = new RestrictedTermsSchema('/distributor/dataProviders/*');
         $enableDataProviders->getTypeSchema()->getRenderingDefinition()->setLabel('Enable Data Providers');
@@ -185,11 +195,11 @@ abstract class Route extends ConfigurablePlugin implements RouteInterface, DataP
         $enableDataProviders->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, $enableDataProviders);
 
-        $gateSchema = new CustomSchema(EvaluationSchema::TYPE);
+        $gateSchema = new CustomSchema(ConditionSchema::TYPE);
         $gateSchema->getRenderingDefinition()->setLabel('Gate');
         $schema->addProperty(static::KEY_GATE, $gateSchema);
 
-        $dataSchema = new CustomSchema(StreamReferenceSchema::TYPE);
+        $dataSchema = new CustomSchema(DataMapperGroupReferenceSchema::TYPE);
         $schema->addProperty(static::KEY_DATA, $dataSchema);
 
         // TODO gdpr should not be handled in the gate. we need a dedicated service for that

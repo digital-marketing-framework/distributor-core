@@ -9,11 +9,11 @@ use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
-use DigitalMarketingFramework\Distributor\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -48,9 +48,9 @@ class RelayTest extends TestCase
 
     protected SubmissionDataSetInterface&MockObject $submission;
 
-    protected SubmissionConfigurationInterface&MockObject $submissionConfiguration;
+    protected DistributorConfigurationInterface&MockObject $submissionConfiguration;
 
-    protected Relay $subject;
+    protected Distributor $subject;
 
     protected function setUp(): void
     {
@@ -78,7 +78,7 @@ class RelayTest extends TestCase
             return $this->routes;
         });
 
-        $this->subject = new Relay($this->registry);
+        $this->subject = new Distributor($this->registry);
         $this->subject->setLogger($this->logger);
         $this->subject->setContext($this->context);
 
@@ -90,7 +90,7 @@ class RelayTest extends TestCase
 
     protected function initSubmission(): void
     {
-        $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
+        $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
         $this->submission = $this->createMock(SubmissionDataSetInterface::class);
         $this->submission->method('getConfiguration')->willReturn($this->submissionConfiguration);
     }

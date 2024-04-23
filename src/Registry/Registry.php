@@ -2,23 +2,28 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\BooleanSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\ContainerSchema;
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\SchemaDocument;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefinition;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\ListSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
-use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\RouteRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
-use DigitalMarketingFramework\Distributor\Core\Service\Relay;
-use DigitalMarketingFramework\Distributor\Core\Service\RelayInterface;
+use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\Route\OutboundRouteSchema;
+use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
+use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
 class Registry extends CoreRegistry implements RegistryInterface
 {
@@ -26,33 +31,39 @@ class Registry extends CoreRegistry implements RegistryInterface
     use QueueDataFactoryRegistryTrait;
     use DataDispatcherRegistryTrait;
     use DataProviderRegistryTrait;
-    use RouteRegistryTrait;
+    use OutboundRouteRegistryTrait;
 
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
     {
         return $this->createObject(QueueProcessor::class, [$queue, $worker]);
     }
 
-    public function getRelay(): RelayInterface
+    public function getDistributor(): DistributorInterface
     {
-        return $this->createObject(Relay::class, [$this]);
+        return $this->createObject(Distributor::class, [$this]);
     }
 
     public function addConfigurationSchema(SchemaDocument $schemaDocument): void
     {
         parent::addConfigurationSchema($schemaDocument);
 
-        $distributorSchema = new ContainerSchema();
-        $distributorSchema->getRenderingDefinition()->setLabel('Form Relay');
+        // general outbound settings
+        $generalOutboundConfiguration = new ContainerSchema();
+        $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ASYNC, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ASYNC));
+        $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ENABLE_STORAGE));
+        $generalIntegration = $this->getGeneralIntegrationSchema($schemaDocument);
+        $generalIntegration->addProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES, $generalOutboundConfiguration);
 
-        $distributorSchema->addProperty(RelayInterface::KEY_ASYNC, new BooleanSchema(RelayInterface::DEFAULT_ASYNC));
-        $distributorSchema->addProperty(RelayInterface::KEY_DISABLE_STORAGE, new BooleanSchema(RelayInterface::DEFAULT_DISABLE_STORAGE));
+        // outbound routes integrations
+        $this->addOutboundRouteSchema($schemaDocument);
 
-        $routeListSchema = $this->getRoutesSchema($schemaDocument);
-        $distributorSchema->addProperty(SubmissionConfiguration::KEY_ROUTES, $routeListSchema);
+        // data providers
+        $dataProcessingSchema = $this->getDataProcessingSchema($schemaDocument);
+        $dataProcessingSchema->addProperty(DistributorConfiguration::KEY_DATA_PROVIDERS, $this->getDataProviderSchema());
 
-        $distributorSchema->addProperty(SubmissionConfiguration::KEY_DATA_PROVIDERS, $this->getDataProviderSchema());
 
-        $schemaDocument->getMainSchema()->addProperty(SubmissionConfigurationInterface::KEY_DISTRIBUTOR, $distributorSchema);
+
+
+
     }
 }

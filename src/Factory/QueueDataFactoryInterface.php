@@ -23,7 +23,7 @@ interface QueueDataFactoryInterface
     /**
      * Returns the label of a set of a submission, a route name and a route pass to a label used in jobs.
      */
-    public function getSubmissionLabel(SubmissionDataSetInterface $submission, string $routeId, string $hash = ''): string;
+    public function getSubmissionLabel(SubmissionDataSetInterface $submission, string $integrationName, string $routeId, string $hash = ''): string;
 
     /**
      * Returns the label of the job.
@@ -34,7 +34,7 @@ interface QueueDataFactoryInterface
      * Converts a set of a submission and a route ID to a job.
      * Additionally the initial status of the job can be passed too.
      */
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $routeId, int $status = QueueInterface::STATUS_QUEUED): JobInterface;
+    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $integationName, string $routeId, int $status = QueueInterface::STATUS_QUEUED): JobInterface;
 
     /**
      * Converts a job to a submission.
@@ -45,4 +45,9 @@ interface QueueDataFactoryInterface
      * Returns the route ID of a job.
      */
     public function getJobRouteId(JobInterface $job): string;
+
+    /**
+     * Returns the integration name of a job.
+     */
+    public function getJobRouteIntegrationName(JobInterface $job): string;
 }

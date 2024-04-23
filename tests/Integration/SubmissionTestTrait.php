@@ -5,10 +5,10 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributor\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 
 trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
 {
@@ -30,9 +30,9 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     {
         return [
             'distributor' => [
-                Relay::KEY_ASYNC => false,
-                SubmissionConfigurationInterface::KEY_DATA_PROVIDERS => [],
-                SubmissionConfigurationInterface::KEY_ROUTES => [],
+                Distributor::KEY_ASYNC => false,
+                DistributorConfigurationInterface::KEY_DATA_PROVIDERS => [],
+                DistributorConfigurationInterface::KEY_ROUTES => [],
             ],
         ];
     }
@@ -52,9 +52,9 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string,mixed> $configuration
      */
-    protected function addStreamConfiguration(string $streamName, string $streamId, int $weight, array $configuration, int $index = 0): void
+    protected function addDataMapperGroupConfiguration(string $dataMapperGroupName, string $dataMapperGroupId, int $weight, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index][ConfigurationInterface::KEY_STREAMS][$streamId] = $this->createMapItem($streamName, $configuration, $streamId, $weight);
+        $this->submissionConfiguration[$index][ConfigurationInterface::KEY_DATA_MAPPER_GROUPS][$dataMapperGroupId] = $this->createMapItem($dataMapperGroupName, $configuration, $dataMapperGroupId, $weight);
     }
 
     /**
@@ -62,7 +62,7 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
      */
     protected function addRouteConfiguration(string $routeName, string $routeId, int $weight, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_ROUTES][$routeId] = $this->createListItem([
+        $this->submissionConfiguration[$index]['distributor'][DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES][$routeId] = $this->createListItem([
             'type' => $routeName,
             'pass' => '',
             'config' => [
@@ -76,16 +76,16 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
      */
     protected function addDataProviderConfiguration(string $name, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_DATA_PROVIDERS][$name] = $configuration;
+        $this->submissionConfiguration[$index]['distributor'][DistributorConfigurationInterface::KEY_DATA_PROVIDERS][$name] = $configuration;
     }
 
     protected function setSubmissionAsync(bool $async = true, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][Relay::KEY_ASYNC] = $async;
+        $this->submissionConfiguration[$index]['distributor'][DistributorConfigurationInterface::KEY_ASYNC] = $async;
     }
 
-    protected function setStorageDisabled(bool $disableStorage = false, int $index = 0): void
+    protected function setStorageEnabled(bool $enableStorage = true, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][Relay::KEY_DISABLE_STORAGE] = $disableStorage;
+        $this->submissionConfiguration[$index]['distributor'][DistributorConfigurationInterface::KEY_ENABLE_STORAGE] = $enableStorage;
     }
 }

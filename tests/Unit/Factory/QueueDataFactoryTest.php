@@ -10,7 +10,7 @@ use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\InvalidValue;
@@ -30,7 +30,7 @@ class QueueDataFactoryTest extends TestCase
 
     protected DataInterface&MockObject $submissionData;
 
-    protected SubmissionConfigurationInterface&MockObject $submissionConfiguration;
+    protected DistributorConfigurationInterface&MockObject $submissionConfiguration;
 
     protected ContextInterface&MockObject $submissionContext;
 

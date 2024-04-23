@@ -3,9 +3,9 @@
 namespace DigitalMarketingFramework\Distributor\Core\Model\DataSet;
 
 use DigitalMarketingFramework\Core\Model\DataSet\DataSetInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 
 interface SubmissionDataSetInterface extends DataSetInterface
 {
-    public function getConfiguration(): SubmissionConfigurationInterface;
+    public function getConfiguration(): DistributorConfigurationInterface;
 }

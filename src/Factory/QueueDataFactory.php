@@ -14,6 +14,8 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 
 class QueueDataFactory implements QueueDataFactoryInterface
 {
+    public const KEY_INTEGRATION_NAME = 'integration';
+
     public const KEY_ROUTE_ID = 'routeId';
 
     public const KEY_SUBMISSION = 'submission';
@@ -51,7 +53,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
     /**
      * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $submissionData
      */
-    protected function getSubmissionDataLabel(array $submissionData, string $routeId, string $hash = ''): string
+    protected function getSubmissionDataLabel(array $submissionData, string $integrationName, string $routeId, string $hash = ''): string
     {
         if ($hash === '') {
             $hash = $this->getSubmissionDataHash($submissionData);
@@ -60,26 +62,27 @@ class QueueDataFactory implements QueueDataFactoryInterface
         try {
             $submission = $this->unpack($submissionData);
 
-            return $this->getSubmissionLabel($submission, $routeId, $hash);
+            return $this->getSubmissionLabel($submission, $integrationName, $routeId, $hash);
         } catch (DigitalMarketingFrameworkException) {
             return static::DEFAULT_LABEL;
         }
     }
 
-    public function getSubmissionLabel(SubmissionDataSetInterface $submission, string $routeId, string $hash = ''): string
+    public function getSubmissionLabel(SubmissionDataSetInterface $submission, string $integrationName, string $routeId, string $hash = ''): string
     {
         if ($hash === '') {
             $hash = $this->getSubmissionHash($submission);
         }
 
         return GeneralUtility::shortenHash($hash)
-            . '#' . $submission->getConfiguration()->getRouteLabel($routeId);
+            . '#' . $submission->getConfiguration()->getOutboundRouteLabel($integrationName, $routeId);
     }
 
     public function getJobLabel(JobInterface $job): string
     {
         return $this->getSubmissionDataLabel(
             $this->getJobSubmissionData($job),
+            $this->getJobRouteIntegrationName($job),
             $this->getJobRouteId($job),
             $job->getHash()
         );
@@ -108,17 +111,32 @@ class QueueDataFactory implements QueueDataFactoryInterface
         return $jobData[static::KEY_ROUTE_ID];
     }
 
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $routeId, int $status = QueueInterface::STATUS_QUEUED): JobInterface
+    public function getJobRouteIntegrationName(JobInterface $job): string
     {
+        $jobData = $job->getData();
+        if (!isset($jobData[static::KEY_INTEGRATION_NAME])) {
+            throw new DigitalMarketingFrameworkException('job does not seem to have an integration name');
+        }
+
+        return $jobData[static::KEY_INTEGRATION_NAME];
+    }
+
+    public function convertSubmissionToJob(
+        SubmissionDataSetInterface $submission,
+        string $integrationName,
+        string $routeId,
+        int $status = QueueInterface::STATUS_QUEUED
+    ): JobInterface {
         $submissionData = $this->pack($submission);
         $job = $this->createJob();
         $job->setStatus($status);
         $job->setData([
+            static::KEY_INTEGRATION_NAME => $integrationName,
             static::KEY_ROUTE_ID => $routeId,
             static::KEY_SUBMISSION => $submissionData,
         ]);
         $job->setHash($this->getSubmissionDataHash($submissionData));
-        $job->setLabel($this->getSubmissionLabel($submission, $routeId, $job->getHash()));
+        $job->setLabel($this->getSubmissionLabel($submission, $integrationName, $routeId, $job->getHash()));
 
         return $job;
     }

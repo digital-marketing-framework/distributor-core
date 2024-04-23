@@ -4,14 +4,14 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Model\Configurat
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfiguration;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use PHPUnit\Framework\TestCase;
 
-class SubmissionConfigurationTest extends TestCase
+class DistributorConfigurationTest extends TestCase
 {
     use ListMapTestTrait;
 
-    protected SubmissionConfiguration $subject;
+    protected DistributorConfiguration $subject;
 
     /** @test */
     public function dataProviderFound(): void
@@ -29,7 +29,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $result = $this->subject->getDataProviderConfiguration('dataProvider1');
         $this->assertEquals($conf, $result);
     }
@@ -50,7 +50,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $result = $this->subject->getDataProviderConfiguration('dataProvider2');
         $this->assertEquals([], $result);
     }
@@ -87,7 +87,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
 
         $result = $this->subject->getRouteConfiguration('routeId1');
         $this->assertEquals($conf, $result);
@@ -109,7 +109,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $this->expectException(DigitalMarketingFrameworkException::class);
         $this->subject->getRouteConfiguration('routeId2');
     }
@@ -127,7 +127,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $this->assertEquals('route1', $this->subject->getRouteLabel('routeId1'));
         $this->assertEquals('route2', $this->subject->getRouteLabel('routeId2'));
     }
@@ -145,7 +145,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $this->assertEquals('route1#1', $this->subject->getRouteLabel('routeId1'));
         $this->assertEquals('route1#2', $this->subject->getRouteLabel('routeId2'));
     }
@@ -163,7 +163,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $this->assertEquals('route1', $this->subject->getRouteLabel('routeId1'));
         $this->assertEquals('route2', $this->subject->getRouteLabel('routeId2'));
     }
@@ -181,7 +181,7 @@ class SubmissionConfigurationTest extends TestCase
                 ],
             ],
         ];
-        $this->subject = new SubmissionConfiguration($configList);
+        $this->subject = new DistributorConfiguration($configList);
         $this->assertEquals('route1#passName1', $this->subject->getRouteLabel('routeId1'));
         $this->assertEquals('route1#passName2', $this->subject->getRouteLabel('routeId2'));
     }

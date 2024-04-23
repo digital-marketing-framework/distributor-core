@@ -10,7 +10,7 @@ use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -36,7 +36,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     protected DataInterface $submissionData;
 
-    protected SubmissionConfigurationInterface&MockObject $submissionConfiguration;
+    protected DistributorConfigurationInterface&MockObject $submissionConfiguration;
 
     protected WriteableContextInterface $submissionContext;
 
@@ -48,7 +48,7 @@ abstract class AbstractDataProviderTest extends TestCase
         $this->globalContext = $this->createMock(ContextInterface::class);
 
         $this->submissionData = new Data();
-        $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
+        $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
         $this->submissionContext = new WriteableContext();
         $this->submission = $this->createMock(SubmissionDataSetInterface::class);
         $this->submission->expects($this->any())->method('getData')->willReturn($this->submissionData);
