@@ -57,6 +57,11 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
         return null;
     }
 
+    public static function getIntegrationWeight(): int
+    {
+        return static::WEIGHT;
+    }
+
     public static function getOutboundRouteListLabel(): ?string
     {
         return null;

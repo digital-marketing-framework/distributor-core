@@ -60,11 +60,12 @@ trait OutboundRouteRegistryTrait
             $label = $class::getLabel();
             $integration = $class::getIntegrationName();
             $integrationLabel = $class::getIntegrationLabel();
+            $integrationWeight = $class::getIntegrationWeight();
             $outboundRouteListLabel = $class::getOutboundRouteListLabel();
 
             $routeSchema->addRoute($key, $schema, $integration, $label);
 
-            $integrationSchema = $this->getIntegrationSchema($schemaDocument, $integration, $integrationLabel);
+            $integrationSchema = $this->getIntegrationSchema($schemaDocument, $integration, $integrationLabel, $integrationWeight);
             $routeListSchema = $integrationSchema->getProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES);
             if (!$routeListSchema instanceof ListSchema) {
                 $routeListSchema = new ListSchema(new CustomSchema(OutboundRouteSchema::TYPE));

@@ -45,7 +45,7 @@ class DistributorConfiguration extends Configuration implements DistributorConfi
     {
         $routeIds = [];
         foreach ($this->getAllIntegrationConfigurations() as $integrationName => $integrationConfig) {
-            $routeIds[$integrationName] = array_keys($integrationConfig[static::KEY_OUTBOUND_ROUTES] ?? []);
+            $routeIds[$integrationName] = ListUtility::getIdsSorted($integrationConfig[static::KEY_OUTBOUND_ROUTES] ?? []);
         }
         return $routeIds;
     }
