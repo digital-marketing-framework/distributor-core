@@ -49,6 +49,7 @@ class Registry extends CoreRegistry implements RegistryInterface
 
         // general outbound settings
         $generalOutboundConfiguration = new ContainerSchema();
+        $generalOutboundConfiguration->getRenderingDefinition()->setIcon('outbound-routes');
         $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ASYNC, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ASYNC));
         $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ENABLE_STORAGE));
         $generalIntegration = $this->getGeneralIntegrationSchema($schemaDocument);

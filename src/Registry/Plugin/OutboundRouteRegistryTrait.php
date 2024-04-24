@@ -60,12 +60,11 @@ trait OutboundRouteRegistryTrait
             $label = $class::getLabel();
             $integration = $class::getIntegrationName();
             $integrationLabel = $class::getIntegrationLabel();
-            $integrationWeight = $class::getIntegrationWeight();
             $outboundRouteListLabel = $class::getOutboundRouteListLabel();
 
             $routeSchema->addRoute($key, $schema, $integration, $label);
 
-            $integrationSchema = $this->getIntegrationSchema($schemaDocument, $integration, $integrationLabel, $integrationWeight);
+            $integrationSchema = $this->getIntegrationSchemaForPluginClass($schemaDocument, $class);
             $routeListSchema = $integrationSchema->getProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES);
             if (!$routeListSchema instanceof ListSchema) {
                 $routeListSchema = new ListSchema(new CustomSchema(OutboundRouteSchema::TYPE));
@@ -73,6 +72,7 @@ trait OutboundRouteRegistryTrait
                     $outboundRouteListLabel = 'Routes to ' . ($integrationLabel ?? GeneralUtility::getLabelFromValue($integration));
                 }
                 $routeListSchema->getRenderingDefinition()->setLabel($outboundRouteListLabel);
+                $routeListSchema->getRenderingDefinition()->setIcon('outbound-routes');
                 $integrationSchema->addProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES, $routeListSchema);
             }
 
