@@ -43,7 +43,7 @@ class OutboundRouteReferenceSchema extends IntegrationReferenceSchema
         $ignorePath = parent::getIntegrationIgnorePath();
         if ($this->integrationNestingLevel === 0) {
             $ignorePath[] = sprintf('/%s/{.}', ConfigurationInterface::KEY_INTEGRATIONS);
-        } elseif ($this->integrationReferenceSchema > 0) {
+        } elseif ($this->integrationNestingLevel > 0) {
             $pathParts = array_fill(0, $this->integrationNestingLevel, '..');
             $path = implode('/', $pathParts);
             $ignorePath[] = sprintf('/%s/{%s}', ConfigurationInterface::KEY_INTEGRATIONS, $path);

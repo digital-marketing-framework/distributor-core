@@ -117,6 +117,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     public static function getSchema(): SchemaInterface
     {
         $schema = new ContainerSchema();
+        $schema->getRenderingDefinition()->setIcon('data-provider');
 
         $label = static::getLabel();
         if ($label !== null) {

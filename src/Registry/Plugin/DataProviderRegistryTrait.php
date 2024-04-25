@@ -36,6 +36,7 @@ trait DataProviderRegistryTrait
     {
         $schema = new DataProviderSchema();
         $schema->getRenderingDefinition()->setLabel('Additional Data');
+        $schema->getRenderingDefinition()->setIcon('data-providers');
         $schema->getRenderingDefinition()->setGeneralDescription('Additional data can be provided for outbound routes, like form submissions. The data is derived from the context of the request that triggered the route, like the website language or the timestamp or request cookies or headers.');
         $schema->getRenderingDefinition()->setHint('Data providers are configured globally, but you can enable or disable them individually for each outbound route.');
         foreach ($this->getAllPluginClasses(DataProviderInterface::class) as $key => $class) {

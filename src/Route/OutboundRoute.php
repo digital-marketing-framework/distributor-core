@@ -59,7 +59,7 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
 
     public static function getIntegrationIcon(): ?string
     {
-        return null;
+        return 'integration';
     }
 
     public static function getIntegrationWeight(): int
@@ -186,6 +186,7 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
     public static function getSchema(): SchemaInterface
     {
         $schema = new ContainerSchema();
+        $schema->getRenderingDefinition()->setIcon('outbound-route');
         $schema->getRenderingDefinition()->setNavigationItem(false);
 
         $enabledProperty = $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
