@@ -2,11 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
-use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\DataProvider\DataProviderSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\DataProvider\DataProviderSchema;
 
 trait DataProviderRegistryTrait
 {

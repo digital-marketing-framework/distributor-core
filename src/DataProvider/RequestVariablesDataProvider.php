@@ -2,11 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\MapSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
-use DigitalMarketingFramework\Core\Context\ContextInterface;
 
 class RequestVariablesDataProvider extends DataProvider
 {

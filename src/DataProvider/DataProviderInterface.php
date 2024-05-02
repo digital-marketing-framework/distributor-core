@@ -2,9 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 
 interface DataProviderInterface extends ConfigurablePluginInterface
 {

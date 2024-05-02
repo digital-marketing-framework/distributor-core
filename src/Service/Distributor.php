@@ -2,7 +2,6 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Service;
 
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
@@ -11,6 +10,7 @@ use DigitalMarketingFramework\Core\Log\LoggerAwareTrait;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueException;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
@@ -97,7 +97,6 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         $syncPersistentJobs = [];
         $syncTemporaryJobs = [];
         $routes = $this->registry->getOutboundRoutes($submission);
-        $distributorConfiguration = $submission->getConfiguration()->getGeneralOutboundConfiguration();
 
         foreach ($routes as $route) {
             if (!$route->enabled()) {

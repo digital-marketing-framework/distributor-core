@@ -2,12 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
-use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 use DigitalMarketingFramework\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
 
 interface OutboundRouteInterface extends RouteInterface
 {

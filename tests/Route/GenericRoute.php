@@ -6,9 +6,9 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributor\Core\Route\Route;
+use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
 
-class GenericRoute extends Route
+class GenericRoute extends OutboundRoute
 {
     public function __construct(
         string $keyword,
@@ -18,6 +18,11 @@ class GenericRoute extends Route
         protected ?DataDispatcherInterface $dataDispatcher = null,
     ) {
         parent::__construct($keyword, $registry, $submission, $routeId);
+    }
+
+    public static function getIntegrationName(): string
+    {
+        return 'generic';
     }
 
     protected function getDispatcher(): DataDispatcherInterface

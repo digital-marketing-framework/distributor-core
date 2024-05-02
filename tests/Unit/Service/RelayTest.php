@@ -12,7 +12,7 @@ use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +37,7 @@ class RelayTest extends TestCase
 
     protected QueueProcessorInterface&MockObject $temporaryQueueProcessor;
 
-    /** @var array<RouteInterface&MockObject> */
+    /** @var array<OutboundRouteInterface&MockObject> */
     protected array $routes = [];
 
     /** @var array<JobInterface&MockObject> */
@@ -106,7 +106,7 @@ class RelayTest extends TestCase
             'value' => $config,
         ];
 
-        $route = $this->createMock(RouteInterface::class);
+        $route = $this->createMock(OutboundRouteInterface::class);
         $route->method('getKeyword')->willReturn($keyword);
         $route->method('getRouteId')->willReturn($id);
         $route->method('enabled')->willReturn($enabled);

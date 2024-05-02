@@ -30,9 +30,9 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     {
         return [
             'distributor' => [
-                Distributor::KEY_ASYNC => false,
+                DistributorConfigurationInterface::KEY_ASYNC => false,
                 DistributorConfigurationInterface::KEY_DATA_PROVIDERS => [],
-                DistributorConfigurationInterface::KEY_ROUTES => [],
+                DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES => [],
             ],
         ];
     }

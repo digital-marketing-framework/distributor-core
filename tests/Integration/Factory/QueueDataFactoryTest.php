@@ -45,12 +45,12 @@ class QueueDataFactoryTest extends TestCase
         return [
             [
                 'id' => 'routeId1',
-                'integration' => 'integration1'
+                'integration' => 'integration1',
             ],
             [
                 'id' => 'routeId2',
-                'integration' => 'integration2'
-            ]
+                'integration' => 'integration2',
+            ],
         ];
     }
 

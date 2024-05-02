@@ -2,9 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Custom;
 
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\IntegrationReferenceSchema;
 use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\IntegrationReferenceSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 
@@ -25,6 +25,7 @@ class OutboundRouteReferenceSchema extends IntegrationReferenceSchema
         if ($required) {
             $this->routeReferenceSchema->setRequired();
         }
+
         $this->routeReferenceSchema->getAllowedValues()->addValue('', 'Please select');
         $this->routeReferenceSchema->getAllowedValues()->addReference(
             sprintf('/%s/{../%s}/%s/*', ConfigurationInterface::KEY_INTEGRATIONS, static::KEY_INTEGRATION_REFERENCE, DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES),
@@ -48,9 +49,13 @@ class OutboundRouteReferenceSchema extends IntegrationReferenceSchema
             $path = implode('/', $pathParts);
             $ignorePath[] = sprintf('/%s/{%s}', ConfigurationInterface::KEY_INTEGRATIONS, $path);
         }
+
         return $ignorePath;
     }
 
+    /**
+     * @param array{routeReference?:string} $config
+     */
     public static function getOutboundRouteId(array $config): string
     {
         return $config[static::KEY_INTEGRATION_REFERENCE] ?? '';

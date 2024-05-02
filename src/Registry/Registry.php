@@ -2,18 +2,16 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry;
 
-use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
-use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefinition;
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\ListSchema;
-use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefinition;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
@@ -21,7 +19,6 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegis
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
-use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\Route\OutboundRouteSchema;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
@@ -52,6 +49,7 @@ class Registry extends CoreRegistry implements RegistryInterface
         $generalOutboundConfiguration->getRenderingDefinition()->setIcon('outbound-routes');
         $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ASYNC, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ASYNC));
         $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ENABLE_STORAGE));
+
         $generalIntegration = $this->getGeneralIntegrationSchema($schemaDocument);
         $generalIntegration->addProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES, $generalOutboundConfiguration);
 

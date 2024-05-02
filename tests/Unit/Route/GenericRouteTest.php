@@ -107,7 +107,7 @@ class GenericRouteTest extends TestCase
     public function processPassGateFails(): void
     {
         $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(false);
-        $this->logger->expects($this->once())->method('debug')->with(sprintf(Route::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
+        $this->logger->expects($this->once())->method('debug')->with(sprintf(OutboundRoute::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
         $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
             'enabled' => true,

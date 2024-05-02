@@ -2,9 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Model\Configuration;
 
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\SwitchSchema;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Configuration\Configuration;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\SwitchSchema;
 use DigitalMarketingFramework\Core\Utility\ListUtility;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\Route\OutboundRouteSchema;
 
@@ -47,6 +47,7 @@ class DistributorConfiguration extends Configuration implements DistributorConfi
         foreach ($this->getAllIntegrationConfigurations() as $integrationName => $integrationConfig) {
             $routeIds[$integrationName] = ListUtility::getIdsSorted($integrationConfig[static::KEY_OUTBOUND_ROUTES] ?? []);
         }
+
         return $routeIds;
     }
 
