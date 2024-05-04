@@ -8,6 +8,7 @@ use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
+use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
@@ -181,10 +182,30 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
         $enabledProperty->setWeight(10);
 
         $asyncSchema = new InheritableBooleanSchema();
+        $asyncSchema->getRenderingDefinition()->addReference(
+            sprintf(
+                '/%s/%s/%s/%s',
+                ConfigurationInterface::KEY_INTEGRATIONS,
+                ConfigurationInterface::KEY_GENERAL_INTEGRATION,
+                DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES,
+                DistributorConfigurationInterface::KEY_ASYNC
+            ),
+            label: 'Original Value ({.})'
+        );
         $asyncSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(DistributorConfigurationInterface::KEY_ASYNC, $asyncSchema);
 
         $enableStorageSchema = new InheritableBooleanSchema();
+        $enableStorageSchema->getRenderingDefinition()->addReference(
+            sprintf(
+                '/%s/%s/%s/%s',
+                ConfigurationInterface::KEY_INTEGRATIONS,
+                ConfigurationInterface::KEY_GENERAL_INTEGRATION,
+                DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES,
+                DistributorConfigurationInterface::KEY_ENABLE_STORAGE
+            ),
+            label: 'Original Value ({.})'
+        );
         $enableStorageSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, $enableStorageSchema);
 
