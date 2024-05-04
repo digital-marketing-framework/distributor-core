@@ -22,7 +22,7 @@ class DistributorConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'distributor' => [
+                'dataProcessing' => [
                     'dataProviders' => [
                         'dataProvider1' => $conf,
                     ],
@@ -43,7 +43,7 @@ class DistributorConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'distributor' => [
+                'dataProcessing' => [
                     'dataProviders' => [
                         'dataProvider1' => $conf,
                     ],
@@ -80,16 +80,18 @@ class DistributorConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->getRouteConfig($conf, 'route1', 'routeId1', 10),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->getRouteConfig($conf, 'route1', 'routeId1', 10),
+                        ],
                     ],
                 ],
             ],
         ];
         $this->subject = new DistributorConfiguration($configList);
 
-        $result = $this->subject->getRouteConfiguration('routeId1');
+        $result = $this->subject->getOutboundRouteConfiguration('integration1', 'routeId1');
         $this->assertEquals($conf, $result);
     }
 
@@ -102,16 +104,18 @@ class DistributorConfigurationTest extends TestCase
         ];
         $configList = [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->getRouteConfig($conf, 'route1', 'routeId1', 10),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->getRouteConfig($conf, 'route1', 'routeId1', 10),
+                        ],
                     ],
                 ],
             ],
         ];
         $this->subject = new DistributorConfiguration($configList);
         $this->expectException(DigitalMarketingFrameworkException::class);
-        $this->subject->getRouteConfiguration('routeId2');
+        $this->subject->getOutboundRouteConfiguration('integration1', 'routeId2');
     }
 
     /** @test */
@@ -119,17 +123,19 @@ class DistributorConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10),
-                        'routeId2' => $this->getRouteConfig([], 'route2', 'routeId2', 20),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10),
+                            'routeId2' => $this->getRouteConfig([], 'route2', 'routeId2', 20),
+                        ],
                     ],
                 ],
             ],
         ];
         $this->subject = new DistributorConfiguration($configList);
-        $this->assertEquals('route1', $this->subject->getRouteLabel('routeId1'));
-        $this->assertEquals('route2', $this->subject->getRouteLabel('routeId2'));
+        $this->assertEquals('route1', $this->subject->getOutboundRouteLabel('integration1', 'routeId1'));
+        $this->assertEquals('route2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 
     /** @test */
@@ -137,17 +143,19 @@ class DistributorConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10),
-                        'routeId2' => $this->getRouteConfig([], 'route1', 'routeId2', 20),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10),
+                            'routeId2' => $this->getRouteConfig([], 'route1', 'routeId2', 20),
+                        ],
                     ],
                 ],
             ],
         ];
         $this->subject = new DistributorConfiguration($configList);
-        $this->assertEquals('route1#1', $this->subject->getRouteLabel('routeId1'));
-        $this->assertEquals('route1#2', $this->subject->getRouteLabel('routeId2'));
+        $this->assertEquals('route1#1', $this->subject->getOutboundRouteLabel('integration1', 'routeId1'));
+        $this->assertEquals('route1#2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 
     /** @test */
@@ -155,17 +163,19 @@ class DistributorConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10, 'passName1'),
-                        'routeId2' => $this->getRouteConfig([], 'route2', 'routeId2', 20, 'passName2'),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10, 'passName1'),
+                            'routeId2' => $this->getRouteConfig([], 'route2', 'routeId2', 20, 'passName2'),
+                        ],
                     ],
                 ],
             ],
         ];
         $this->subject = new DistributorConfiguration($configList);
-        $this->assertEquals('route1', $this->subject->getRouteLabel('routeId1'));
-        $this->assertEquals('route2', $this->subject->getRouteLabel('routeId2'));
+        $this->assertEquals('route1', $this->subject->getOutboundRouteLabel('integration1', 'routeId1'));
+        $this->assertEquals('route2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 
     /** @test */
@@ -173,16 +183,18 @@ class DistributorConfigurationTest extends TestCase
     {
         $configList = [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10, 'passName1'),
-                        'routeId2' => $this->getRouteConfig([], 'route1', 'routeId2', 20, 'passName2'),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->getRouteConfig([], 'route1', 'routeId1', 10, 'passName1'),
+                            'routeId2' => $this->getRouteConfig([], 'route1', 'routeId2', 20, 'passName2'),
+                        ],
                     ],
                 ],
             ],
         ];
         $this->subject = new DistributorConfiguration($configList);
-        $this->assertEquals('route1#passName1', $this->subject->getRouteLabel('routeId1'));
-        $this->assertEquals('route1#passName2', $this->subject->getRouteLabel('routeId2'));
+        $this->assertEquals('route1#passName1', $this->subject->getOutboundRouteLabel('integration1', 'routeId1'));
+        $this->assertEquals('route1#passName2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 }

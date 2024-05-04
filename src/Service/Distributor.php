@@ -116,7 +116,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
 
             $job = $this->queueDataFactory->convertSubmissionToJob(
                 $submission,
-                $route::getIntegrationName(),
+                $route->getIntegrationInfo()->getName(),
                 $route->getRouteId(),
                 $status
             );

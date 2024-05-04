@@ -58,6 +58,6 @@ class OutboundRouteReferenceSchema extends IntegrationReferenceSchema
      */
     public static function getOutboundRouteId(array $config): string
     {
-        return $config[static::KEY_INTEGRATION_REFERENCE] ?? '';
+        return $config[static::KEY_ROUTE_REFERENCE] ?? '';
     }
 }

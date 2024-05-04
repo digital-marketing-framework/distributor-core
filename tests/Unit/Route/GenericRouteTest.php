@@ -82,7 +82,7 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function useCorrectKeyword(): void
     {
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
         ]);
         $this->createRoute();
@@ -93,7 +93,7 @@ class GenericRouteTest extends TestCase
     public function addContextShouldNotAddAnyContextByDefault(): void
     {
         $this->submissionData['field1'] = 'value1';
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
         ]);
 
@@ -109,7 +109,7 @@ class GenericRouteTest extends TestCase
         $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(false);
         $this->logger->expects($this->once())->method('debug')->with(sprintf(OutboundRoute::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
@@ -125,7 +125,7 @@ class GenericRouteTest extends TestCase
     public function processPassEmptyInputDataWillCauseException(): void
     {
         $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(true);
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
@@ -146,7 +146,7 @@ class GenericRouteTest extends TestCase
         $this->submissionData['field1'] = 'value1';
         $this->submissionData['field2'] = 'value2';
 
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',

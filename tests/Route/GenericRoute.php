@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Route;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
+use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
@@ -20,9 +21,9 @@ class GenericRoute extends OutboundRoute
         parent::__construct($keyword, $registry, $submission, $routeId);
     }
 
-    public static function getIntegrationName(): string
+    public static function getDefaultIntegrationInfo(): IntegrationInfo
     {
-        return 'generic';
+        return new IntegrationInfo('generic');
     }
 
     protected function getDispatcher(): DataDispatcherInterface

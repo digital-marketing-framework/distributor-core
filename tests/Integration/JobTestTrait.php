@@ -15,13 +15,15 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
      * @param array<string,array{type:string,value:mixed}> $data
      * @param array<string,array<string,mixed>> $routeConfigs
      * @param array<string,array<string,mixed>> $dataMapperGroupConfigs
+     * @param array<string,array<string,mixed>> $conditionConfigs
      * @param array<string,mixed> $config
      * @param array<string,mixed> $context
      */
-    protected function createJob(array $data, array $routeConfigs, array $dataMapperGroupConfigs = [], array $config = [], array $context = [], string $jobRouteId = 'routeId1'): JobInterface
+    protected function createJob(array $data, array $routeConfigs, array $dataMapperGroupConfigs = [], array $conditionConfigs = [], array $config = [], array $context = [], string $jobRouteId = 'routeId1', string $jobRouteIntegrationName = 'integration1'): JobInterface
     {
         $data = [
             QueueDataFactory::KEY_ROUTE_ID => $jobRouteId,
+            QueueDataFactory::KEY_INTEGRATION_NAME => $jobRouteIntegrationName,
             QueueDataFactory::KEY_SUBMISSION => [
                 'data' => $data,
                 'configuration' => $config,
@@ -31,7 +33,8 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 
         $weight = 10;
         foreach ($routeConfigs as $routeId => $routeConfig) {
-            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['distributor']['routes'][$routeId] = $this->createListItem([
+            $this->updateRouteConfiguration($routeConfig); // TODO located in SubmissionTestTrait, cleanup these test traits!
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['integrations'][$jobRouteIntegrationName]['outboundRoutes'][$routeId] = $this->createListItem([
                 'type' => 'generic',
                 'config' => [
                     'generic' => $routeConfig,
@@ -42,10 +45,21 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 
         $weight = 10;
         foreach ($dataMapperGroupConfigs as $dataMapperGroupId => $dataMapperGroupConfig) {
-            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataMapperGroups'][$dataMapperGroupId] = $this->createMapItem(
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataProcessing']['dataMapperGroups'][$dataMapperGroupId] = $this->createMapItem(
                 $dataMapperGroupId . 'Name',
                 $dataMapperGroupConfig,
                 $dataMapperGroupId,
+                $weight
+            );
+            $weight += 10;
+        }
+
+        $weight = 10;
+        foreach ($conditionConfigs as $conditionId => $conditionConfig) {
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataProcessing']['conditions'][$conditionId] = $this->createMapItem(
+                $conditionId . 'Name',
+                $conditionConfig,
+                $conditionId,
                 $weight
             );
             $weight += 10;

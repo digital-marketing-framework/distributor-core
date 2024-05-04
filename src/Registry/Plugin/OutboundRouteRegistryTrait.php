@@ -8,7 +8,6 @@ use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefin
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ListSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
-use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
@@ -56,28 +55,23 @@ trait OutboundRouteRegistryTrait
         foreach ($this->getAllPluginClasses(OutboundRouteInterface::class) as $key => $class) {
             $schema = $class::getSchema();
             $label = $class::getLabel();
-            $integration = $class::getIntegrationName();
-            $integrationLabel = $class::getIntegrationLabel();
-            $outboundRouteListLabel = $class::getOutboundRouteListLabel();
+            $integrationInfo = $class::getDefaultIntegrationInfo();
 
-            $routeSchema->addRoute($key, $schema, $integration, $label);
+            $routeSchema->addRoute($key, $schema, $integrationInfo->getName(), $label);
 
-            $integrationSchema = $this->getIntegrationSchemaForPluginClass($schemaDocument, $class);
+            $integrationSchema = $this->getIntegrationSchemaForPlugin($schemaDocument, $integrationInfo);
             $routeListSchema = $integrationSchema->getProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES)?->getSchema();
             if (!$routeListSchema instanceof ListSchema) {
                 $routeListSchema = new ListSchema(new CustomSchema(OutboundRouteSchema::TYPE));
-                if ($outboundRouteListLabel === null) {
-                    $outboundRouteListLabel = 'Routes to ' . ($integrationLabel ?? GeneralUtility::getLabelFromValue($integration));
-                }
 
-                $routeListSchema->getRenderingDefinition()->setLabel($outboundRouteListLabel);
+                $routeListSchema->getRenderingDefinition()->setLabel($integrationInfo->getOutboundRouteListLabel());
                 $routeListSchema->getRenderingDefinition()->setIcon('outbound-routes');
                 $integrationSchema->addProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES, $routeListSchema);
             }
 
             $fields = $class::getDefaultFields();
             if ($fields !== []) {
-                $fieldListDefinition = new FieldListDefinition(sprintf('distributor.out.defaults.%s.%s', $integration, $key));
+                $fieldListDefinition = new FieldListDefinition(sprintf('distributor.out.defaults.%s.%s', $integrationInfo->getName(), $key));
                 foreach ($fields as $field) {
                     if (!$field instanceof FieldDefinition) {
                         $field = new FieldDefinition($field);

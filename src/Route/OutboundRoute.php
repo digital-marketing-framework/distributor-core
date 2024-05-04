@@ -7,6 +7,7 @@ use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
+use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
@@ -28,7 +29,7 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
 {
     use DataProcessorAwareTrait;
 
-    protected const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
+    public const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
     public const MESSAGE_GATE_FAILED = 'Gate not passed for route "%s" with ID %s.';
 
@@ -38,36 +39,25 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
 
     public const MESSAGE_NO_DATA_MAPPER_GROUP_CONFIG_FOUND = 'No data mapper group configuration found for group ID "%s" in outbound route "%s" with ID %s.';
 
+    protected IntegrationInfo $integrationInfo;
+
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
         protected SubmissionDataSetInterface $submission,
         protected string $routeId,
+        ?IntegrationInfo $integrationInfo = null,
     ) {
         parent::__construct($keyword, $registry);
-        $this->configuration = $this->submission->getConfiguration()->getOutboundRouteConfiguration(static::getIntegrationName(), $this->routeId);
+        $this->integrationInfo = $integrationInfo ?? static::getDefaultIntegrationInfo();
+        $this->configuration = $this->submission->getConfiguration()->getOutboundRouteConfiguration($this->integrationInfo->getName(), $this->routeId);
     }
 
-    abstract public static function getIntegrationName(): string;
+    abstract public static function getDefaultIntegrationInfo(): IntegrationInfo;
 
-    public static function getIntegrationLabel(): ?string
+    public function getIntegrationInfo(): IntegrationInfo
     {
-        return null;
-    }
-
-    public static function getIntegrationIcon(): ?string
-    {
-        return 'integration';
-    }
-
-    public static function getIntegrationWeight(): int
-    {
-        return static::INTEGRATION_WEIGHT_DEFAULT;
-    }
-
-    public static function getOutboundRouteListLabel(): ?string
-    {
-        return null;
+        return $this->integrationInfo;
     }
 
     public function buildData(): DataInterface

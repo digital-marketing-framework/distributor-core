@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers \DigitalMarketingFramework\Distributor\Core\Service\Distributor
  */
-class RelayTest extends TestCase
+class DistributorTest extends TestCase
 {
     use DistributorRegistryTestTrait;
     use SubmissionTestTrait;
@@ -93,20 +93,20 @@ class RelayTest extends TestCase
     /**
      * @param array<mixed> $dataMapperConfig
      *
-     * @return array{type:string,config:array{dataMapper:array<mixed>}}
+     * @return array{type:string,config:array{single:array<mixed>}}
      */
     protected function getDataMapperGroupConfiguration(array $dataMapperConfig): array
     {
         return [
-            'type' => 'dataMapper',
+            'type' => 'single',
             'config' => [
-                'dataMapper' => $dataMapperConfig,
+                'single' => $dataMapperConfig,
             ],
         ];
     }
 
     /**
-     * @return array{type:string,config:array{dataMapper:array{passthroughField:array{enabled:bool}}}}
+     * @return array{type:string,config:array{single:array{passthroughField:array{enabled:bool}}}}
      */
     protected function getPassthroughDataMapperGroupConfiguration(bool $enabled = true): array
     {
@@ -119,6 +119,29 @@ class RelayTest extends TestCase
         ]);
     }
 
+    /**
+     * @param array<string,mixed> $configuration
+     *
+     * @return array{type:string,config:array<string,array<string,mixed>>}
+     */
+    protected function getConditionConfiguration(string $key, array $configuration): array
+    {
+        return [
+            'type' => $key,
+            'config' => [
+                $key => $configuration,
+            ],
+        ];
+    }
+
+    /**
+     * @return array{type:string,config:array<string,array<string,mixed>>}
+     */
+    protected function getStaticConditionConfiguration(bool $succeed = true): array
+    {
+        return $this->getConditionConfiguration($succeed ? 'true' : 'false', []);
+    }
+
     protected function configurePassthroughDataMapperGroup(string $dataMapperGroupId): void
     {
         $this->addDataMapperGroupConfiguration($dataMapperGroupId . 'Name', $dataMapperGroupId, 0, $this->getPassthroughDataMapperGroupConfiguration());
@@ -128,7 +151,7 @@ class RelayTest extends TestCase
     public function processSyncOneRouteOnePassWithStorage(): void
     {
         $this->setSubmissionAsync(false);
-        $this->setStorageEnabled(false);
+        $this->setStorageEnabled(true);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
@@ -164,7 +187,7 @@ class RelayTest extends TestCase
     public function processSyncOneRouteOnePassWithoutStorage(): void
     {
         $this->setSubmissionAsync(false);
-        $this->setStorageEnabled(true);
+        $this->setStorageEnabled(false);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
@@ -200,7 +223,7 @@ class RelayTest extends TestCase
     public function processAsyncOneRouteOnePassWithStorage(): void
     {
         $this->setSubmissionAsync(true);
-        $this->setStorageEnabled(false);
+        $this->setStorageEnabled(true);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
@@ -289,7 +312,7 @@ class RelayTest extends TestCase
     public function processSyncOneRouteWithMultiplePasses(): void
     {
         $this->setSubmissionAsync(false);
-        $this->setStorageEnabled(false);
+        $this->setStorageEnabled(true);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
@@ -318,7 +341,7 @@ class RelayTest extends TestCase
     public function processAsyncOneRouteWithMultiplePasses(): void
     {
         $this->setSubmissionAsync(true);
-        $this->setStorageEnabled(false);
+        $this->setStorageEnabled(true);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
@@ -501,7 +524,7 @@ class RelayTest extends TestCase
     }
 
     /** @test */
-    public function processJobThatSucceedsAndIsNotSkippedBecauseOfAForeignGate(): void
+    public function processJobThatSucceedsAndIsNotSkippedBecauseOfAReferencedCondition(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
         $job = $this->createJob(
@@ -513,21 +536,21 @@ class RelayTest extends TestCase
                 'routeId1' => [
                     'enabled' => true,
                     'gate' => [
-                        'type' => 'gate',
+                        'type' => 'reference',
                         'config' => [
-                            'gate' => [
-                                'routeId' => 'routeId2',
+                            'reference' => [
+                                'conditionId' => 'conditionId1',
                             ],
                         ],
                     ],
                     'data' => 'dataMapperGroupId1',
                 ],
-                'routeId2' => [
-                    'enabled' => true,
-                ],
             ],
             [
                 'dataMapperGroupId1' => $this->getPassthroughDataMapperGroupConfiguration(),
+            ],
+            [
+                'conditionId1' => $this->getStaticConditionConfiguration(true),
             ]
         );
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -583,8 +606,8 @@ class RelayTest extends TestCase
             [
                 'dataMapperGroupId1' => $this->getPassthroughDataMapperGroupConfiguration(),
             ],
-            [
-                'distributor' => [
+            config: [
+                'dataProcessing' => [
                     'dataProviders' => [
                         'generic' => [
                             'enabled' => true,
@@ -618,8 +641,8 @@ class RelayTest extends TestCase
             [
                 'dataMapperGroupId1' => $this->getPassthroughDataMapperGroupConfiguration(),
             ],
-            [
-                'distributor' => [
+            config: [
+                'dataProcessing' => [
                     'dataProviders' => [
                         'generic' => ['enabled' => false],
                     ],
@@ -651,8 +674,8 @@ class RelayTest extends TestCase
             [
                 'dataMapperGroupId1' => $this->getPassthroughDataMapperGroupConfiguration(),
             ],
-            [
-                'distributor' => [
+            config: [
+                'dataProcessing' => [
                     'dataProviders' => [
                         'generic' => ['enabled' => true],
                     ],

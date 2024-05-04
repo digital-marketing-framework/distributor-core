@@ -20,8 +20,6 @@ interface OutboundRouteInterface extends RouteInterface
 
     public const KEY_DATA = 'data';
 
-    public static function getOutboundRouteListLabel(): ?string;
-
     public function getRouteId(): string;
 
     public function buildData(): DataInterface;

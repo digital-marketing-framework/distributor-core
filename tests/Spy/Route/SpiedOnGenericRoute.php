@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
@@ -20,9 +21,9 @@ class SpiedOnGenericRoute extends OutboundRoute
         parent::__construct($keyword, $registry, $submission, $routeId);
     }
 
-    public static function getIntegrationName(): string
+    public static function getDefaultIntegrationInfo(): IntegrationInfo
     {
-        return 'spiedOn';
+        return new IntegrationInfo('integration1');
     }
 
     public function addContext(ContextInterface $context): void

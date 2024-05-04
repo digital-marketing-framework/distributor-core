@@ -53,16 +53,18 @@ class QueueDataFactoryTest extends TestCase
      *
      * @return array<int,array<string,mixed>>
      */
-    protected function createRouteConfig(string $routeName, array $routeConfigs): array
+    protected function createRouteConfig(string $integrationName, string $routeName, array $routeConfigs): array
     {
         $config = [
-            'distributor' => [
-                'routes' => [],
+            'integrations' => [
+                $integrationName => [
+                    'outboundRoutes' => [],
+                ],
             ],
         ];
         $weight = 10;
         foreach ($routeConfigs as $routeId => $routeConfig) {
-            $config['distributor']['routes'][$routeId] = $this->createListItem([
+            $config['integrations'][$integrationName]['outboundRoutes'][$routeId] = $this->createListItem([
                 'type' => $routeName,
                 'pass' => '',
                 'config' => [
@@ -81,10 +83,11 @@ class QueueDataFactoryTest extends TestCase
         $data = [
             'field1' => 'value1',
         ];
-        $configuration = $this->createRouteConfig('route1', ['routeId1' => [], 'routeId2' => []]);
+        $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => [], 'routeId2' => []]);
         $submission = new SubmissionDataSet($data, $configuration);
-        $job = $this->subject->convertSubmissionToJob($submission, 'routeId2');
+        $job = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
         $this->assertEquals([
+            'integration' => 'integration1',
             'routeId' => 'routeId2',
             'submission' => [
                 'data' => [
@@ -94,8 +97,8 @@ class QueueDataFactoryTest extends TestCase
                 'context' => [],
             ],
         ], $job->getData());
-        $this->assertEquals('69A810E6D2A9637B72BE8C75819DF893', $job->getHash());
-        $this->assertEquals('69A81#route1#2', $job->getLabel());
+        $this->assertEquals('C3CF9EA66E2617BE0CF44E13EA7F7F7E', $job->getHash());
+        $this->assertEquals('C3CF9#route1#2', $job->getLabel());
     }
 
     /** @test */
@@ -104,10 +107,11 @@ class QueueDataFactoryTest extends TestCase
         $data = [
             'field1' => new StringValue('value1'),
         ];
-        $configuration = $this->createRouteConfig('route1', ['routeId1' => [], 'routeId2' => []]);
+        $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => [], 'routeId2' => []]);
         $submission = new SubmissionDataSet($data, $configuration);
-        $job = $this->subject->convertSubmissionToJob($submission, 'routeId2');
+        $job = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
         $this->assertEquals([
+            'integration' => 'integration1',
             'routeId' => 'routeId2',
             'submission' => [
                 'data' => [
@@ -117,8 +121,8 @@ class QueueDataFactoryTest extends TestCase
                 'context' => [],
             ],
         ], $job->getData());
-        $this->assertEquals('1A1EF9ADCBE8855DA36DA7CF4AC91923', $job->getHash());
-        $this->assertEquals('1A1EF#route1#2', $job->getLabel());
+        $this->assertEquals('D29B99BC5C123153A76155EC07EE02CE', $job->getHash());
+        $this->assertEquals('D29B9#route1#2', $job->getLabel());
     }
 
     /** @test */
@@ -127,11 +131,11 @@ class QueueDataFactoryTest extends TestCase
         $data = [
             'field1' => new InvalidValue(),
         ];
-        $configuration = $this->createRouteConfig('route1', ['routeId1' => [], 'routeId2' => []]);
+        $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => [], 'routeId2' => []]);
         $submission = new SubmissionDataSet($data, $configuration); // @phpstan-ignore-line this test case specifically checks how the system handles invalid data
 
         $this->expectException(InvalidArgumentException::class);
-        $this->subject->convertSubmissionToJob($submission, 'routeId2');
+        $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
     }
 
     /** @test */
@@ -140,7 +144,7 @@ class QueueDataFactoryTest extends TestCase
         $data = [
             'field1' => 'value1',
         ];
-        $configuration = $this->createRouteConfig('route1', ['routeId1' => []]);
+        $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => []]);
         $configuration[0] += [
             'globalConfKey1' => 'globalConfValue1',
             'globalConfKey2' => [
@@ -157,8 +161,9 @@ class QueueDataFactoryTest extends TestCase
         ];
         $submission = new SubmissionDataSet($data, $configuration, $context);
 
-        $job = $this->subject->convertSubmissionToJob($submission, 'routeId1');
+        $job = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId1');
         $this->assertEquals([
+            'integration' => 'integration1',
             'routeId' => 'routeId1',
             'submission' => [
                 'data' => [
@@ -168,8 +173,8 @@ class QueueDataFactoryTest extends TestCase
                 'context' => $context,
             ],
         ], $job->getData());
-        $this->assertEquals('B0B538F156E4ECC7A40C367720F251EC', $job->getHash());
-        $this->assertEquals('B0B53#route1', $job->getLabel());
+        $this->assertEquals('346EF6A5A7C4D70A51A0B803DF4BC832', $job->getHash());
+        $this->assertEquals('346EF#route1', $job->getLabel());
     }
 
     /**
@@ -179,10 +184,11 @@ class QueueDataFactoryTest extends TestCase
      *   context:array<string,mixed>
      * } $submissionData
      */
-    protected function createJob(array $submissionData, string $routeId, string $hash = ''): JobInterface
+    protected function createJob(array $submissionData, string $integration, string $routeId, string $hash = ''): JobInterface
     {
         return new Job(
             data: [
+                'integration' => $integration,
                 'routeId' => $routeId,
                 'submission' => $submissionData,
             ],
@@ -199,7 +205,7 @@ class QueueDataFactoryTest extends TestCase
             ],
             'configuration' => [],
             'context' => [],
-        ], 'routeId1');
+        ], 'integration1', 'routeId1');
         $submission = $this->subject->convertJobToSubmission($job);
         $this->assertTrue($submission->getData()->fieldExists('field1'));
         $this->assertEquals('value1', $submission->getData()['field1']);
@@ -214,7 +220,7 @@ class QueueDataFactoryTest extends TestCase
             ],
             'configuration' => [],
             'context' => [],
-        ], 'routeId1');
+        ], 'integration1', 'routeId1');
         $submission = $this->subject->convertJobToSubmission($job);
         $this->assertTrue($submission->getData()->fieldExists('field1'));
         $this->assertInstanceOf(StringValue::class, $submission->getData()['field1']);
@@ -231,7 +237,7 @@ class QueueDataFactoryTest extends TestCase
             ],
             'configuration' => [],
             'context' => [],
-        ], 'routeId1');
+        ], 'integration1', 'routeId1');
         $this->expectException(DigitalMarketingFrameworkException::class);
         $this->subject->convertJobToSubmission($job);
     }
@@ -245,7 +251,7 @@ class QueueDataFactoryTest extends TestCase
             ],
             'configuration' => [],
             'context' => [],
-        ], 'routeId1');
+        ], 'integration1', 'routeId1');
         $this->expectException(DigitalMarketingFrameworkException::class);
         $this->subject->convertJobToSubmission($job);
     }
@@ -255,7 +261,7 @@ class QueueDataFactoryTest extends TestCase
      */
     public function hashDataProvider(): array
     {
-        $config = $this->createRouteConfig('route1', ['routeId1' => []]);
+        $config = $this->createRouteConfig('integration1', 'route1', ['routeId1' => []]);
 
         return [
             [
@@ -270,9 +276,9 @@ class QueueDataFactoryTest extends TestCase
                         'configuration' => $config[0],
                         'context' => ['context1' => 'contextValue1'],
                     ],
-                    'routeId1'
+                    'integration1', 'routeId1'
                 ),
-                '64FBD6B9C005AE2FDA353B6A5DD87CD2',
+                'A9E964B825A86846FFEA38CE67AEF776',
             ],
         ];
     }
@@ -309,7 +315,7 @@ class QueueDataFactoryTest extends TestCase
     public function getSubmissionAndConvertedJobHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash): void
     {
         $submissionHash = $this->subject->getSubmissionHash($submission);
-        $convertedJob = $this->subject->convertSubmissionToJob($submission, 'routeId1');
+        $convertedJob = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId1');
         $convertedJobHash = $this->subject->getJobHash($convertedJob);
         $convertedSubmission = $this->subject->convertJobToSubmission($convertedJob);
         $convertedSubmissionHash = $this->subject->getSubmissionHash($convertedSubmission);
@@ -330,7 +336,7 @@ class QueueDataFactoryTest extends TestCase
         $jobHash = $this->subject->getJobHash($job);
         $convertedSubmission = $this->subject->convertJobToSubmission($job);
         $convertedSubmissionHash = $this->subject->getSubmissionHash($convertedSubmission);
-        $convertedJob = $this->subject->convertSubmissionToJob($convertedSubmission, 'routeId1');
+        $convertedJob = $this->subject->convertSubmissionToJob($convertedSubmission, 'integration1', 'routeId1');
         $convertedJobHash = $this->subject->getJobHash($convertedJob);
 
         $this->assertEquals($jobHash, $convertedSubmissionHash);
@@ -342,20 +348,22 @@ class QueueDataFactoryTest extends TestCase
     {
         $submission = new SubmissionDataSet([], [
             [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->createListItem([
-                            'type' => 'route1',
-                            'config' => [
-                                'route1' => [],
-                            ],
-                        ], 'routeId1', 10),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'config' => [
+                                    'route1' => [],
+                                ],
+                            ], 'routeId1', 10),
+                        ],
                     ],
                 ],
             ],
         ]);
-        $label = $this->subject->getSubmissionLabel($submission, 'routeId1');
-        $this->assertEquals('D52BE#route1', $label);
+        $label = $this->subject->getSubmissionLabel($submission, 'integration1', 'routeId1');
+        $this->assertEquals('B5289#route1', $label);
     }
 
     /** @test */
@@ -364,19 +372,21 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'configuration' => [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->createListItem([
-                            'type' => 'route1',
-                            'config' => [
-                                'route1' => [],
-                            ],
-                        ], 'routeId1', 10),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'config' => [
+                                    'route1' => [],
+                                ],
+                            ], 'routeId1', 10),
+                        ],
                     ],
                 ],
             ],
             'context' => [],
-        ], 'routeId1', 'ABCDEFGHIJKLMNO');
+        ], 'integration1', 'routeId1', 'ABCDEFGHIJKLMNO');
         $label = $this->subject->getJobLabel($job);
         $this->assertEquals('ABCDE#route1', $label);
     }
@@ -387,21 +397,23 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'configuration' => [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->createListItem([
-                            'type' => 'route1',
-                            'config' => [
-                                'route1' => [],
-                            ],
-                        ], 'routeId1', 10),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'config' => [
+                                    'route1' => [],
+                                ],
+                            ], 'routeId1', 10),
+                        ],
                     ],
                 ],
             ],
             'context' => [],
-        ], 'routeId1');
+        ], 'integration1', 'routeId1');
         $label = $this->subject->getJobLabel($job);
-        $this->assertEquals('D52BE#route1', $label);
+        $this->assertEquals('B5289#route1', $label);
     }
 
     /** @test */
@@ -410,20 +422,47 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'configuration' => [
-                'distributor' => [
-                    'routes' => [
-                        'routeId1' => $this->createListItem([
-                            'type' => 'route1',
-                            'config' => [
-                                'route1' => [],
-                            ],
-                        ], 'routeId1', 10),
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'config' => [
+                                    'route1' => [],
+                                ],
+                            ], 'routeId1', 10),
+                        ],
                     ],
                 ],
             ],
             'context' => [],
-        ], 'routeId1');
+        ], 'integration1', 'routeId1');
         $route = $this->subject->getJobRouteId($job);
         $this->assertEquals('routeId1', $route);
+    }
+
+    /** @test */
+    public function getJobIntegrationName(): void
+    {
+        $job = $this->createJob([
+            'data' => [],
+            'configuration' => [
+                'integrations' => [
+                    'integration1' => [
+                        'outboundRoutes' => [
+                            'routeId1' => $this->createListItem([
+                                'type' => 'route1',
+                                'config' => [
+                                    'route1' => [],
+                                ],
+                            ], 'routeId1', 10),
+                        ],
+                    ],
+                ],
+            ],
+            'context' => [],
+        ], 'integration1', 'routeId1');
+        $integration = $this->subject->getJobRouteIntegrationName($job);
+        $this->assertEquals('integration1', $integration);
     }
 }
