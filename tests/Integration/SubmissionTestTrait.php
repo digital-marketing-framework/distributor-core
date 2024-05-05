@@ -56,6 +56,48 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @return array{type:string,config:array<string,array<string,mixed>>}
+     */
+    protected function getStaticConditionConfiguration(bool $succeed = true): array
+    {
+        return $this->getConditionConfiguration($succeed ? 'true' : 'false', []);
+    }
+
+    /**
+     * @param array<mixed> $dataMapperConfig
+     *
+     * @return array{type:string,config:array{single:array<mixed>}}
+     */
+    protected function getDataMapperGroupConfiguration(array $dataMapperConfig): array
+    {
+        return [
+            'type' => 'single',
+            'config' => [
+                'single' => $dataMapperConfig,
+            ],
+        ];
+    }
+
+    /**
+     * @return array{type:string,config:array{single:array{passthroughField:array{enabled:bool}}}}
+     */
+    protected function getPassthroughDataMapperGroupConfiguration(bool $enabled = true): array
+    {
+        return $this->getDataMapperGroupConfiguration([
+            'data' => [
+                'passthroughFields' => [
+                    'enabled' => $enabled,
+                ],
+            ],
+        ]);
+    }
+
+    protected function configurePassthroughDataMapperGroup(string $dataMapperGroupId): void
+    {
+        $this->addDataMapperGroupConfiguration($dataMapperGroupId . 'Name', $dataMapperGroupId, 0, $this->getPassthroughDataMapperGroupConfiguration());
+    }
+
+    /**
      * @param array<string,mixed> $configuration
      */
     protected function addDataMapperGroupConfiguration(string $dataMapperGroupName, string $dataMapperGroupId, int $weight, array $configuration, int $index = 0): void

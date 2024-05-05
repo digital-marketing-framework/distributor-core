@@ -91,35 +91,6 @@ class DistributorTest extends TestCase
     }
 
     /**
-     * @param array<mixed> $dataMapperConfig
-     *
-     * @return array{type:string,config:array{single:array<mixed>}}
-     */
-    protected function getDataMapperGroupConfiguration(array $dataMapperConfig): array
-    {
-        return [
-            'type' => 'single',
-            'config' => [
-                'single' => $dataMapperConfig,
-            ],
-        ];
-    }
-
-    /**
-     * @return array{type:string,config:array{single:array{passthroughField:array{enabled:bool}}}}
-     */
-    protected function getPassthroughDataMapperGroupConfiguration(bool $enabled = true): array
-    {
-        return $this->getDataMapperGroupConfiguration([
-            'data' => [
-                'passthroughFields' => [
-                    'enabled' => $enabled,
-                ],
-            ],
-        ]);
-    }
-
-    /**
      * @param array<string,mixed> $configuration
      *
      * @return array{type:string,config:array<string,array<string,mixed>>}
@@ -132,19 +103,6 @@ class DistributorTest extends TestCase
                 $key => $configuration,
             ],
         ];
-    }
-
-    /**
-     * @return array{type:string,config:array<string,array<string,mixed>>}
-     */
-    protected function getStaticConditionConfiguration(bool $succeed = true): array
-    {
-        return $this->getConditionConfiguration($succeed ? 'true' : 'false', []);
-    }
-
-    protected function configurePassthroughDataMapperGroup(string $dataMapperGroupId): void
-    {
-        $this->addDataMapperGroupConfiguration($dataMapperGroupId . 'Name', $dataMapperGroupId, 0, $this->getPassthroughDataMapperGroupConfiguration());
     }
 
     /** @test */
