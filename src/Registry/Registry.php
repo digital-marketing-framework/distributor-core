@@ -59,10 +59,5 @@ class Registry extends CoreRegistry implements RegistryInterface
         // data providers
         $dataProcessingSchema = $this->getDataProcessingSchema($schemaDocument);
         $dataProcessingSchema->addProperty(DistributorConfiguration::KEY_DATA_PROVIDERS, $this->getDataProviderSchema());
-
-
-
-
-
     }
 }
