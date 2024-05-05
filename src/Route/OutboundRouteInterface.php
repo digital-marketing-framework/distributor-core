@@ -5,9 +5,10 @@ namespace DigitalMarketingFramework\Distributor\Core\Route;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
+use DigitalMarketingFramework\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
 
-interface RouteInterface extends ConfigurablePluginInterface
+interface OutboundRouteInterface extends RouteInterface
 {
     public const KEY_ENABLED = 'enabled';
 
@@ -29,12 +30,19 @@ interface RouteInterface extends ConfigurablePluginInterface
 
     public function async(): ?bool;
 
-    public function disableStorage(): ?bool;
+    public function enableStorage(): ?bool;
 
     /**
      * @return array<string>
      */
     public function getEnabledDataProviders(): array;
+
+    public static function getDefaultPassthroughFields(): bool;
+
+    /**
+     * @return array<string|FieldDefinition>
+     */
+    public static function getDefaultFields(): array;
 
     /**
      * @throws DigitalMarketingFrameworkException

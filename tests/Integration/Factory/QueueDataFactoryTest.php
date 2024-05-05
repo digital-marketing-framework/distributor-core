@@ -38,13 +38,19 @@ class QueueDataFactoryTest extends TestCase
     }
 
     /**
-     * @return array<string>
+     * @return array<array{id:string,integration:string}>
      */
     protected function routeIdProvider(): array
     {
         return [
-            'routeId1',
-            'routeId2',
+            [
+                'id' => 'routeId1',
+                'integration' => 'integration1',
+            ],
+            [
+                'id' => 'routeId2',
+                'integration' => 'integration2',
+            ],
         ];
     }
 
@@ -86,50 +92,62 @@ class QueueDataFactoryTest extends TestCase
         return [
             [
                 [ // config
-                    'distributor' => [
-                        'routes' => [
-                            'routeId1' => $this->createListItem([
-                                'type' => 'route1',
-                                'pass' => '',
-                                'config' => [
-                                    'route1' => [
-                                        'confKey1' => 'confValue1',
+                    'integrations' => [
+                        'integration1' => [
+                            'outboundRoutes' => [
+                                'routeId1' => $this->createListItem([
+                                    'type' => 'route1',
+                                    'pass' => '',
+                                    'config' => [
+                                        'route1' => [
+                                            'confKey1' => 'confValue1',
+                                        ],
                                     ],
-                                ],
-                            ], 'routeId1', 10),
-                            'routeId2' => $this->createListItem([
-                                'type' => 'route1',
-                                'pass' => '',
-                                'config' => [
-                                    'route1' => [
-                                        'confKey2' => 'confValue2',
+                                ], 'routeId1', 10),
+                            ],
+                        ],
+                        'integration2' => [
+                            'outboundRoutes' => [
+                                'routeId2' => $this->createListItem([
+                                    'type' => 'route1',
+                                    'pass' => '',
+                                    'config' => [
+                                        'route1' => [
+                                            'confKey2' => 'confValue2',
+                                        ],
                                     ],
-                                ],
-                            ], 'routeId2', 20),
+                                ], 'routeId2', 20),
+                            ],
                         ],
                     ],
                 ],
                 [ // packed config
-                    'distributor' => [
-                        'routes' => [
-                            'routeId1' => $this->createListItem([
-                                'type' => 'route1',
-                                'pass' => '',
-                                'config' => [
-                                    'route1' => [
-                                        'confKey1' => 'confValue1',
+                    'integrations' => [
+                        'integration1' => [
+                            'outboundRoutes' => [
+                                'routeId1' => $this->createListItem([
+                                    'type' => 'route1',
+                                    'pass' => '',
+                                    'config' => [
+                                        'route1' => [
+                                            'confKey1' => 'confValue1',
+                                        ],
                                     ],
-                                ],
-                            ], 'routeId1', 10),
-                            'routeId2' => $this->createListItem([
-                                'type' => 'route1',
-                                'pass' => '',
-                                'config' => [
-                                    'route1' => [
-                                        'confKey2' => 'confValue2',
+                                ], 'routeId1', 10),
+                            ],
+                        ],
+                        'integration2' => [
+                            'outboundRoutes' => [
+                                'routeId2' => $this->createListItem([
+                                    'type' => 'route1',
+                                    'pass' => '',
+                                    'config' => [
+                                        'route1' => [
+                                            'confKey2' => 'confValue2',
+                                        ],
                                     ],
-                                ],
-                            ], 'routeId2', 20),
+                                ], 'routeId2', 20),
+                            ],
                         ],
                     ],
                 ],
@@ -154,7 +172,9 @@ class QueueDataFactoryTest extends TestCase
      *   1:array<int,array<string,mixed>>,
      *   2:array<string,mixed>,
      *   3:string,
-     *   4:array{
+     *   4:string,
+     *   5:array{
+     *     integration:string,
      *     routeId:string,
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
@@ -175,9 +195,11 @@ class QueueDataFactoryTest extends TestCase
                             $data,
                             [$configuration],
                             $context,
-                            $routeId,
+                            $routeId['id'],
+                            $routeId['integration'],
                             [
-                                'routeId' => $routeId,
+                                'routeId' => $routeId['id'],
+                                'integration' => $routeId['integration'],
                                 'submission' => [
                                     'data' => $packedData,
                                     'configuration' => $packedConfiguration,
@@ -199,6 +221,7 @@ class QueueDataFactoryTest extends TestCase
      * @param array<string,mixed> $context
      * @param array{
      *     routeId:string,
+     *     integration:string,
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       configuration:array<string,mixed>,
@@ -210,10 +233,10 @@ class QueueDataFactoryTest extends TestCase
      *
      * @test
      */
-    public function pack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
+    public function pack(array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);
-        $job = $this->subject->convertSubmissionToJob($submission, $routeId);
+        $job = $this->subject->convertSubmissionToJob($submission, $integration, $routeId);
         $this->assertEquals($jobData, $job->getData());
     }
 
@@ -223,6 +246,7 @@ class QueueDataFactoryTest extends TestCase
      * @param array<string,mixed> $context
      * @param array{
      *     routeId:string,
+     *     integration:string,
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       configuration:array<string,mixed>,
@@ -236,7 +260,7 @@ class QueueDataFactoryTest extends TestCase
      *
      * @test
      */
-    public function unpack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
+    public function unpack(array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $job = new Job();
         $job->setData($jobData);
@@ -254,6 +278,7 @@ class QueueDataFactoryTest extends TestCase
      * @param array<string,mixed> $context
      * @param array{
      *     routeId:string,
+     *     integration:string,
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       configuration:array<string,mixed>,
@@ -267,10 +292,10 @@ class QueueDataFactoryTest extends TestCase
      *
      * @test
      */
-    public function packUnpack(array $data, array $configuration, array $context, string $routeId, array $jobData): void
+    public function packUnpack(array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);
-        $job = $this->subject->convertSubmissionToJob($submission, $routeId);
+        $job = $this->subject->convertSubmissionToJob($submission, $integration, $routeId);
         $this->assertEquals($jobData, $job->getData());
 
         /** @var SubmissionDataSetInterface $result */

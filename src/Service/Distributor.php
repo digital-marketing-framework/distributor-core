@@ -2,7 +2,6 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Service;
 
-use DigitalMarketingFramework\Core\ConfigurationDocument\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
@@ -11,12 +10,13 @@ use DigitalMarketingFramework\Core\Log\LoggerAwareTrait;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueException;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributor\Core\Route\RouteInterface;
+use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
 
-class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterface
+class Distributor implements DistributorInterface, LoggerAwareInterface, ContextAwareInterface
 {
     use LoggerAwareTrait;
     use ContextAwareTrait;
@@ -45,7 +45,7 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             }
         }
 
-        $routes = $this->registry->getRoutes($submission);
+        $routes = $this->registry->getOutboundRoutes($submission);
         foreach ($routes as $route) {
             try {
                 $route->addContext($this->context);
@@ -75,9 +75,10 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
 
             $routeId = $this->queueDataFactory->getJobRouteId($job);
-            $route = $this->registry->getRoute($submission, $routeId);
-            if (!$route instanceof RouteInterface) {
-                throw new DigitalMarketingFrameworkException(sprintf('route with ID "%s" not found', $routeId));
+            $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
+            $route = $this->registry->getOutboundRoute($submission, $integrationName, $routeId);
+            if (!$route instanceof OutboundRouteInterface) {
+                throw new DigitalMarketingFrameworkException(sprintf('route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
             }
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders());
@@ -95,32 +96,36 @@ class Relay implements RelayInterface, LoggerAwareInterface, ContextAwareInterfa
 
         $syncPersistentJobs = [];
         $syncTemporaryJobs = [];
-        $routes = $this->registry->getRoutes($submission);
-        $distributorConfiguration = $submission->getConfiguration()->getDistributorConfiguration();
+        $routes = $this->registry->getOutboundRoutes($submission);
 
         foreach ($routes as $route) {
             if (!$route->enabled()) {
                 continue;
             }
 
-            $async = $route->async() ?? $distributorConfiguration[static::KEY_ASYNC] ?? static::DEFAULT_ASYNC;
-            $disableStorage = $route->disableStorage() ?? $distributorConfiguration[static::KEY_DISABLE_STORAGE] ?? static::DEFAULT_DISABLE_STORAGE;
+            $async = $route->async() ?? $submission->getConfiguration()->async();
+            $enableStorage = $route->enableStorage() ?? $submission->getConfiguration()->enableStorage();
 
-            if ($disableStorage && $async) {
+            if (!$enableStorage && $async) {
                 $this->logger->error('Async submissions without storage are not possible. Using sync submission instead.');
                 $async = false;
             }
 
             $status = $async ? QueueInterface::STATUS_QUEUED : QueueInterface::STATUS_PENDING;
-            $queue = $disableStorage ? $this->temporaryQueue : $this->persistentQueue;
+            $queue = $enableStorage ? $this->persistentQueue : $this->temporaryQueue;
 
-            $job = $this->queueDataFactory->convertSubmissionToJob($submission, $route->getRouteId(), $status);
+            $job = $this->queueDataFactory->convertSubmissionToJob(
+                $submission,
+                $route->getIntegrationInfo()->getName(),
+                $route->getRouteId(),
+                $status
+            );
             $job = $queue->addJob($job);
             if (!$async) {
-                if ($disableStorage) {
-                    $syncTemporaryJobs[] = $job;
-                } else {
+                if ($enableStorage) {
                     $syncPersistentJobs[] = $job;
+                } else {
+                    $syncTemporaryJobs[] = $job;
                 }
             }
         }

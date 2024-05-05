@@ -10,10 +10,10 @@ use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Distributor\Core\Route\Route;
+use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
 use DigitalMarketingFramework\Distributor\Core\Tests\Route\GenericRoute;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +23,7 @@ class GenericRouteTest extends TestCase
     protected const DEFAULT_CONFIG = [
         'enabled' => false,
         'gate' => [],
-        'data' => [],
+        'data' => '',
     ];
 
     protected RegistryInterface&MockObject $registry;
@@ -40,7 +40,7 @@ class GenericRouteTest extends TestCase
 
     protected DataInterface $submissionData;
 
-    protected SubmissionConfigurationInterface&MockObject $submissionConfiguration;
+    protected DistributorConfigurationInterface&MockObject $submissionConfiguration;
 
     protected WriteableContext $submissionContext;
 
@@ -57,7 +57,7 @@ class GenericRouteTest extends TestCase
         $this->dataDispatcher = $this->createMock(DataDispatcherInterface::class);
 
         $this->submissionData = new Data();
-        $this->submissionConfiguration = $this->createMock(SubmissionConfigurationInterface::class);
+        $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
         $this->submissionContext = new WriteableContext();
         $this->submission = $this->createMock(SubmissionDataSetInterface::class);
         $this->submission->expects($this->any())->method('getData')->willReturn($this->submissionData);
@@ -82,7 +82,7 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function useCorrectKeyword(): void
     {
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
         ]);
         $this->createRoute();
@@ -93,7 +93,7 @@ class GenericRouteTest extends TestCase
     public function addContextShouldNotAddAnyContextByDefault(): void
     {
         $this->submissionData['field1'] = 'value1';
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
         ]);
 
@@ -106,10 +106,10 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassGateFails(): void
     {
-        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(false);
-        $this->logger->expects($this->once())->method('debug')->with(sprintf(Route::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
+        $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(false);
+        $this->logger->expects($this->once())->method('debug')->with(sprintf(OutboundRoute::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
@@ -124,8 +124,8 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassEmptyInputDataWillCauseException(): void
     {
-        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(true);
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
@@ -133,7 +133,7 @@ class GenericRouteTest extends TestCase
         ]);
 
         $this->expectException(DigitalMarketingFrameworkException::class);
-        $this->expectExceptionMessage(sprintf(Route::MESSAGE_DATA_EMPTY, 'myCustomKeyword', 'myCustomKeywordId1'));
+        $this->expectExceptionMessage(sprintf(OutboundRoute::MESSAGE_NO_DATA_MAPPER_GROUP_DEFINED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
         $this->createRoute();
         $this->subject->process();
@@ -142,22 +142,24 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassWithFieldConfigWillSendProcessedData(): void
     {
-        $this->dataProcessor->expects($this->once())->method('processEvaluation')->willReturn(true);
+        $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(true);
         $this->submissionData['field1'] = 'value1';
         $this->submissionData['field2'] = 'value2';
 
-        $this->submissionConfiguration->expects($this->once())->method('getRouteConfiguration')->willReturn([
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
             ],
-            'fields' => [
-                'processedField1' => 'someConfig',
-                'processedField2' => 'someOtherConfig',
-            ],
+            'data' => 'dataMapperGroupId1',
         ]);
 
-        $this->dataProcessor->expects($this->once())->method('processDataMapper')->willReturn(new Data([
+        $this->submissionConfiguration->expects($this->once())->method('getDataMapperGroupConfiguration')->with('dataMapperGroupId1')->willReturn([
+            'dataMapperGroupConfigKey1' => 'dataMapperGroupConfigValue1',
+            'dataMapperGroupConfigKey2' => 'dataMapperGroupConfigValue2',
+        ]);
+
+        $this->dataProcessor->expects($this->once())->method('processDataMapperGroup')->willReturn(new Data([
             'processedField1' => 'processedValue1',
             'processedField2' => 'processedValue2',
         ]));

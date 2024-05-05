@@ -2,12 +2,16 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\Model\Configuration\ConfigurationInterface;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\SwitchSchema;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
-use DigitalMarketingFramework\Distributor\Core\Model\Configuration\SubmissionConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributor\Core\Service\Relay;
+use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
+use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
 
 trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
 {
@@ -28,10 +32,13 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     protected function baseConfiguration(): array
     {
         return [
-            'distributor' => [
-                Relay::KEY_ASYNC => false,
-                SubmissionConfigurationInterface::KEY_DATA_PROVIDERS => [],
-                SubmissionConfigurationInterface::KEY_ROUTES => [],
+            'integrations' => [
+                'general' => [
+                    'outboundRoutes' => [
+                        DistributorConfigurationInterface::KEY_ASYNC => DistributorConfigurationInterface::DEFAULT_ASYNC,
+                        DistributorConfigurationInterface::KEY_ENABLE_STORAGE => DistributorConfigurationInterface::DEFAULT_ENABLE_STORAGE,
+                    ],
+                ],
             ],
         ];
     }
@@ -51,9 +58,42 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string,mixed> $configuration
      */
-    protected function addRouteConfiguration(string $routeName, string $routeId, int $weight, array $configuration, int $index = 0): void
+    protected function addDataMapperGroupConfiguration(string $dataMapperGroupName, string $dataMapperGroupId, int $weight, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_ROUTES][$routeId] = $this->createListItem([
+        $this->submissionConfiguration[$index][ConfigurationInterface::KEY_DATA_PROCESSING][ConfigurationInterface::KEY_DATA_MAPPER_GROUPS][$dataMapperGroupId] = $this->createMapItem($dataMapperGroupName, $configuration, $dataMapperGroupId, $weight);
+    }
+
+    /**
+     * @param array<string,mixed> $configuration
+     */
+    protected function updateRouteConfiguration(array &$configuration): void
+    {
+        if (!isset($configuration[OutboundRoute::KEY_ENABLE_DATA_PROVIDERS])) {
+            $configuration[OutboundRoute::KEY_ENABLE_DATA_PROVIDERS] = [
+                SwitchSchema::KEY_TYPE => RestrictedTermsSchema::KEY_ALL,
+                SwitchSchema::KEY_CONFIG => [
+                    RestrictedTermsSchema::KEY_ALL => [],
+                ],
+            ];
+        }
+
+        if (!isset($configuration[OutboundRouteInterface::KEY_GATE])) {
+            $configuration[OutboundRouteInterface::KEY_GATE] = [
+                SwitchSchema::KEY_TYPE => 'true',
+                SwitchSchema::KEY_CONFIG => [
+                    'true' => [],
+                ],
+            ];
+        }
+    }
+
+    /**
+     * @param array<string,mixed> $configuration
+     */
+    protected function addRouteConfiguration(string $routeName, string $routeId, int $weight, array $configuration, int $index = 0, string $integrationName = 'integration1'): void
+    {
+        $this->updateRouteConfiguration($configuration);
+        $this->submissionConfiguration[$index]['integrations'][$integrationName][DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES][$routeId] = $this->createListItem([
             'type' => $routeName,
             'pass' => '',
             'config' => [
@@ -67,16 +107,16 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
      */
     protected function addDataProviderConfiguration(string $name, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][SubmissionConfigurationInterface::KEY_DATA_PROVIDERS][$name] = $configuration;
+        $this->submissionConfiguration[$index]['dataProcessing'][DistributorConfigurationInterface::KEY_DATA_PROVIDERS][$name] = $configuration;
     }
 
     protected function setSubmissionAsync(bool $async = true, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][Relay::KEY_ASYNC] = $async;
+        $this->submissionConfiguration[$index]['integrations']['general']['outboundRoutes'][DistributorConfigurationInterface::KEY_ASYNC] = $async;
     }
 
-    protected function setStorageDisabled(bool $disableStorage = false, int $index = 0): void
+    protected function setStorageEnabled(bool $enableStorage = true, int $index = 0): void
     {
-        $this->submissionConfiguration[$index]['distributor'][Relay::KEY_DISABLE_STORAGE] = $disableStorage;
+        $this->submissionConfiguration[$index]['integrations']['general']['outboundRoutes'][DistributorConfigurationInterface::KEY_ENABLE_STORAGE] = $enableStorage;
     }
 }
