@@ -40,9 +40,9 @@ class Registry extends CoreRegistry implements RegistryInterface
         return $this->createObject(Distributor::class, [$this]);
     }
 
-    public function addConfigurationSchema(SchemaDocument $schemaDocument): void
+    public function addConfigurationSchemaDocument(SchemaDocument $schemaDocument): void
     {
-        parent::addConfigurationSchema($schemaDocument);
+        parent::addConfigurationSchemaDocument($schemaDocument);
 
         // general outbound settings
         $generalOutboundConfiguration = new ContainerSchema();
