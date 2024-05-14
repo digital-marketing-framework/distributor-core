@@ -30,6 +30,12 @@ class DistributorCoreInitialization extends Initialization
         ],
     ];
 
+    protected const FRONTEND_SCRIPTS = [
+        'core' => [
+            '/scripts/dmf-distributor-push.js',
+        ],
+    ];
+
     protected const SCHEMA_MIGRATIONS = [];
 
     public function __construct(string $packageAlias = '')

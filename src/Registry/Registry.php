@@ -15,6 +15,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorCo
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\ApiRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
@@ -27,6 +28,7 @@ class Registry extends CoreRegistry implements RegistryInterface
     use DataDispatcherRegistryTrait;
     use DataProviderRegistryTrait;
     use OutboundRouteRegistryTrait;
+    use ApiRegistryTrait;
 
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
     {
