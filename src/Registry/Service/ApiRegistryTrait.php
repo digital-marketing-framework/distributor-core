@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Service;
 
+use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandler;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandlerInterface;
 use DigitalMarketingFramework\Distributor\Core\Api\RouteResolver\DistributorRouteResolver;
@@ -59,5 +60,29 @@ trait ApiRegistryTrait
     public function setDistributorSubmissionHandler(DistributorSubmissionHandlerInterface $distributorApi): void
     {
         $this->distributorSubmissionHandler = $distributorApi;
+    }
+
+    public function getFrontendSettings(): array
+    {
+        $settings = parent::getFrontendSettings();
+        $endPointStorage = $this->getEndPointStorage();
+        $entryRouteResolver = $this->getApiEntryRouteResolver();
+        $distributorRouteResolver = $this->getDistributorApiRouteResolver();
+
+        $endPointRoute = $distributorRouteResolver->getEndPointRoute();
+        $endPoints = $endPointStorage->getAllEndPoints();
+        foreach ($endPoints as $endPoint) {
+            $route = $endPointRoute->getResourceRoute(
+                idAffix: $endPoint->getName(),
+                variables: [
+                    DistributorRouteResolverInterface::VARIABLE_END_POINT_SEGMENT => GeneralUtility::slugify($endPoint->getName()),
+                ]
+            );
+            $id = $route->getId();
+            $settings['pluginSettings'][$id] = []; // TODO do we need plugin settings for distributor end points?
+            $settings['urls'][$id] = $entryRouteResolver->getFullPath($route->getPath());
+        }
+
+        return $settings;
     }
 }

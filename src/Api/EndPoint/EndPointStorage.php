@@ -9,9 +9,9 @@ class EndPointStorage implements EndPointStorageInterface
 {
     protected array $endpoints = [];
 
-    public function getEndPointFromSegment(string $segment): ?EndPointInterface
+    public function getEndPointByName(string $name): ?EndPointInterface
     {
-        return $this->endpoints[$segment] ?? null;
+        return $this->endpoints[$name] ?? null;
     }
 
     public function getAllEndPoints(): array
@@ -21,16 +21,16 @@ class EndPointStorage implements EndPointStorageInterface
 
     public function addEndPoint(EndPointInterface $endPoint): void
     {
-        $this->endpoints[$endPoint->getPathSegment()] = $endPoint;
+        $this->endpoints[$endPoint->getName()] = $endPoint;
     }
 
     public function removeEndPoint(EndPointInterface $endPoint): void
     {
-        unset($this->endpoints[$endPoint->getPathSegment()]);
+        unset($this->endpoints[$endPoint->getName()]);
     }
 
     public function updateEndPoint(EndPointInterface $endPoint): void
     {
-        $this->endpoints[$endPoint->getPathSegment()] = $endPoint;
+        $this->endpoints[$endPoint->getName()] = $endPoint;
     }
 }

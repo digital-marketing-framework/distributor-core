@@ -5,19 +5,52 @@ namespace DigitalMarketingFramework\Distributor\Core\Model\Api;
 class EndPoint implements EndPointInterface
 {
     public function __construct(
-        protected string $pathSegment,
+        protected string $name,
+        protected bool $enabled,
+        protected bool $disableContext,
+        protected bool $allowContextOverride,
         protected string $configurationDocument,
     ) {
     }
 
-    public function getPathSegment(): string
+    public function getName(): string
     {
-        return $this->pathSegment;
+        return $this->name;
     }
 
-    public function setPathSegment(string $pathSegment): void
+    public function setName(string $name): void
     {
-        $this->pathSegment = $pathSegment;
+        $this->name = $name;
+    }
+
+    public function getEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
+    }
+
+    public function getDisableContext(): bool
+    {
+        return $this->disableContext;
+    }
+
+    public function setDisableContext(bool $disableContext): void
+    {
+        $this->disableContext = $disableContext;
+    }
+
+    public function getAllowContextOverride(): bool
+    {
+        return $this->allowContextOverride;
+    }
+
+    public function setAllowContextOverride(bool $allowContextOverride): void
+    {
+        $this->allowContextOverride = $allowContextOverride;
     }
 
     public function getConfigurationDocument(): string

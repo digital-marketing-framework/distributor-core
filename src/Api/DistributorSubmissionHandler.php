@@ -34,7 +34,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         $this->endPointStorage = $registry->getEndPointStorage();
     }
 
-    protected function handleException(string|DigitalMarketingFrameworkException $error): never
+    protected function handleException(string|DigitalMarketingFrameworkException $error, ?int $code = null): never
     {
         $message = $error;
         $exception = null;
@@ -43,7 +43,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
             $exception = $error;
         }
         $this->logger->error($message);
-        throw new ApiException($message, 500, $exception);
+        throw new ApiException($message, $code ?? 500, $exception);
     }
 
     public function submit(array|DistributorConfigurationInterface $configuration, array|DataInterface $data): void
@@ -58,6 +58,11 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
     public function submitToEndPoint(EndPointInterface $endPoint, array|DataInterface $data): void
     {
+
+        if (!$endPoint->getEnabled()) {
+            $this->handleException('End point not found or disabled', 404);
+        }
+
         try {
             $configurationDocument = $endPoint->getConfigurationDocument();
             $configurationStack = $this->configurationDocumentManager->getConfigurationStackFromDocument($configurationDocument);
@@ -69,25 +74,29 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         $this->submit($configuration, $data);
     }
 
-    public function submitToEndPointBySegment(string $endPointSegment, array|DataInterface $data): void
+    public function submitToEndPointByName(string $endPointName, array|DataInterface $data): void
     {
         try {
-            $endPoint = $this->endPointStorage->getEndPointFromSegment($endPointSegment);
+            $endPoint = $this->endPointStorage->getEndPointByName($endPointName);
         } catch (DigitalMarketingFrameworkException $e) {
             $this->handleException($e);
         }
 
         if (!$endPoint instanceof EndPointInterface) {
-            $this->handleException(sprintf('No end point "%s" found.', $endPointSegment));
+            $this->handleException('End point not found or disabled', 404);
         }
 
         $this->submitToEndPoint($endPoint, $data);
     }
 
-    public function getEndpointSegments(): array
+    public function getEndPointNames(): array
     {
-        return array_map(function(EndPointInterface $endPoint) {
-            return $endPoint->getPathSegment();
-        }, $this->endPointStorage->getAllEndPoints());
+        $names = [];
+        foreach ($this->endPointStorage->getAllEndPoints() as $endPoint) {
+            if ($endPoint->getEnabled()) {
+                $names[] = $endPoint->getName();
+            }
+        }
+        return $names;
     }
 }

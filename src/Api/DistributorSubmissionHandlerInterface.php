@@ -12,7 +12,7 @@ interface DistributorSubmissionHandlerInterface
 
     public function submitToEndPoint(EndPointInterface $endPoint, array|DataInterface $data): void;
 
-    public function submitToEndPointBySegment(string $endPointSegment, array|DataInterface $data): void;
+    public function submitToEndPointByName(string $endPointName, array|DataInterface $data): void;
 
-    public function getEndpointSegments(): array;
+    public function getEndPointNames(): array;
 }

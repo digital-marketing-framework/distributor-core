@@ -6,7 +6,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\Api\EndPointInterface;
 
 interface EndPointStorageInterface
 {
-    public function getEndPointFromSegment(string $segment): ?EndPointInterface;
+    public function getEndPointByName(string $name): ?EndPointInterface;
 
     /**
      * @return array<EndPointInterface>

@@ -31,7 +31,7 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
     {
         $endpointSegment = GeneralUtility::dashedToCamelCase($request->getVariable(static::VARIABLE_END_POINT_SEGMENT));
         $data = $request->getPayload();
-        $this->distributorSubmissionHandler->submitToEndPointBySegment($endpointSegment, $data);
+        $this->distributorSubmissionHandler->submitToEndPointByName($endpointSegment, $data);
 
         return new ApiResponse(['success' => true], 200);
     }
@@ -63,7 +63,7 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
     {
         $routes = [];
         $endPointRoute = $this->getEndPointRoute();
-        foreach ($this->distributorSubmissionHandler->getEndpointSegments() as $segment) {
+        foreach ($this->distributorSubmissionHandler->getEndPointNames() as $segment) {
             $route = $endPointRoute->getResourceRoute(
                 idAffix: $segment,
                 variables: [
