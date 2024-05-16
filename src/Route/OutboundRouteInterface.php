@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Route\RouteInterface;
@@ -49,5 +50,5 @@ interface OutboundRouteInterface extends RouteInterface
      */
     public function process(): bool;
 
-    public function addContext(ContextInterface $context): void;
+    public function addContext(WriteableContextInterface $context): void;
 }

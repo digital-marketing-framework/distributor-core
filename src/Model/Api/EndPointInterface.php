@@ -20,6 +20,10 @@ interface EndPointInterface
 
     public function setAllowContextOverride(bool $allowContextOverride): void;
 
+    public function getExposeToFrontend(): bool;
+
+    public function setExposeToFrontend(bool $exposeToFrontend): void;
+
     public function getConfigurationDocument(): string;
 
     public function setConfigurationDocument(string $configurationDocument): void;

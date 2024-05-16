@@ -72,14 +72,26 @@ trait ApiRegistryTrait
         $endPointRoute = $distributorRouteResolver->getEndPointRoute();
         $endPoints = $endPointStorage->getAllEndPoints();
         foreach ($endPoints as $endPoint) {
+            if (!$endPoint->getEnabled()) {
+                continue;
+            }
+
+            if (!$endPoint->getExposeToFrontend()) {
+                continue;
+            }
+
             $route = $endPointRoute->getResourceRoute(
                 idAffix: $endPoint->getName(),
                 variables: [
                     DistributorRouteResolverInterface::VARIABLE_END_POINT_SEGMENT => GeneralUtility::slugify($endPoint->getName()),
                 ]
             );
+
             $id = $route->getId();
-            $settings['pluginSettings'][$id] = []; // TODO do we need plugin settings for distributor end points?
+            $settings['pluginSettings'][$id] = [
+                'contextDisabled' => $endPoint->getDisableContext(),
+                'allowContextOverride' => $endPoint->getAllowContextOverride(),
+            ];
             $settings['urls'][$id] = $entryRouteResolver->getFullPath($route->getPath());
         }
 

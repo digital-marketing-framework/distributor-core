@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
@@ -17,12 +18,12 @@ class TimestampDataProvider extends DataProvider
 
     public const DEFAULT_FORMAT = 'c';
 
-    protected function processContext(ContextInterface $context): void
+    protected function processContext(WriteableContextInterface $context): void
     {
-        $this->submission->getContext()->copyTimestampFromContext($context);
+        $context->copyTimestampFromContext($this->context);
     }
 
-    public function addContext(ContextInterface $context): void
+    public function addContext(WriteableContextInterface $context): void
     {
         // NOTE For context management this data provider bypasses the enabled check.
         //      This means it will add context to the submission even if the provider is disabled,
@@ -36,7 +37,7 @@ class TimestampDataProvider extends DataProvider
 
     protected function process(): void
     {
-        $timestamp = $this->submission->getContext()->getTimestamp();
+        $timestamp = $this->context->getTimestamp();
         if ($timestamp !== null) {
             $format = $this->getConfig(static::KEY_FORMAT);
             $value = date($format, $timestamp);

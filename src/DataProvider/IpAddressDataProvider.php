@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
@@ -13,14 +14,14 @@ class IpAddressDataProvider extends DataProvider
 
     public const DEFAULT_FIELD = 'ip_address';
 
-    protected function processContext(ContextInterface $context): void
+    protected function processContext(WriteableContextInterface $context): void
     {
-        $this->submission->getContext()->copyIpAddressFromContext($context);
+        $context->copyIpAddressFromContext($this->context);
     }
 
     protected function process(): void
     {
-        $value = $this->submission->getContext()->getIpAddress();
+        $value = $this->context->getIpAddress();
         if ($value !== null) {
             $this->setField($this->getConfig(static::KEY_FIELD), $value);
         }

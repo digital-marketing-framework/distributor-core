@@ -44,6 +44,11 @@ class Registry extends CoreRegistry implements RegistryInterface
     {
         parent::addConfigurationSchemaDocument($schemaDocument);
 
+        // distributor API endpoints
+        foreach ($this->getEndPointStorage()->getAllEndPoints() as $endpoint) {
+            $schemaDocument->addValueToValueSet('distributorEndPoints/all', $endpoint->getName());
+        }
+
         // general outbound settings
         $generalOutboundConfiguration = new ContainerSchema();
         $generalOutboundConfiguration->getRenderingDefinition()->setIcon('outbound-routes');

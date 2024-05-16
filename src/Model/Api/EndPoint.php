@@ -9,6 +9,7 @@ class EndPoint implements EndPointInterface
         protected bool $enabled,
         protected bool $disableContext,
         protected bool $allowContextOverride,
+        protected bool $exposeToFrontend,
         protected string $configurationDocument,
     ) {
     }
@@ -51,6 +52,16 @@ class EndPoint implements EndPointInterface
     public function setAllowContextOverride(bool $allowContextOverride): void
     {
         $this->allowContextOverride = $allowContextOverride;
+    }
+
+    public function getExposeToFrontend(): bool
+    {
+        return $this->exposeToFrontend;
+    }
+
+    public function setExposeToFrontend(bool $exposeToFrontend): void
+    {
+        $this->exposeToFrontend = $exposeToFrontend;
     }
 
     public function getConfigurationDocument(): string

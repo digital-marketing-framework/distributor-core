@@ -2,7 +2,10 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Route;
 
+use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
+use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
@@ -26,9 +29,10 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRouteInterface, DataProcessorAwareInterface
+abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface
 {
     use DataProcessorAwareTrait;
+    use ContextAwareTrait;
 
     public const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
@@ -133,7 +137,7 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
         return RestrictedTermsSchema::getAllowedTerms($config);
     }
 
-    public function addContext(ContextInterface $context): void
+    public function addContext(WriteableContextInterface $context): void
     {
     }
 

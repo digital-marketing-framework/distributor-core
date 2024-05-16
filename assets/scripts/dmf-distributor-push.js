@@ -80,6 +80,7 @@
           hide(snippets.success)
           show(snippets.error)
         }
+        DMF.refresh()
       }
 
       addEventListener(form, 'submit', handleSubmit)
