@@ -4,7 +4,6 @@ namespace DigitalMarketingFramework\Distributor\Core\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
-use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
@@ -22,14 +21,15 @@ use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsS
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\Plugin\DataProcessor\ConditionSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
-use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
+use DigitalMarketingFramework\Distributor\Core\Plugin\IntegrationPlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface
+abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface
 {
     use DataProcessorAwareTrait;
     use ContextAwareTrait;
@@ -44,8 +44,6 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
 
     public const MESSAGE_NO_DATA_MAPPER_GROUP_CONFIG_FOUND = 'No data mapper group configuration found for group ID "%s" in outbound route "%s" with ID %s.';
 
-    protected IntegrationInfo $integrationInfo;
-
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
@@ -53,8 +51,12 @@ abstract class OutboundRoute extends ConfigurablePlugin implements OutboundRoute
         protected string $routeId,
         ?IntegrationInfo $integrationInfo = null,
     ) {
-        parent::__construct($keyword, $registry);
-        $this->integrationInfo = $integrationInfo ?? static::getDefaultIntegrationInfo();
+        parent::__construct(
+            $keyword,
+            $integrationInfo ?? static::getDefaultIntegrationInfo(),
+            $submission->getConfiguration(),
+            $registry
+        );
         $this->configuration = $this->submission->getConfiguration()->getOutboundRouteConfiguration($this->integrationInfo->getName(), $this->routeId);
     }
 

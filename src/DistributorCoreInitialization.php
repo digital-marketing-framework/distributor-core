@@ -31,7 +31,7 @@ class DistributorCoreInitialization extends Initialization
     ];
 
     protected const FRONTEND_SCRIPTS = [
-        'core' => [
+        'distributor' => [
             '/scripts/dmf-distributor-push.js',
         ],
     ];

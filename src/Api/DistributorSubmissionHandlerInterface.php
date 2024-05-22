@@ -4,7 +4,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Api;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Api\EndPointInterface;
+use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 
 interface DistributorSubmissionHandlerInterface

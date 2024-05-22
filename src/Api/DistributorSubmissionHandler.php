@@ -3,6 +3,8 @@
 namespace DigitalMarketingFramework\Distributor\Core\Api;
 
 use DigitalMarketingFramework\Core\Api\ApiException;
+use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageAwareInterface;
+use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageAwareTrait;
 use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
@@ -10,21 +12,20 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerAwareInterface;
 use DigitalMarketingFramework\Core\Log\LoggerAwareTrait;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Distributor\Core\Api\EndPoint\EndPointStorageInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\Api\EndPointInterface;
+use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageInterface;
+use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
-class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterface, LoggerAwareInterface
+class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterface, LoggerAwareInterface, EndPointStorageAwareInterface
 {
     use LoggerAwareTrait;
+    use EndPointStorageAwareTrait;
 
     protected ConfigurationDocumentManagerInterface $configurationDocumentManager;
-
-    protected EndPointStorageInterface $endPointStorage;
 
     protected DistributorInterface $distributor;
 
@@ -33,7 +34,6 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
     ){
         $this->configurationDocumentManager = $registry->getConfigurationDocumentManager();
         $this->distributor = $registry->getDistributor();
-        $this->endPointStorage = $registry->getEndPointStorage();
     }
 
     protected function handleException(string|DigitalMarketingFrameworkException $error, ?int $code = null): never
@@ -139,6 +139,10 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         $names = [];
         foreach ($this->endPointStorage->getAllEndPoints() as $endPoint) {
             if (!$endPoint->getEnabled()) {
+                continue;
+            }
+
+            if (!$endPoint->getPushEnabled()) {
                 continue;
             }
 

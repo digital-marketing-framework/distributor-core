@@ -6,31 +6,16 @@ use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandler;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandlerInterface;
 use DigitalMarketingFramework\Distributor\Core\Api\RouteResolver\DistributorRouteResolver;
-use DigitalMarketingFramework\Distributor\Core\Api\EndPoint\EndPointStorage;
-use DigitalMarketingFramework\Distributor\Core\Api\EndPoint\EndPointStorageInterface;
+use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorage;
+use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageInterface;
 use DigitalMarketingFramework\Distributor\Core\Api\RouteResolver\DistributorRouteResolverInterface;
 
 trait ApiRegistryTrait
 {
-    protected EndPointStorageInterface $endPointStorage;
 
     protected DistributorRouteResolverInterface $distributorRouteResolver;
 
     protected DistributorSubmissionHandlerInterface $distributorSubmissionHandler;
-
-    public function getEndPointStorage(): EndPointStorageInterface
-    {
-        if (!isset($this->endPointStorage)) {
-            $this->endPointStorage = $this->createObject(EndPointStorage::class);
-        }
-
-        return $this->endPointStorage;
-    }
-
-    public function setEndPointStorage(EndPointStorageInterface $endPointStorage): void
-    {
-        $this->endPointStorage = $endPointStorage;
-    }
 
     public function getDistributorApiRouteResolver(): DistributorRouteResolverInterface
     {

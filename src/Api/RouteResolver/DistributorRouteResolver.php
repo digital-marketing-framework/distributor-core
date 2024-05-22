@@ -5,6 +5,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Api\RouteResolver;
 use DigitalMarketingFramework\Core\Api\Response\ApiResponse;
 use DigitalMarketingFramework\Core\Api\Route\TemplateRoute;
 use DigitalMarketingFramework\Core\Api\Route\TemplateRouteInterface;
+use DigitalMarketingFramework\Core\Api\RouteResolver\EntryRouteResolverInterface;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandlerInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Core\Api\Request\ApiRequestInterface;
@@ -43,10 +44,10 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
             id: static::SEGMENT_DISTRIBUTOR,
             template: implode('/', [
                 GeneralUtility::slugify(static::SEGMENT_DISTRIBUTOR),
-                '{' . static::VARIABLE_END_POINT_SEGMENT . '}',
+                '{' . static::VARIABLE_END_POINT . '}',
             ]),
             variables: [
-                static::VARIABLE_END_POINT_SEGMENT => '',
+                static::VARIABLE_END_POINT => '',
             ],
             constants: [
                 static::VARIABLE_DOMAIN => static::SEGMENT_DISTRIBUTOR,
