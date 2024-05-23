@@ -2,7 +2,6 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Plugin\ConfigurablePluginInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;

@@ -6,13 +6,10 @@ use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandler;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandlerInterface;
 use DigitalMarketingFramework\Distributor\Core\Api\RouteResolver\DistributorRouteResolver;
-use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorage;
-use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageInterface;
 use DigitalMarketingFramework\Distributor\Core\Api\RouteResolver\DistributorRouteResolverInterface;
 
 trait ApiRegistryTrait
 {
-
     protected DistributorRouteResolverInterface $distributorRouteResolver;
 
     protected DistributorSubmissionHandlerInterface $distributorSubmissionHandler;

@@ -96,6 +96,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             if ($contextPushed) {
                 $this->registry->popContext();
             }
+
             $this->logger->error($e->getMessage());
             throw new QueueException($e->getMessage(), $e->getCode(), $e);
         }

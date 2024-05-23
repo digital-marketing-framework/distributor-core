@@ -2,15 +2,14 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Api\RouteResolver;
 
+use DigitalMarketingFramework\Core\Api\Request\ApiRequestInterface;
 use DigitalMarketingFramework\Core\Api\Response\ApiResponse;
+use DigitalMarketingFramework\Core\Api\Response\ApiResponseInterface;
 use DigitalMarketingFramework\Core\Api\Route\TemplateRoute;
 use DigitalMarketingFramework\Core\Api\Route\TemplateRouteInterface;
-use DigitalMarketingFramework\Core\Api\RouteResolver\EntryRouteResolverInterface;
+use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\Api\DistributorSubmissionHandlerInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
-use DigitalMarketingFramework\Core\Api\Request\ApiRequestInterface;
-use DigitalMarketingFramework\Core\Api\Response\ApiResponseInterface;
-use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 
 class DistributorRouteResolver implements DistributorRouteResolverInterface
 {
@@ -30,10 +29,10 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
 
     public function resolveRequest(ApiRequestInterface $request): ApiResponseInterface
     {
-        $endpointSegment = GeneralUtility::dashedToCamelCase($request->getVariable(static::VARIABLE_END_POINT_SEGMENT));
         $data = $request->getPayload();
         $context = $request->getContext();
-        $this->distributorSubmissionHandler->submitToEndPointByName($endpointSegment, $data, $context);
+        $endPoint = $request->getEndpoint();
+        $this->distributorSubmissionHandler->submitToEndPoint($endPoint, $data, $context);
 
         return new ApiResponse(['success' => true], 200);
     }
@@ -73,6 +72,7 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
                 ]);
             $routes[$route->getId()] = $route;
         }
+
         return $routes;
     }
 }

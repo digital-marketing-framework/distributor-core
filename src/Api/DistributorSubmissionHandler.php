@@ -11,9 +11,8 @@ use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerAwareInterface;
 use DigitalMarketingFramework\Core\Log\LoggerAwareTrait;
-use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageInterface;
 use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
+use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
@@ -31,7 +30,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
     public function __construct(
         protected RegistryInterface $registry,
-    ){
+    ) {
         $this->configurationDocumentManager = $registry->getConfigurationDocumentManager();
         $this->distributor = $registry->getDistributor();
     }
@@ -44,6 +43,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
             $message = $error->getMessage();
             $exception = $error;
         }
+
         $this->logger->error($message);
         throw new ApiException($message, $code ?? 500, $exception);
     }
@@ -51,10 +51,9 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
     public function submit(
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
-        null|array|ContextInterface $context = null,
+        array|ContextInterface|null $context = null,
         bool $responsive = false
     ): void {
-
         if (is_array($context)) {
             $context = new WriteableContext($context);
         }
@@ -87,9 +86,8 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
     public function submitToEndPoint(
         EndPointInterface $endPoint,
         array|DataInterface $data,
-        null|array|ContextInterface $context = null
+        array|ContextInterface|null $context = null
     ): void {
-
         if (!$endPoint->getEnabled()) {
             $this->handleException('End point not found or disabled', 404);
         }
@@ -116,24 +114,6 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         $this->submit($configuration, $data, $context, responsive: !$endPoint->getDisableContext());
     }
 
-    public function submitToEndPointByName(
-        string $endPointName,
-        array|DataInterface $data,
-        null|array|ContextInterface $context = null
-    ): void {
-        try {
-            $endPoint = $this->endPointStorage->getEndPointByName($endPointName);
-        } catch (DigitalMarketingFrameworkException $e) {
-            $this->handleException($e);
-        }
-
-        if (!$endPoint instanceof EndPointInterface) {
-            $this->handleException('End point not found or disabled', 404);
-        }
-
-        $this->submitToEndPoint($endPoint, $data, $context);
-    }
-
     public function getEndPointNames(bool $frontend = false): array
     {
         $names = [];
@@ -152,6 +132,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
             $names[] = $endPoint->getName();
         }
+
         return $names;
     }
 }

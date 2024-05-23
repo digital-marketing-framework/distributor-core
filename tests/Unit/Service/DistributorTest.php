@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Service;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\ContextStackInterface;
 use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
@@ -62,7 +63,7 @@ class DistributorTest extends TestCase
         $this->routes = [];
 
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->context = $this->createMock(ContextInterface::class);
+        $this->context = $this->createMock(ContextStackInterface::class);
         $this->persistentQueue = $this->createMock(QueueInterface::class);
         $this->temporaryQueue = $this->createMock(QueueInterface::class);
         $this->queueDataFactory = $this->createMock(QueueDataFactoryInterface::class);
