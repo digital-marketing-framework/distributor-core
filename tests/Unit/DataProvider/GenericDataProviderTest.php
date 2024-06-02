@@ -26,8 +26,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
 
         $this->createGenericDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -49,8 +50,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals([
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + [
             'contextField1' => 'contextValue1',
         ], $this->submissionContext->toArray());
 
@@ -76,8 +78,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
@@ -102,8 +105,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
@@ -129,8 +133,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
@@ -152,8 +157,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
@@ -175,8 +181,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -201,8 +208,9 @@ class GenericDataProviderTest extends AbstractDataProviderTest
             ]
         );
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([

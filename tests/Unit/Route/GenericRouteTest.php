@@ -99,8 +99,9 @@ class GenericRouteTest extends TestCase
 
         $this->createRoute();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
     }
 
     /** @test */

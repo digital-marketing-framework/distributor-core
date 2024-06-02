@@ -2,7 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
+use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
@@ -12,8 +14,10 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface
+abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface, ContextAwareInterface
 {
+    use ContextAwareTrait;
+
     public const KEY_ENABLED = 'enabled';
 
     public const DEFAULT_ENABLED = false;
@@ -35,7 +39,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         $this->configuration = $this->submission->getConfiguration()->getDataProviderConfiguration($this->getKeyword());
     }
 
-    abstract protected function processContext(ContextInterface $context): void;
+    abstract protected function processContext(WriteableContextInterface $context): void;
 
     abstract protected function process(): void;
 
@@ -107,7 +111,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         }
     }
 
-    public function addContext(ContextInterface $context): void
+    public function addContext(WriteableContextInterface $context): void
     {
         if ($this->enabled()) {
             $this->processContext($context);

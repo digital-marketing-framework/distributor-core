@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Factory;
 
+use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -34,10 +35,12 @@ interface QueueDataFactoryInterface
      * Converts a set of a submission and a route ID to a job.
      * Additionally the initial status of the job can be passed too.
      */
-    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $integationName, string $routeId, int $status = QueueInterface::STATUS_QUEUED): JobInterface;
+    public function convertSubmissionToJob(SubmissionDataSetInterface $submission, string $integrationName, string $routeId, int $status = QueueInterface::STATUS_QUEUED): JobInterface;
 
     /**
      * Converts a job to a submission.
+     *
+     * @throws DigitalMarketingFrameworkException
      */
     public function convertJobToSubmission(JobInterface $job): SubmissionDataSetInterface;
 

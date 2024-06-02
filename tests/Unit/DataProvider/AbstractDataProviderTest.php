@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\ContextStackInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
@@ -45,7 +46,7 @@ abstract class AbstractDataProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->registry = $this->createMock(RegistryInterface::class);
-        $this->globalContext = $this->createMock(ContextInterface::class);
+        $this->globalContext = $this->createMock(ContextStackInterface::class);
 
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
@@ -76,6 +77,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
         $class = static::DATA_PROVIDER_CLASS;
         $this->subject = new $class($keyword, $this->registry, $this->submission, ...$additionalArguments);
+        $this->subject->setContext($this->globalContext);
         $this->subject->setDefaultConfiguration($defaultConfig);
     }
 }

@@ -11,6 +11,7 @@ use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterfac
 use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\RequestVariablesDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\TimestampDataProvider;
+use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\DistributorCoreGlobalConfigurationSchema;
 
 class DistributorCoreInitialization extends Initialization
 {
@@ -30,10 +31,16 @@ class DistributorCoreInitialization extends Initialization
         ],
     ];
 
+    protected const FRONTEND_SCRIPTS = [
+        'distributor' => [
+            'dmf-distributor-push.js',
+        ],
+    ];
+
     protected const SCHEMA_MIGRATIONS = [];
 
     public function __construct(string $packageAlias = '')
     {
-        parent::__construct('distributor-core', '1.0.0', $packageAlias);
+        parent::__construct('distributor-core', '1.0.0', $packageAlias, new DistributorCoreGlobalConfigurationSchema());
     }
 }

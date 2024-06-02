@@ -2,7 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
-use DigitalMarketingFramework\Core\Context\ContextInterface;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\MapSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
@@ -12,11 +12,11 @@ class RequestVariablesDataProvider extends DataProvider
 {
     public const KEY_VARIABLE_FIELD_MAP = 'variableFieldMap';
 
-    protected function processContext(ContextInterface $context): void
+    protected function processContext(WriteableContextInterface $context): void
     {
         $variables = array_keys($this->getMapConfig(static::KEY_VARIABLE_FIELD_MAP));
         foreach ($variables as $variable) {
-            $this->submission->getContext()->copyRequestVariableFromContext($context, $variable);
+            $context->copyRequestVariableFromContext($this->context, $variable);
         }
     }
 
@@ -24,7 +24,7 @@ class RequestVariablesDataProvider extends DataProvider
     {
         $variableFieldMap = $this->getMapConfig(static::KEY_VARIABLE_FIELD_MAP);
         foreach ($variableFieldMap as $variable => $field) {
-            $value = $this->submission->getContext()->getRequestVariable($variable);
+            $value = $this->context->getRequestVariable($variable);
             if ($value !== null) {
                 $this->setField($field, $value);
             }

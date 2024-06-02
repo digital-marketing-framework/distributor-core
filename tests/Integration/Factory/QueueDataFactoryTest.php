@@ -161,8 +161,8 @@ class QueueDataFactoryTest extends TestCase
     protected function packContextProvider(): array
     {
         return [
-            [[], []],
-            [['contextKey1' => 'contextValue1'], ['contextKey1' => 'contextValue1']],
+            [['timestamp' => 1716482226], ['timestamp' => 1716482226]],
+            [['timestamp' => 1716482226, 'contextKey1' => 'contextValue1'], ['timestamp' => 1716482226, 'contextKey1' => 'contextValue1']],
         ];
     }
 
@@ -298,7 +298,7 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->subject->convertSubmissionToJob($submission, $integration, $routeId);
         $this->assertEquals($jobData, $job->getData());
 
-        /** @var SubmissionDataSetInterface $result */
+        /** @var SubmissionDataSetInterface */
         $result = $this->subject->convertJobToSubmission($job);
         $this->assertEquals($data, $result->getData()->toArray());
         $this->assertEquals($configuration, $result->getConfiguration()->toArray());

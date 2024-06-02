@@ -22,8 +22,9 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -38,12 +39,13 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
                 'requestVariableItemId1' => $this->createMapItem('requestVariableName1', 'fieldName1', 'requestVariableItemId1', 10),
             ],
         ]);
-        $this->globalContext->expects($this->once())->method('getRequestVariable')->willReturn(null);
+        $this->globalContext->expects($this->exactly(2))->method('getRequestVariable')->willReturn(null);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -66,8 +68,9 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals([
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + [
             'request_variables' => [
                 'requestVariableName1' => 'requestVariableValue1',
                 'requestVariableName2' => 'requestVariableValue2',
@@ -90,15 +93,16 @@ class RequestVariablesDataProviderTest extends AbstractDataProviderTest
                 'requestVariableItemId1' => $this->createMapItem('requestVariableName1', 'fieldName1', 'requestVariableItemId1', 10),
             ],
         ]);
-        $this->globalContext->expects($this->once())->method('getRequestVariable')->willReturnMap([
+        $this->globalContext->expects($this->exactly(2))->method('getRequestVariable')->willReturnMap([
             ['requestVariableName1', 'requestVariableValue1'],
         ]);
         $this->submissionData['fieldName1'] = 'requestVariableValue1FromFormData';
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals([
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + [
             'request_variables' => [
                 'requestVariableName1' => 'requestVariableValue1',
             ],

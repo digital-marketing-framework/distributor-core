@@ -39,7 +39,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         $dataProviders = $this->registry->getDataProviders($submission);
         foreach ($dataProviders as $dataProvider) {
             try {
-                $dataProvider->addContext($this->context);
+                $dataProvider->addContext($submission->getContext());
             } catch (DigitalMarketingFrameworkException $e) {
                 $this->logger->error($e->getMessage());
             }
@@ -48,7 +48,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         $routes = $this->registry->getOutboundRoutes($submission);
         foreach ($routes as $route) {
             try {
-                $route->addContext($this->context);
+                $route->addContext($submission->getContext());
             } catch (DigitalMarketingFrameworkException $e) {
                 $this->logger->error($e->getMessage());
             }
@@ -71,8 +71,13 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
 
     public function processJob(JobInterface $job): bool
     {
+        $contextPushed = false;
         try {
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
+            $submission->getContext()->setResponsive(false);
+
+            $this->registry->pushContext($submission->getContext());
+            $contextPushed = true;
 
             $routeId = $this->queueDataFactory->getJobRouteId($job);
             $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
@@ -83,8 +88,15 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders());
 
-            return $route->process();
+            $result = $route->process();
+            $this->registry->popContext();
+
+            return $result;
         } catch (DigitalMarketingFrameworkException $e) {
+            if ($contextPushed) {
+                $this->registry->popContext();
+            }
+
             $this->logger->error($e->getMessage());
             throw new QueueException($e->getMessage(), $e->getCode(), $e);
         }

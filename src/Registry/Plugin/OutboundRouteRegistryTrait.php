@@ -60,6 +60,8 @@ trait OutboundRouteRegistryTrait
             $routeSchema->addRoute($key, $schema, $integrationInfo->getName(), $label);
 
             $integrationSchema = $this->getIntegrationSchemaForPlugin($schemaDocument, $integrationInfo);
+            $integrationInfo->addSchema($schemaDocument, $integrationSchema);
+
             $routeListSchema = $integrationSchema->getProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES)?->getSchema();
             if (!$routeListSchema instanceof ListSchema) {
                 $routeListSchema = new ListSchema(new CustomSchema(OutboundRouteSchema::TYPE));

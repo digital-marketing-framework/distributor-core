@@ -21,7 +21,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
+        $this->subject->addContext($this->submissionContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
         $this->subject->addData();
@@ -32,12 +32,13 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
     public function doesNotDoAnythingIfTimestampIsNotAvailable(): void
     {
         $this->setDataProviderConfiguration(['enabled' => true]);
-        $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(null);
+        $this->globalContext->expects($this->exactly(2))->method('getTimestamp')->willReturn(null);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -47,11 +48,11 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
     public function timestampIsAddedToContextAndFields(): void
     {
         $this->setDataProviderConfiguration(['enabled' => true]);
-        $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
+        $this->globalContext->expects($this->exactly(2))->method('getTimestamp')->willReturn(1669119788);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
+        $this->subject->addContext($this->submissionContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
         $this->subject->addData();
@@ -67,11 +68,11 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
             'enabled' => true,
             'field' => 'custom_timestamp_field',
         ]);
-        $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
+        $this->globalContext->expects($this->exactly(2))->method('getTimestamp')->willReturn(1669119788);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
+        $this->subject->addContext($this->submissionContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
         $this->subject->addData();
@@ -87,11 +88,11 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
             'enabled' => true,
             'format' => 'Y-m-d',
         ]);
-        $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
+        $this->globalContext->expects($this->exactly(2))->method('getTimestamp')->willReturn(1669119788);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
+        $this->subject->addContext($this->submissionContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
         $this->subject->addData();
@@ -104,12 +105,12 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
     public function doesNotOverwriteFieldByDefault(): void
     {
         $this->setDataProviderConfiguration(['enabled' => true]);
-        $this->globalContext->expects($this->once())->method('getTimestamp')->willReturn(1669119788);
+        $this->globalContext->expects($this->exactly(2))->method('getTimestamp')->willReturn(1669119788);
         $this->submissionData['timestamp'] = 'timestampFromFormData';
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
+        $this->subject->addContext($this->submissionContext);
         $this->assertEquals(['timestamp' => 1669119788], $this->submissionContext->toArray());
 
         $this->subject->addData();

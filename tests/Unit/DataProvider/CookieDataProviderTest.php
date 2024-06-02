@@ -22,8 +22,9 @@ class CookieDataProviderTest extends AbstractDataProviderTest
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -38,12 +39,13 @@ class CookieDataProviderTest extends AbstractDataProviderTest
                 'cookieItemId1' => $this->createMapItem('cookieName1', 'fieldName1', 'cookieItemId1', 10),
             ],
         ]);
-        $this->globalContext->expects($this->once())->method('getCookie')->willReturn(null);
+        $this->globalContext->expects($this->exactly(2))->method('getCookie')->willReturn(null);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -66,8 +68,9 @@ class CookieDataProviderTest extends AbstractDataProviderTest
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals([
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + [
             'cookies' => [
                 'cookieName1' => 'cookieValue1',
                 'cookieName2' => 'cookieValue2',
@@ -90,15 +93,16 @@ class CookieDataProviderTest extends AbstractDataProviderTest
                 'cookieItemId1' => $this->createMapItem('cookieName1', 'fieldName1', 'cookieItemId1', 10),
             ],
         ]);
-        $this->globalContext->expects($this->once())->method('getCookie')->willReturnMap([
+        $this->globalContext->expects($this->exactly(2))->method('getCookie')->willReturnMap([
             ['cookieName1', 'cookieValue1'],
         ]);
         $this->submissionData['fieldName1'] = 'cookieValue1FromFormData';
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals([
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + [
             'cookies' => [
                 'cookieName1' => 'cookieValue1',
             ],

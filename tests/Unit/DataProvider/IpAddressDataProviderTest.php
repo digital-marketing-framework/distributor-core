@@ -22,8 +22,9 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -35,12 +36,13 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
         ]);
-        $this->globalContext->expects($this->once())->method('getIpAddress')->willReturn(null);
+        $this->globalContext->expects($this->exactly(2))->method('getIpAddress')->willReturn(null);
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEmpty($this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore, $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEmpty($this->submissionData->toArray());
@@ -52,12 +54,13 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
         ]);
-        $this->globalContext->expects($this->once())->method('getIpAddress')->willReturn('111.222.333.444');
+        $this->globalContext->expects($this->exactly(2))->method('getIpAddress')->willReturn('111.222.333.444');
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals(['ip_address' => '111.222.333.444'], $this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + ['ip_address' => '111.222.333.444'], $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
@@ -72,12 +75,13 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
             'enabled' => true,
             'field' => 'custom_ip_address_field',
         ]);
-        $this->globalContext->expects($this->once())->method('getIpAddress')->willReturn('111.222.333.444');
+        $this->globalContext->expects($this->exactly(2))->method('getIpAddress')->willReturn('111.222.333.444');
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals(['ip_address' => '111.222.333.444'], $this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + ['ip_address' => '111.222.333.444'], $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
@@ -91,13 +95,14 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         $this->setDataProviderConfiguration([
             'enabled' => true,
         ]);
-        $this->globalContext->expects($this->once())->method('getIpAddress')->willReturn('111.222.333.444');
+        $this->globalContext->expects($this->exactly(2))->method('getIpAddress')->willReturn('111.222.333.444');
         $this->submissionData['ip_address'] = 'ipAddressFromFormData';
 
         $this->createDataProvider();
 
-        $this->subject->addContext($this->globalContext);
-        $this->assertEquals(['ip_address' => '111.222.333.444'], $this->submissionContext->toArray());
+        $contextBefore = $this->submissionContext->toArray();
+        $this->subject->addContext($this->submissionContext);
+        $this->assertEquals($contextBefore + ['ip_address' => '111.222.333.444'], $this->submissionContext->toArray());
 
         $this->subject->addData();
         $this->assertEquals([
