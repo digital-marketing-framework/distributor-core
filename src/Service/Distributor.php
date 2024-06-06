@@ -36,6 +36,8 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
 
     protected function addContext(SubmissionDataSetInterface $submission): void
     {
+        $this->registry->addServiceContext($submission->getContext());
+
         $dataProviders = $this->registry->getDataProviders($submission);
         foreach ($dataProviders as $dataProvider) {
             try {
