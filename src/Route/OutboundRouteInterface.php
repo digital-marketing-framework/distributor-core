@@ -14,9 +14,9 @@ interface OutboundRouteInterface extends RouteInterface
 
     public const DEFAULT_ENABLED = false;
 
-    public const KEY_GATE = 'gate';
+    public const KEY_REQUIRED_PERMISSION = 'requiredPermission';
 
-    public const DEFAULT_GATE = [];
+    public const KEY_GATE = 'gate';
 
     public const KEY_DATA = 'data';
 
@@ -27,6 +27,8 @@ interface OutboundRouteInterface extends RouteInterface
     public function processGate(): bool;
 
     public function enabled(): bool;
+
+    public function allowed(): bool;
 
     public function async(): ?bool;
 
