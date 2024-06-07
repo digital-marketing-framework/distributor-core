@@ -4,6 +4,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Route;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
+use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
@@ -44,6 +45,8 @@ class GenericRouteTest extends TestCase
 
     protected WriteableContext $submissionContext;
 
+    protected DataPrivacyManagerInterface&MockObject $dataPrivacyManager;
+
     protected GenericRoute $subject;
 
     protected function setUp(): void
@@ -51,6 +54,7 @@ class GenericRouteTest extends TestCase
         $this->registry = $this->createMock(RegistryInterface::class);
         $this->globalContext = $this->createMock(ContextInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->dataPrivacyManager = $this->createMock(DataPrivacyManagerInterface::class);
 
         $this->dataProcessor = $this->createMock(DataProcessorInterface::class);
 
@@ -76,6 +80,7 @@ class GenericRouteTest extends TestCase
         );
         $this->subject->setLogger($this->logger);
         $this->subject->setDataProcessor($this->dataProcessor);
+        $this->subject->setDataPrivacyManager($this->dataPrivacyManager);
         $this->subject->setDefaultConfiguration(static::DEFAULT_CONFIG);
     }
 
@@ -107,11 +112,33 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassGateFails(): void
     {
+        $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(true);
         $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(false);
         $this->logger->expects($this->once())->method('debug')->with(sprintf(OutboundRoute::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
 
         $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
+            'requiredPermission' => 'testPermission',
+            'gate' => [
+                'gateConfigKey1' => 'gateConfigValue1',
+            ],
+        ]);
+
+        $this->createRoute();
+        $result = $this->subject->process();
+        $this->assertFalse($result);
+    }
+
+    /** @test */
+    public function processPassGatePermissionFails(): void
+    {
+        $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(false);
+        $this->dataProcessor->expects($this->never())->method('processCondition');
+        $this->logger->expects($this->once())->method('debug')->with(sprintf(OutboundRoute::MESSAGE_GATE_FAILED, 'myCustomKeyword', 'myCustomKeywordId1'));
+
+        $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
+            'enabled' => true,
+            'requiredPermission' => 'testPermission',
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
             ],
@@ -125,9 +152,11 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassEmptyInputDataWillCauseException(): void
     {
+        $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(true);
         $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(true);
         $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
+            'requiredPermission' => 'testPermission',
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
             ],
@@ -143,12 +172,14 @@ class GenericRouteTest extends TestCase
     /** @test */
     public function processPassWithFieldConfigWillSendProcessedData(): void
     {
+        $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(true);
         $this->dataProcessor->expects($this->once())->method('processCondition')->willReturn(true);
         $this->submissionData['field1'] = 'value1';
         $this->submissionData['field2'] = 'value2';
 
         $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
             'enabled' => true,
+            'requiredPermission' => 'testPermission',
             'gate' => [
                 'gateConfigKey1' => 'gateConfigValue1',
             ],

@@ -101,6 +101,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
     public function allowed(): bool
     {
         $permission = $this->getConfig(static::KEY_REQUIRED_PERMISSION);
+
         return $this->dataPrivacyManager->getPermission($permission);
     }
 

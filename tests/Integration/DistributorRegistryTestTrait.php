@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\DataPrivacy\UnregulatedDataPrivacyPlugin;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Core\Tests\Integration\RegistryTestTrait;
@@ -43,6 +44,7 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
         $this->registry->setPersistentQueue($this->queue);
         $this->registry->setNonPersistentQueue($this->temporaryQueue);
         $this->registry->setQueueDataFactory($this->queueDataFactory);
+        $this->registry->getDataPrivacyManager()->addPlugin($this->registry->createObject(UnregulatedDataPrivacyPlugin::class));
 
         // init plugins
         $distributorCoreInitialization = new DistributorCoreInitialization();
