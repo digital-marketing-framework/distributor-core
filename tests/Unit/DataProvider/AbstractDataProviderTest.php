@@ -6,6 +6,7 @@ use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\ContextStackInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
@@ -25,6 +26,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     protected const DEFAULT_CONFIG = [
         DataProvider::KEY_ENABLED => DataProvider::DEFAULT_ENABLED,
+        DataProvider::KEY_REQUIRED_PERMISSION => 'unregulated:allowed', // TODO implement tests for required permissions
         DataProvider::KEY_MUST_EXIST => DataProvider::DEFAULT_MUST_EXIST,
         DataProvider::KEY_MUST_BE_EMPTY => DataProvider::DEFAULT_MUST_BE_EMPTY,
     ];
@@ -34,6 +36,8 @@ abstract class AbstractDataProviderTest extends TestCase
     protected ContextInterface&MockObject $globalContext;
 
     protected SubmissionDataSetInterface&MockObject $submission;
+
+    protected DataPrivacyManagerInterface&MockObject $dataPrivacyManager;
 
     protected DataInterface $submissionData;
 
@@ -47,6 +51,8 @@ abstract class AbstractDataProviderTest extends TestCase
     {
         $this->registry = $this->createMock(RegistryInterface::class);
         $this->globalContext = $this->createMock(ContextStackInterface::class);
+        $this->dataPrivacyManager = $this->createMock(DataPrivacyManagerInterface::class);
+        $this->dataPrivacyManager->expects($this->any())->method('getPermission')->willReturnMap([['unregulated:allowed', true], ['unregulated:denied', false]]);
 
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
@@ -77,6 +83,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
         $class = static::DATA_PROVIDER_CLASS;
         $this->subject = new $class($keyword, $this->registry, $this->submission, ...$additionalArguments);
+        $this->subject->setDataPrivacyManager($this->dataPrivacyManager);
         $this->subject->setContext($this->globalContext);
         $this->subject->setDefaultConfiguration($defaultConfig);
     }

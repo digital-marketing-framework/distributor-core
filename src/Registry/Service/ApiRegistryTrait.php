@@ -48,7 +48,7 @@ trait ApiRegistryTrait
     {
         $settings = parent::getFrontendSettings();
         $endPointStorage = $this->getEndPointStorage();
-        $entryRouteResolver = $this->getApiEntryRouteResolver();
+        $entryRouteResolver = $this->getRegistryCollection()->getApiEntryRouteResolver();
         $distributorRouteResolver = $this->getDistributorApiRouteResolver();
 
         $endPointRoute = $distributorRouteResolver->getEndPointRoute();

@@ -5,6 +5,8 @@ namespace DigitalMarketingFramework\Distributor\Core\Route;
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerAwareInterface;
+use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareInterface;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorAwareTrait;
 use DigitalMarketingFramework\Core\DataProcessor\DataProcessorContextInterface;
@@ -16,6 +18,7 @@ use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingD
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\DataMapperGroupReferenceSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\DataPrivacyPermissionSelectionSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\InheritableBooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
@@ -28,10 +31,11 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Plugin\IntegrationPlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface
+abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface
 {
     use DataProcessorAwareTrait;
     use ContextAwareTrait;
+    use DataPrivacyManagerAwareTrait;
 
     public const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
@@ -94,9 +98,20 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         );
     }
 
+    public function allowed(): bool
+    {
+        $permission = $this->getConfig(static::KEY_REQUIRED_PERMISSION);
+
+        return $this->dataPrivacyManager->getPermission($permission);
+    }
+
     public function processGate(): bool
     {
         if (!$this->enabled()) {
+            return false;
+        }
+
+        if (!$this->allowed()) {
             return false;
         }
 
@@ -186,6 +201,15 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         $enabledProperty = $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
         $enabledProperty->setWeight(10);
 
+        $requiredPermissionSchema = new CustomSchema(DataPrivacyPermissionSelectionSchema::TYPE);
+        $requiredPermissionProperty = $schema->addProperty(static::KEY_REQUIRED_PERMISSION, $requiredPermissionSchema);
+        $requiredPermissionProperty->setWeight(15);
+
+        $gateSchema = new CustomSchema(ConditionSchema::TYPE);
+        $gateSchema->getRenderingDefinition()->setLabel('Gate');
+        $gateProperty = $schema->addProperty(static::KEY_GATE, $gateSchema);
+        $gateProperty->setWeight(20);
+
         $asyncSchema = new InheritableBooleanSchema();
         $asyncSchema->getRenderingDefinition()->addReference(
             sprintf(
@@ -220,14 +244,8 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         $enableDataProviders->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(static::KEY_ENABLE_DATA_PROVIDERS, $enableDataProviders);
 
-        $gateSchema = new CustomSchema(ConditionSchema::TYPE);
-        $gateSchema->getRenderingDefinition()->setLabel('Gate');
-        $schema->addProperty(static::KEY_GATE, $gateSchema);
-
         $dataSchema = new CustomSchema(DataMapperGroupReferenceSchema::TYPE);
         $schema->addProperty(static::KEY_DATA, $dataSchema);
-
-        // TODO gdpr should not be handled in the gate. we need a dedicated service for that
 
         return $schema;
     }

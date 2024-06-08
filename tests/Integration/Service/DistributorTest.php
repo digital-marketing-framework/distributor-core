@@ -113,6 +113,7 @@ class DistributorTest extends TestCase
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
         $this->submissionData = [
@@ -149,6 +150,7 @@ class DistributorTest extends TestCase
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
         $this->submissionData = [
@@ -185,6 +187,7 @@ class DistributorTest extends TestCase
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
         $this->submissionData = [
@@ -251,6 +254,7 @@ class DistributorTest extends TestCase
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => $routeEnabled,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
         $this->addDataProviderSpy([
@@ -274,10 +278,12 @@ class DistributorTest extends TestCase
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
@@ -303,10 +309,12 @@ class DistributorTest extends TestCase
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
         $this->addRouteSpy([
             'enabled' => true,
+            'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
@@ -335,6 +343,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'passthroughDataMapperGroupId1',
                 ],
             ],
@@ -385,10 +394,12 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
                 'routeId2' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId2',
                 ],
             ],
@@ -435,6 +446,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => false,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
             ],
@@ -493,6 +505,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'gate' => [
                         'type' => 'reference',
                         'config' => [
@@ -532,6 +545,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
             ],
@@ -558,6 +572,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
             ],
@@ -569,6 +584,7 @@ class DistributorTest extends TestCase
                     'dataProviders' => [
                         'generic' => [
                             'enabled' => true,
+                            'requiredPermission' => 'unregulated:allowed',
                         ],
                     ],
                 ],
@@ -593,6 +609,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
             ],
@@ -602,7 +619,47 @@ class DistributorTest extends TestCase
             config: [
                 'dataProcessing' => [
                     'dataProviders' => [
-                        'generic' => ['enabled' => false],
+                        'generic' => [
+                            'enabled' => false,
+                            'requiredPermission' => 'unregulated:allowed',
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $this->dataProviderSpy->expects($this->never())->method('process');
+        $this->routeSpy->expects($this->once())->method('send')->with(['field1' => 'value1', 'field2' => 'value2']);
+        $result = $this->subject->processJob($job);
+        $this->assertTrue($result);
+    }
+
+    /** @test */
+    public function processJobWithDataProviderThatIsNotAllowed(): void
+    {
+        $this->routeSpy = $this->registerRouteSpy();
+        $this->dataProviderSpy = $this->registerDataProviderSpy();
+        $job = $this->createJob(
+            [
+                'field1' => ['type' => 'string', 'value' => 'value1'],
+                'field2' => ['type' => 'string', 'value' => 'value2'],
+            ],
+            [
+                'routeId1' => [
+                    'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
+                    'data' => 'dataMapperGroupId1',
+                ],
+            ],
+            [
+                'dataMapperGroupId1' => $this->getPassthroughDataMapperGroupConfiguration(),
+            ],
+            config: [
+                'dataProcessing' => [
+                    'dataProviders' => [
+                        'generic' => [
+                            'enabled' => true,
+                            'requiredPermission' => 'unregulated:denied',
+                        ],
                     ],
                 ],
             ]
@@ -626,6 +683,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => false,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
             ],
@@ -635,7 +693,10 @@ class DistributorTest extends TestCase
             config: [
                 'dataProcessing' => [
                     'dataProviders' => [
-                        'generic' => ['enabled' => true],
+                        'generic' => [
+                            'enabled' => true,
+                            'requiredPermission' => 'unregulated:allowed',
+                        ],
                     ],
                 ],
             ]
@@ -655,6 +716,7 @@ class DistributorTest extends TestCase
             [
                 'routeId1' => [
                     'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
                     'data' => 'dataMapperGroupId1',
                 ],
             ],
