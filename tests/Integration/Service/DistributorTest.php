@@ -584,6 +584,7 @@ class DistributorTest extends TestCase
                     'dataProviders' => [
                         'generic' => [
                             'enabled' => true,
+                            'requiredPermission' => 'unregulated:allowed',
                         ],
                     ],
                 ],
@@ -618,7 +619,47 @@ class DistributorTest extends TestCase
             config: [
                 'dataProcessing' => [
                     'dataProviders' => [
-                        'generic' => ['enabled' => false],
+                        'generic' => [
+                            'enabled' => false,
+                            'requiredPermission' => 'unregulated:allowed',
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $this->dataProviderSpy->expects($this->never())->method('process');
+        $this->routeSpy->expects($this->once())->method('send')->with(['field1' => 'value1', 'field2' => 'value2']);
+        $result = $this->subject->processJob($job);
+        $this->assertTrue($result);
+    }
+
+    /** @test */
+    public function processJobWithDataProviderThatIsNotAllowed(): void
+    {
+        $this->routeSpy = $this->registerRouteSpy();
+        $this->dataProviderSpy = $this->registerDataProviderSpy();
+        $job = $this->createJob(
+            [
+                'field1' => ['type' => 'string', 'value' => 'value1'],
+                'field2' => ['type' => 'string', 'value' => 'value2'],
+            ],
+            [
+                'routeId1' => [
+                    'enabled' => true,
+                    'requiredPermission' => 'unregulated:allowed',
+                    'data' => 'dataMapperGroupId1',
+                ],
+            ],
+            [
+                'dataMapperGroupId1' => $this->getPassthroughDataMapperGroupConfiguration(),
+            ],
+            config: [
+                'dataProcessing' => [
+                    'dataProviders' => [
+                        'generic' => [
+                            'enabled' => true,
+                            'requiredPermission' => 'unregulated:denied',
+                        ],
                     ],
                 ],
             ]
@@ -652,7 +693,10 @@ class DistributorTest extends TestCase
             config: [
                 'dataProcessing' => [
                     'dataProviders' => [
-                        'generic' => ['enabled' => true],
+                        'generic' => [
+                            'enabled' => true,
+                            'requiredPermission' => 'unregulated:allowed',
+                        ],
                     ],
                 ],
             ]

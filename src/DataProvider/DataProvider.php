@@ -5,22 +5,29 @@ namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerAwareInterface;
+use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerAwareTrait;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\RenderingDefinition\RenderingDefinitionInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\DataPrivacyPermissionSelectionSchema;
+use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
-abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface, ContextAwareInterface
+abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface
 {
     use ContextAwareTrait;
+    use DataPrivacyManagerAwareTrait;
 
     public const KEY_ENABLED = 'enabled';
 
     public const DEFAULT_ENABLED = false;
+
+    public const KEY_REQUIRED_PERMISSION = 'requiredPermission';
 
     public const KEY_MUST_EXIST = 'mustExist';
 
@@ -45,21 +52,26 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
 
     /**
      * Public information on whether the data provider is enabled.
-     * Can be used from outside to consider whether or not it should even be called or its configuration stored.
+     * Can be used from outside to consider whether it should even be called or its configuration stored.
      */
     public function enabled(): bool
     {
         return (bool)$this->getConfig(static::KEY_ENABLED);
     }
 
+    public function allowed(): bool
+    {
+        $permission = $this->getConfig(static::KEY_REQUIRED_PERMISSION);
+
+        return $this->dataPrivacyManager->getPermission($permission);
+    }
+
     /**
      * Internal information on whether the data provider should proceed adding data.
-     * An enabled data provider may still have a reason not to add data,
-     * which is why this is different form the method enabled().
      */
     protected function proceed(): bool
     {
-        return $this->enabled();
+        return $this->enabled() && $this->allowed();
     }
 
     protected function appendToField(string $key, string|ValueInterface $value, string $glue = "\n"): bool
@@ -129,6 +141,8 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         }
 
         $schema->addProperty(static::KEY_ENABLED, new BooleanSchema(static::DEFAULT_ENABLED));
+
+        $schema->addProperty(static::KEY_REQUIRED_PERMISSION, new CustomSchema(DataPrivacyPermissionSelectionSchema::TYPE));
 
         $mustExistSchema = new BooleanSchema(static::DEFAULT_MUST_EXIST);
         $mustExistSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
