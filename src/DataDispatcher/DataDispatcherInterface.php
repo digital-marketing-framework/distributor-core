@@ -14,4 +14,11 @@ interface DataDispatcherInterface extends PluginInterface
      * @throws DigitalMarketingFrameworkException
      */
     public function send(array $data): void;
+
+    /**
+     * @param array<string,string|ValueInterface> $data
+     *
+     * @throws DigitalMarketingFrameworkException
+     */
+    public function preview(array $data): string;
 }

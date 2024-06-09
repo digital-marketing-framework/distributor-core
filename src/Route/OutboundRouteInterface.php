@@ -51,5 +51,7 @@ interface OutboundRouteInterface extends RouteInterface
      */
     public function process(): bool;
 
+    public function preview(): string;
+
     public function addContext(WriteableContextInterface $context): void;
 }
