@@ -51,6 +51,9 @@ interface OutboundRouteInterface extends RouteInterface
      */
     public function process(): bool;
 
+    /**
+     * @throws DigitalMarketingFrameworkException
+     */
     public function preview(): string;
 
     public function addContext(WriteableContextInterface $context): void;

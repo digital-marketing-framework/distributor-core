@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataDispatcher;
 
+use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\TemplateEngine\TemplateEngineAwareInterface;
 use DigitalMarketingFramework\Core\TemplateEngine\TemplateEngineAwareTrait;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
@@ -12,6 +13,9 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface,
 {
     use TemplateEngineAwareTrait;
 
+    /**
+     * @return array<string>
+     */
     protected function getTemplateNameCandidates(): array
     {
         return [
@@ -20,12 +24,17 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface,
         ];
     }
 
+    /**
+     * @param array<string,string|ValueInterface> $data
+     *
+     * @return array<string,mixed>
+     */
     protected function getPreviewData(array $data): array
     {
         return [
             'dataDispatcher' => $this,
             'keyword' => $this->getKeyword(),
-            'class' => $this::class,
+            'class' => static::class,
             'data' => $data,
         ];
     }

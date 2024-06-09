@@ -181,6 +181,9 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         return true;
     }
 
+    /**
+     * @return array<string>
+     */
     protected function getTemplateNameCandidates(): array
     {
         return [
@@ -189,12 +192,15 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         ];
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     protected function getPreviewData(): array
     {
         $viewData = [
             'outboundRoute' => $this,
             'keyword' => $this->getKeyword(),
-            'class' => $this::class,
+            'class' => static::class,
             'skipped' => false,
             'enabled' => true,
             'allowed' => true,
