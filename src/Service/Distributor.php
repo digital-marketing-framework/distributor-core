@@ -104,6 +104,38 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         }
     }
 
+    public function previewJobProcess(JobInterface $job): string
+    {
+        $contextPushed = false;
+        try {
+            $submission = $this->queueDataFactory->convertJobToSubmission($job);
+            $submission->getContext()->setResponsive(false);
+
+            $this->registry->pushContext($submission->getContext());
+            $contextPushed = true;
+
+            $routeId = $this->queueDataFactory->getJobRouteId($job);
+            $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
+            $route = $this->registry->getOutboundRoute($submission, $integrationName, $routeId);
+            if (!$route instanceof OutboundRouteInterface) {
+                return $this->registry->renderErrorMessage(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
+            }
+
+            $this->processDataProviders($submission, $route->getEnabledDataProviders());
+
+            $result = $route->preview();
+            $this->registry->popContext();
+
+            return $result;
+        } catch (DigitalMarketingFrameworkException $e) {
+            if ($contextPushed) {
+                $this->registry->popContext();
+            }
+
+            return $this->registry->renderErrorMessage($e->getMessage());
+        }
+    }
+
     public function process(SubmissionDataSetInterface $submission): void
     {
         $this->addContext($submission);
