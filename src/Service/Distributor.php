@@ -60,13 +60,17 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
     /**
      * @param array<string> $enabledDataProviders
      */
-    protected function processDataProviders(SubmissionDataSetInterface $submission, array $enabledDataProviders = ['*']): void
+    protected function processDataProviders(SubmissionDataSetInterface $submission, array $enabledDataProviders = ['*'], bool $preview = false): void
     {
         $dataProviders = $this->registry->getDataProviders($submission);
         foreach ($dataProviders as $dataProvider) {
             $keyword = $dataProvider->getKeyword();
             if (RestrictedTermsSchema::isTermAllowed($enabledDataProviders, $keyword)) {
-                $dataProvider->addData();
+                if ($preview) {
+                    $dataProvider->addDataForPreview();
+                } else {
+                    $dataProvider->addData();
+                }
             }
         }
     }
@@ -121,7 +125,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
                 return $this->registry->renderErrorMessage(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
             }
 
-            $this->processDataProviders($submission, $route->getEnabledDataProviders());
+            $this->processDataProviders($submission, $route->getEnabledDataProviders(), preview: true);
 
             $result = $route->preview();
             $this->registry->popContext();

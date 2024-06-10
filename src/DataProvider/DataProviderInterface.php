@@ -14,5 +14,7 @@ interface DataProviderInterface extends ConfigurablePluginInterface
 
     public function addData(): void;
 
+    public function addDataForPreview(): void;
+
     public static function getSchema(): SchemaInterface;
 }

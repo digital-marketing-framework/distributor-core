@@ -123,6 +123,11 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
         }
     }
 
+    public function addDataForPreview(): void
+    {
+        $this->addData();
+    }
+
     public function addContext(WriteableContextInterface $context): void
     {
         if ($this->enabled()) {
