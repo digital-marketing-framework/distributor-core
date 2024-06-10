@@ -24,18 +24,22 @@ use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsS
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\Plugin\DataProcessor\ConditionSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
+use DigitalMarketingFramework\Core\TemplateEngine\TemplateEngineAwareInterface;
+use DigitalMarketingFramework\Core\TemplateEngine\TemplateEngineAwareTrait;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Plugin\IntegrationPlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\TemplateEngineTwig\TemplateEngine\TwigTemplateEngine;
 
-abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface
+abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface, TemplateEngineAwareInterface
 {
     use DataProcessorAwareTrait;
     use ContextAwareTrait;
     use DataPrivacyManagerAwareTrait;
+    use TemplateEngineAwareTrait;
 
     public const KEY_ENABLE_DATA_PROVIDERS = 'enableDataProviders';
 
@@ -175,6 +179,69 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         $dataDispatcher->send($data->toArray());
 
         return true;
+    }
+
+    /**
+     * @return array<string>
+     */
+    protected function getTemplateNameCandidates(): array
+    {
+        return [
+            sprintf('preview/outbound-route/%s.html.twig', GeneralUtility::camelCaseToDashed($this->getKeyword())),
+            'preview/outbound-route/default.html.twig',
+        ];
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    protected function getPreviewData(): array
+    {
+        $viewData = [
+            'outboundRoute' => $this,
+            'keyword' => $this->getKeyword(),
+            'class' => static::class,
+            'skipped' => false,
+            'enabled' => true,
+            'allowed' => true,
+            'dataDispatcherPreview' => '',
+            'error' => '',
+        ];
+
+        try {
+            if (!$this->processGate()) {
+                $viewData['skipped'] = true;
+                $viewData['enabled'] = $this->enabled();
+                $viewData['allowed'] = $this->allowed();
+            } else {
+                $data = $this->buildData();
+
+                if (GeneralUtility::isEmpty($data)) {
+                    throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->routeId));
+                }
+
+                $dataDispatcher = $this->getDispatcher();
+                $viewData['dataDispatcherPreview'] = $dataDispatcher->preview($data->toArray());
+            }
+        } catch (DigitalMarketingFrameworkException $e) {
+            $viewData['error'] = $e->getMessage();
+        }
+
+        return $viewData;
+    }
+
+    public function preview(): string
+    {
+        $viewData = $this->getPreviewData();
+
+        $templateNameCandidates = $this->getTemplateNameCandidates();
+
+        $config = [
+            TwigTemplateEngine::KEY_TEMPLATE => '',
+            TwigTemplateEngine::KEY_TEMPLATE_NAME => $templateNameCandidates,
+        ];
+
+        return $this->templateEngine->render($config, $viewData);
     }
 
     abstract protected function getDispatcher(): DataDispatcherInterface;
