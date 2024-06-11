@@ -206,6 +206,8 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
             'allowed' => true,
             'dataDispatcherPreview' => '',
             'error' => '',
+            'formData' => $this->submission->getData()->toArray(),
+            'formContext' => $this->submission->getContext()->toArray(),
         ];
 
         try {

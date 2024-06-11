@@ -1,0 +1,7 @@
+<div>
+    {% if preformatted %}
+        <pre>{{ info|raw }}</pre>
+    {% else %}
+        {{ info|raw }}
+    {% endif %}
+</div>

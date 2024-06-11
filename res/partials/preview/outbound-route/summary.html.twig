@@ -1,0 +1,18 @@
+{% if error %}
+    <p>Error: <span>{{ error }}</span></p>
+{% elseif skipped %}
+    <p>
+        Will be skipped, reason:
+        {% if not enabled %}
+            not enabled
+        {% elseif not allowed %}
+            not allowed
+        {% else %}
+            gate not passed
+        {% endif %}
+    </p>
+{% else %}
+    <p>
+        Can be processed
+    </p>
+{% endif %}

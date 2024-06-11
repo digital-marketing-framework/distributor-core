@@ -1,8 +1,17 @@
 <h3>Data Dispatcher Preview ({{ keyword }})</h3>
 
-<div>
-    <h4>Data</h4>
+{% if config is not empty %}
     <div>
-        {% include 'preview/data-table.html.twig' %}
+        <h4>Config</h4>
+        <div>
+            {% include 'preview/data-table.html.twig' with { 'tableData': config } %}
+        </div>
+    </div>
+{% endif %}
+
+<div>
+    <h4>Processed data</h4>
+    <div>
+        {% include 'preview/data-table.html.twig' with {'tableData': data, 'tableKeyHeader': 'Field', 'tableValueHeader': 'Value'} %}
     </div>
 </div>

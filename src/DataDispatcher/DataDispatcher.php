@@ -35,6 +35,7 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface,
             'dataDispatcher' => $this,
             'keyword' => $this->getKeyword(),
             'class' => static::class,
+            'config' => [],
             'data' => $data,
         ];
     }

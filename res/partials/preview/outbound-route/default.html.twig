@@ -1,0 +1,15 @@
+<h3>Outbound Route Preview ({{ keyword }})</h3>
+
+<h4>Status</h4>
+{% set summary = include('preview/outbound-route/summary.html.twig') %}
+{% include 'preview/info-box.html.twig' with {'info': summary} %}
+
+{% if not error and not skipped %}
+    {{ dataDispatcherPreview|raw }}
+{% endif %}
+
+<h4>Original form data</h4>
+{% include 'preview/data-table.html.twig' with {'tableData': formData, 'tableKeyHeader': 'Field', 'tableValueHeader': 'Value' } %}
+
+<h4>Original form context</h4>
+{% include 'preview/data-table.html.twig' with {'tableData': formContext, 'tableKeyHeader': 'Field', 'tableValueHeader': 'Value' } %}
