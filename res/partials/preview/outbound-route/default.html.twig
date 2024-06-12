@@ -1,8 +1,14 @@
 <h3>Outbound Route Preview ({{ keyword }})</h3>
 
 <h4>Status</h4>
+{% set infoType = 'success' %}
+{% if error %}
+    {% set infoType = 'error' %}
+{% elseif skipped %}
+    {% set infoType = 'warning' %}
+{% endif %}
 {% set summary = include('preview/outbound-route/summary.html.twig') %}
-{% include 'preview/info-box.html.twig' with {'info': summary} %}
+{% include 'preview/info-box.html.twig' with { 'info': summary, 'infoType': infoType } %}
 
 {% if not error and not skipped %}
     {{ dataDispatcherPreview|raw }}
