@@ -16,12 +16,22 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface,
     /**
      * @return array<string>
      */
-    protected function getTemplateNameCandidates(): array
+    protected function getPreviewTemplateNameCandidates(): array
     {
         return [
             sprintf('preview/data-dispatcher/%s.html.twig', GeneralUtility::camelCaseToDashed($this->getKeyword())),
             'preview/data-dispatcher/default.html.twig',
         ];
+    }
+
+    /**
+     * @param array<string,string|ValueInterface> $data
+     *
+     * @return array<string,string|ValueInterface>
+     */
+    protected function transformDataForPreview(array $data): array
+    {
+        return $data;
     }
 
     /**
@@ -36,14 +46,14 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface,
             'keyword' => $this->getKeyword(),
             'class' => static::class,
             'config' => [],
-            'data' => $data,
+            'data' => $this->transformDataForPreview($data),
         ];
     }
 
     public function preview(array $data): string
     {
         $viewData = $this->getPreviewData($data);
-        $templateNameCandidates = $this->getTemplateNameCandidates();
+        $templateNameCandidates = $this->getPreviewTemplateNameCandidates();
 
         $config = [
             TwigTemplateEngine::KEY_TEMPLATE => '',

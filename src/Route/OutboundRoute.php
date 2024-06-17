@@ -184,7 +184,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
     /**
      * @return array<string>
      */
-    protected function getTemplateNameCandidates(): array
+    protected function getPreviewTemplateNameCandidates(): array
     {
         return [
             sprintf('preview/outbound-route/%s.html.twig', GeneralUtility::camelCaseToDashed($this->getKeyword())),
@@ -236,7 +236,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
     {
         $viewData = $this->getPreviewData();
 
-        $templateNameCandidates = $this->getTemplateNameCandidates();
+        $templateNameCandidates = $this->getPreviewTemplateNameCandidates();
 
         $config = [
             TwigTemplateEngine::KEY_TEMPLATE => '',
