@@ -7,6 +7,7 @@ use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\RequestVariablesDataProvider;
@@ -24,6 +25,7 @@ class DistributorCoreInitialization extends Initialization
         RegistryDomain::DISTRIBUTOR => [
             DataProviderInterface::class => [
                 CookieDataProvider::class,
+                DataPrivacyDataProvider::class,
                 IpAddressDataProvider::class,
                 RequestVariablesDataProvider::class,
                 TimestampDataProvider::class,
