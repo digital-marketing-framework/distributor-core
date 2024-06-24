@@ -95,6 +95,14 @@
         "ci:tests": [
             "@ci:php:tests"
         ],
+        "coding-standards:reset": [
+            "./vendor/bin/mediatis-coding-standards-setup reset",
+            "@fix:composer"
+        ],
+        "coding-standards:update": [
+            "./vendor/bin/mediatis-coding-standards-setup",
+            "@fix:composer"
+        ],
         "fix": [
             "@fix:composer",
             "@fix:php"
