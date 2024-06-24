@@ -14,7 +14,6 @@ use DigitalMarketingFramework\Core\SchemaDocument\Schema\CustomSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ListSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
-use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProvider;
 
 class DataPrivacyDataProvider extends DataProvider implements DataPrivacyManagerAwareInterface
 {
