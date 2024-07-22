@@ -59,9 +59,9 @@
       function getFormData() {
         const formData = new FormData(form)
         const data = {}
-        formData.entries().forEach(pair => {
+      for (const pair of formData.entries()) {
           data[pair[0]] = pair[1]
-        })
+      }
         return data
       }
 
