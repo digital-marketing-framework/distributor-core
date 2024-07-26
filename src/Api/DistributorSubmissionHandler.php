@@ -13,6 +13,7 @@ use DigitalMarketingFramework\Core\Log\LoggerAwareInterface;
 use DigitalMarketingFramework\Core\Log\LoggerAwareTrait;
 use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
+use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
@@ -65,7 +66,12 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
             $submission = new SubmissionDataSet($data, $configuration);
             $submission->getContext()->setResponsive($responsive);
-            $this->distributor->process($submission);
+            $jobs = $this->distributor->process($submission);
+            foreach ($jobs as $job) {
+                if ($job->getStatus() === QueueInterface::STATUS_FAILED) {
+                    throw new DigitalMarketingFrameworkException($job->getStatusMessage());
+                }
+            }
 
             if ($submission->getContext()->isResponsive()) {
                 $submission->getContext()->applyResponseData();

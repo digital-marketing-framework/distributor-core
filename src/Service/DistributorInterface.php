@@ -8,7 +8,10 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 
 interface DistributorInterface extends WorkerInterface
 {
-    public function process(SubmissionDataSetInterface $submission): void;
+    /**
+     * @return array<JobInterface>
+     */
+    public function process(SubmissionDataSetInterface $submission): array;
 
     public function previewJobProcess(JobInterface $job): string;
 }

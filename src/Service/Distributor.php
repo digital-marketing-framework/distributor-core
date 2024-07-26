@@ -140,12 +140,13 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         }
     }
 
-    public function process(SubmissionDataSetInterface $submission): void
+    public function process(SubmissionDataSetInterface $submission): array
     {
         $this->addContext($submission);
 
         $syncPersistentJobs = [];
         $syncTemporaryJobs = [];
+        $allJobs = [];
         $routes = $this->registry->getOutboundRoutes($submission);
 
         foreach ($routes as $route) {
@@ -171,6 +172,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
                 $status
             );
             $job = $queue->addJob($job);
+            $allJobs[] = $job;
             if (!$async) {
                 if ($enableStorage) {
                     $syncPersistentJobs[] = $job;
@@ -189,5 +191,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             $processor = $this->registry->getQueueProcessor($this->persistentQueue, $this);
             $processor->processJobs($syncPersistentJobs);
         }
+
+        return $allJobs;
     }
 }
