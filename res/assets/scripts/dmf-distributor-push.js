@@ -41,7 +41,7 @@
 
   function initElement(element, plugin) {
     const form = element.closest('form')
-    const behaviour = element.dataset[prefix + 'PluginBehaviour'] || 'hide'
+    const behaviour = element.dataset[prefix + 'PluginBehaviour'] || ''
     const snippets = DMF.getPluginSnippets(element)
 
     if (form === null) {
@@ -77,6 +77,19 @@
 
     async function handleSubmit(event) {
       event.preventDefault()
+
+      const submitter = event.submitter
+      if (submitter) {
+        const name = submitter.dataset[prefix + 'Name']
+        const value = submitter.dataset[prefix + 'Value']
+        if (name && value) {
+          const input = form.querySelector('input[name="' + name + '"]')
+          if (input !== null) {
+            input.value = value
+          }
+        }
+      }
+
       const data = getFormData()
       const response = await plugin.push(data)
       if (behaviour === 'hide') {
