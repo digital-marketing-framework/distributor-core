@@ -17,6 +17,7 @@ use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Plugin\ConfigurablePlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
 
 abstract class DataProvider extends ConfigurablePlugin implements DataProviderInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface
 {
@@ -138,7 +139,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     public static function getSchema(): SchemaInterface
     {
         $schema = new ContainerSchema();
-        $schema->getRenderingDefinition()->setIcon('data-provider');
+        $schema->getRenderingDefinition()->setIcon(Icon::DATA_PROVIDER);
 
         $label = static::getLabel();
         if ($label !== null) {

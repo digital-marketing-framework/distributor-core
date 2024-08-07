@@ -18,6 +18,7 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegi
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\ApiRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
@@ -51,7 +52,7 @@ class Registry extends CoreRegistry implements RegistryInterface
 
         // general outbound settings
         $generalOutboundConfiguration = new ContainerSchema();
-        $generalOutboundConfiguration->getRenderingDefinition()->setIcon('outbound-routes');
+        $generalOutboundConfiguration->getRenderingDefinition()->setIcon(Icon::OUTBOUND_ROUTES);
         $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ASYNC, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ASYNC));
         $generalOutboundConfiguration->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, new BooleanSchema(DistributorConfigurationInterface::DEFAULT_ENABLE_STORAGE));
 

@@ -6,6 +6,7 @@ use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\DataProvider\DataProviderSchema;
 
 trait DataProviderRegistryTrait
@@ -36,7 +37,7 @@ trait DataProviderRegistryTrait
     {
         $schema = new DataProviderSchema();
         $schema->getRenderingDefinition()->setLabel('Additional Data');
-        $schema->getRenderingDefinition()->setIcon('data-providers');
+        $schema->getRenderingDefinition()->setIcon(Icon::DATA_PROVIDERS);
         $schema->getRenderingDefinition()->setGeneralDescription('Additional data can be provided for outbound routes, like form submissions. The data is derived from the context of the request that triggered the route, like the website language or the timestamp or request cookies or headers.');
         $schema->getRenderingDefinition()->setHint('Data providers are configured globally, but you can enable or disable them individually for each outbound route.');
         foreach ($this->getAllPluginClasses(DataProviderInterface::class) as $key => $class) {

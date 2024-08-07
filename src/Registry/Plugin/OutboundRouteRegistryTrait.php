@@ -11,6 +11,7 @@ use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
+use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\Schema\Plugin\Route\OutboundRouteSchema;
 
 trait OutboundRouteRegistryTrait
@@ -67,7 +68,7 @@ trait OutboundRouteRegistryTrait
                 $routeListSchema = new ListSchema(new CustomSchema(OutboundRouteSchema::TYPE));
 
                 $routeListSchema->getRenderingDefinition()->setLabel($integrationInfo->getOutboundRouteListLabel());
-                $routeListSchema->getRenderingDefinition()->setIcon('outbound-routes');
+                $routeListSchema->getRenderingDefinition()->setIcon(Icon::OUTBOUND_ROUTES);
                 $integrationSchema->addProperty(DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES, $routeListSchema);
             }
 
