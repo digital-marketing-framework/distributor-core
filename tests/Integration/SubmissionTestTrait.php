@@ -102,7 +102,12 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
      */
     protected function addDataMapperGroupConfiguration(string $dataMapperGroupName, string $dataMapperGroupId, int $weight, array $configuration, int $index = 0): void
     {
-        $this->submissionConfiguration[$index][ConfigurationInterface::KEY_DATA_PROCESSING][ConfigurationInterface::KEY_DATA_MAPPER_GROUPS][$dataMapperGroupId] = $this->createMapItem($dataMapperGroupName, $configuration, $dataMapperGroupId, $weight);
+        $this->submissionConfiguration[$index][ConfigurationInterface::KEY_DATA_PROCESSING][ConfigurationInterface::KEY_DATA_MAPPER_GROUPS][$dataMapperGroupId] = static::createMapItem(
+            $dataMapperGroupName,
+            $configuration,
+            $dataMapperGroupId,
+            $weight
+        );
     }
 
     /**
@@ -135,7 +140,7 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     protected function addRouteConfiguration(string $routeName, string $routeId, int $weight, array $configuration, int $index = 0, string $integrationName = 'integration1'): void
     {
         $this->updateRouteConfiguration($configuration);
-        $this->submissionConfiguration[$index]['integrations'][$integrationName][DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES][$routeId] = $this->createListItem([
+        $this->submissionConfiguration[$index]['integrations'][$integrationName][DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES][$routeId] = static::createListItem([
             'type' => $routeName,
             'pass' => '',
             'config' => [

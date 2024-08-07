@@ -49,10 +49,12 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
         // init plugins
         $distributorCoreInitialization = new DistributorCoreInitialization();
         $distributorCoreInitialization->initMetaData($this->registry);
-        $distributorCoreInitialization->initGlobalConfiguration(RegistryDomain::CORE, $this->registry);
-        $distributorCoreInitialization->initGlobalConfiguration(RegistryDomain::DISTRIBUTOR, $this->registry);
-        $distributorCoreInitialization->initServices(RegistryDomain::CORE, $this->registry);
-        $distributorCoreInitialization->initServices(RegistryDomain::DISTRIBUTOR, $this->registry);
+        // NOTE core initialization has no global config or services to initialize customly
+        //      but other integrations will want to call those methods on their init object
+        // $distributorCoreInitialization->initGlobalConfiguration(RegistryDomain::CORE, $this->registry);
+        // $distributorCoreInitialization->initGlobalConfiguration(RegistryDomain::DISTRIBUTOR, $this->registry);
+        // $distributorCoreInitialization->initServices(RegistryDomain::CORE, $this->registry);
+        // $distributorCoreInitialization->initServices(RegistryDomain::DISTRIBUTOR, $this->registry);
         $distributorCoreInitialization->initPlugins(RegistryDomain::CORE, $this->registry);
         $distributorCoreInitialization->initPlugins(RegistryDomain::DISTRIBUTOR, $this->registry);
     }

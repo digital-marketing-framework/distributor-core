@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Route;
 
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
 use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
@@ -24,6 +25,11 @@ class GenericRoute extends OutboundRoute
     public static function getDefaultIntegrationInfo(): IntegrationInfo
     {
         return new IntegrationInfo('generic');
+    }
+
+    public function addContext(WriteableContextInterface $context): void
+    {
+        $context['genericContextKey'] = 'genericContextValue';
     }
 
     protected function getDispatcher(): DataDispatcherInterface

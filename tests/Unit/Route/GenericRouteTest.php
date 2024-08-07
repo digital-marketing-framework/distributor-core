@@ -95,7 +95,7 @@ class GenericRouteTest extends TestCase
     }
 
     /** @test */
-    public function addContextShouldNotAddAnyContextByDefault(): void
+    public function addContext(): void
     {
         $this->submissionData['field1'] = 'value1';
         $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
@@ -106,6 +106,7 @@ class GenericRouteTest extends TestCase
 
         $contextBefore = $this->submissionContext->toArray();
         $this->subject->addContext($this->submissionContext);
+        $contextBefore['genericContextKey'] = 'genericContextValue';
         $this->assertEquals($contextBefore, $this->submissionContext->toArray());
     }
 

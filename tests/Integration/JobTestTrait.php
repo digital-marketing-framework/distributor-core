@@ -34,7 +34,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
         $weight = 10;
         foreach ($routeConfigs as $routeId => $routeConfig) {
             $this->updateRouteConfiguration($routeConfig); // TODO located in SubmissionTestTrait, cleanup these test traits!
-            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['integrations'][$jobRouteIntegrationName]['outboundRoutes'][$routeId] = $this->createListItem([
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['integrations'][$jobRouteIntegrationName]['outboundRoutes'][$routeId] = static::createListItem([
                 'type' => 'generic',
                 'config' => [
                     'generic' => $routeConfig,
@@ -45,7 +45,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 
         $weight = 10;
         foreach ($dataMapperGroupConfigs as $dataMapperGroupId => $dataMapperGroupConfig) {
-            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataProcessing']['dataMapperGroups'][$dataMapperGroupId] = $this->createMapItem(
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataProcessing']['dataMapperGroups'][$dataMapperGroupId] = static::createMapItem(
                 $dataMapperGroupId . 'Name',
                 $dataMapperGroupConfig,
                 $dataMapperGroupId,
@@ -56,7 +56,7 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
 
         $weight = 10;
         foreach ($conditionConfigs as $conditionId => $conditionConfig) {
-            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataProcessing']['conditions'][$conditionId] = $this->createMapItem(
+            $data[QueueDataFactory::KEY_SUBMISSION]['configuration']['dataProcessing']['conditions'][$conditionId] = static::createMapItem(
                 $conditionId . 'Name',
                 $conditionConfig,
                 $conditionId,
