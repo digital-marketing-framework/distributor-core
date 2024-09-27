@@ -53,7 +53,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
-        bool $responsive = false
+        bool $responsive = false,
     ): void {
         if (is_array($context)) {
             $context = new WriteableContext($context);
@@ -92,7 +92,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
     public function submitToEndPoint(
         EndPointInterface $endPoint,
         array|DataInterface $data,
-        array|ContextInterface|null $context = null
+        array|ContextInterface|null $context = null,
     ): void {
         if (!$endPoint->getEnabled()) {
             $this->handleException('End point not found or disabled', 404);

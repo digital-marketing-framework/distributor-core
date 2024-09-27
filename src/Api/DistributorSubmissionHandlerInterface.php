@@ -18,7 +18,7 @@ interface DistributorSubmissionHandlerInterface
     public function submit(
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
-        array|ContextInterface|null $context = null
+        array|ContextInterface|null $context = null,
     ): void;
 
     /**
@@ -28,7 +28,7 @@ interface DistributorSubmissionHandlerInterface
     public function submitToEndPoint(
         EndPointInterface $endPoint,
         array|DataInterface $data,
-        array|ContextInterface|null $context = null
+        array|ContextInterface|null $context = null,
     ): void;
 
     /**

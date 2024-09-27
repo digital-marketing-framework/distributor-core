@@ -13,7 +13,7 @@ class SpiedOnGenericDataProvider extends DataProvider
         string $keyword,
         RegistryInterface $registry,
         SubmissionDataSetInterface $submission,
-        public DataProviderSpyInterface $spy
+        public DataProviderSpyInterface $spy,
     ) {
         parent::__construct($keyword, $registry, $submission);
     }

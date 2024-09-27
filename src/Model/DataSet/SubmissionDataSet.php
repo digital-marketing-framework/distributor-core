@@ -26,7 +26,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
     public function __construct(
         array|DataInterface $data,
         array|DistributorConfigurationInterface $configurationList = [],
-        array|WriteableContextInterface $context = []
+        array|WriteableContextInterface $context = [],
     ) {
         $this->data = $data instanceof DataInterface
             ? $data

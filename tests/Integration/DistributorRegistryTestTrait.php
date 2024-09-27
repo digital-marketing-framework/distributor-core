@@ -4,6 +4,8 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
 use DigitalMarketingFramework\Core\DataPrivacy\UnregulatedDataPrivacyPlugin;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
+use DigitalMarketingFramework\Core\Registry\RegistryCollection;
+use DigitalMarketingFramework\Core\Registry\RegistryCollectionInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Core\Tests\Integration\RegistryTestTrait;
 use DigitalMarketingFramework\Distributor\Core\DistributorCoreInitialization;
@@ -20,6 +22,8 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
 
     protected Registry $registry;
 
+    protected RegistryCollectionInterface $registryCollection;
+
     protected QueueInterface&MockObject $queue;
 
     protected QueueInterface&MockObject $temporaryQueue;
@@ -28,7 +32,9 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
 
     protected function createRegistry(): void
     {
+        $this->registryCollection = new RegistryCollection();
         $this->registry = new Registry();
+        $this->registry->setRegistryCollection($this->registryCollection);
     }
 
     protected function initRegistry(): void

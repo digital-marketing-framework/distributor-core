@@ -125,7 +125,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
         SubmissionDataSetInterface $submission,
         string $integrationName,
         string $routeId,
-        int $status = QueueInterface::STATUS_QUEUED
+        int $status = QueueInterface::STATUS_QUEUED,
     ): JobInterface {
         $submissionData = $this->pack($submission);
         $job = $this->createJob();

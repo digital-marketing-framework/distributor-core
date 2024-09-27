@@ -41,7 +41,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
-        protected SubmissionDataSetInterface $submission
+        protected SubmissionDataSetInterface $submission,
     ) {
         parent::__construct($keyword, $registry);
         $this->configuration = $this->submission->getConfiguration()->getDataProviderConfiguration($this->getKeyword());

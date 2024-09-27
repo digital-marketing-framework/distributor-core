@@ -10,7 +10,7 @@ class SpiedOnDataDispatcher extends DataDispatcher
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
-        public DataDispatcherSpyInterface $spy
+        public DataDispatcherSpyInterface $spy,
     ) {
         parent::__construct($keyword, $registry);
     }

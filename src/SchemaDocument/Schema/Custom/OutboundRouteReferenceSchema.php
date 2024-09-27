@@ -17,7 +17,7 @@ class OutboundRouteReferenceSchema extends IntegrationReferenceSchema
     public function __construct(
         protected int $integrationNestingLevel = -1,
         mixed $defaultValue = null,
-        bool $required = true
+        bool $required = true,
     ) {
         parent::__construct($defaultValue, $required);
 
