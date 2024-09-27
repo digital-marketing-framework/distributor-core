@@ -308,7 +308,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         $enableStorageSchema->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
         $schema->addProperty(DistributorConfigurationInterface::KEY_ENABLE_STORAGE, $enableStorageSchema);
 
-        $enableDataProviders = new RestrictedTermsSchema('/distributor/dataProviders/*');
+        $enableDataProviders = new RestrictedTermsSchema('/dataProcessing/dataProviders/*');
         $enableDataProviders->getTypeSchema()->getRenderingDefinition()->setLabel('Enable Data Providers');
         $enableDataProviders->getRenderingDefinition()->setSkipHeader(true);
         $enableDataProviders->getRenderingDefinition()->setGroup(RenderingDefinitionInterface::GROUP_SECONDARY);
