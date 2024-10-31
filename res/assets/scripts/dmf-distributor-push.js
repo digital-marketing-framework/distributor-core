@@ -1,6 +1,6 @@
 ;(async function () {
 
-  async function initDMF() {
+  async function loadDMF() {
     setTimeout(() => {
       document.dispatchEvent(new Event('dmf-request-ready'))
     }, 0)
@@ -11,21 +11,9 @@
     })
   }
 
-  const DMF = await initDMF()
+  const DMF = await loadDMF()
   const prefix = DMF.settings.prefix
   const listeners = []
-
-  function show(element) {
-    if (typeof element !== 'undefined') {
-      element.style.display = ''
-    }
-  }
-
-  function hide(element) {
-    if (typeof element !== 'undefined') {
-      element.style.display = 'none'
-    }
-  }
 
   function reset() {
     while (listeners.length > 0) {
@@ -39,10 +27,10 @@
     listeners.push({element, event, handler})
   }
 
-  function initElement(element, plugin) {
-    const form = element.closest('form')
-    const behaviour = element.dataset[prefix + 'PluginBehaviour'] || ''
-    const snippets = DMF.getPluginSnippets(element)
+  function initElement(plugin) {
+    const form = plugin.element.closest('form')
+    const behaviour = plugin.settings.behaviour
+    const snippets = plugin.getSnippets()
 
     if (form === null) {
       return
@@ -51,15 +39,15 @@
     function handleReset(event) {
       event.preventDefault()
       if (snippets.reset) {
-        hide(snippets.reset)
+        plugin.hide(snippets.reset)
       }
       if (snippets.success) {
-        hide(snippets.success)
+        plugin.hide(snippets.success)
       }
       if (snippets.error) {
-        hide(snippets.error);
+        plugin.hide(snippets.error);
       }
-      show(element)
+      plugin.show()
     }
 
     if (snippets.reset) {
@@ -69,8 +57,8 @@
     function getFormData() {
       const formData = new FormData(form)
       const data = {}
-      for (const pair of formData.entries()) {
-        data[pair[0]] = pair[1]
+      for (let [name, value] of formData.entries()) {
+        data[name] = value
       }
       return data
     }
@@ -93,15 +81,15 @@
       const data = getFormData()
       const response = await plugin.push(data)
       if (behaviour === 'hide') {
-        hide(element)
+        plugin.hide()
       }
-      show(snippets.reset)
+      plugin.show(snippets.reset)
       if (response.status.code === 200) {
-        show(snippets.success)
-        hide(snippets.error)
+        plugin.show(snippets.success)
+        plugin.hide(snippets.error)
       } else {
-        hide(snippets.success)
-        show(snippets.error)
+        plugin.hide(snippets.success)
+        plugin.show(snippets.error)
       }
       DMF.refresh()
     }
@@ -111,11 +99,7 @@
 
   function initAllElements() {
     reset()
-    DMF.getAllPluginInstancesWithElements(
-      'distributor'
-    ).forEach(({ element, plugin }) => {
-      initElement(element, plugin)
-    })
+    DMF.plugins('distributor').forEach(initElement)
   }
 
   initAllElements()
