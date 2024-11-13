@@ -1,4 +1,8 @@
 ;(async function () {
+  const EVENT_FORM_SUBMIT = 'dmf-form-submit'
+  const EVENT_FORM_SUBMIT_SUCCESS = 'dmf-form-submit-success'
+  const EVENT_FORM_SUBMIT_ERROR = 'dmf-form-submit-error'
+  const EVENT_FORM_SUBMIT_RESET = 'dmf-form-reset'
 
   async function loadDMF() {
     setTimeout(() => {
@@ -30,28 +34,26 @@
   function initElement(plugin) {
     const form = plugin.element.closest('form')
     const behaviour = plugin.settings.behaviour
-    const snippets = plugin.getSnippets()
 
     if (form === null) {
       return
     }
 
+    function trigger(name, payload = {}) {
+      form.dispatchEvent(new CustomEvent(name, {detail: payload}));
+    }
+
     function handleReset(event) {
       event.preventDefault()
-      if (snippets.reset) {
-        plugin.hide(snippets.reset)
-      }
-      if (snippets.success) {
-        plugin.hide(snippets.success)
-      }
-      if (snippets.error) {
-        plugin.hide(snippets.error);
-      }
+      plugin.hide('reset')
+      plugin.hide('success')
+      plugin.hide('error')
       plugin.show()
     }
 
-    if (snippets.reset) {
-      addEventListener(snippets.reset, 'click', handleReset)
+    const reset = plugin.snippet('reset')
+    if (reset) {
+      addEventListener(reset, 'click', handleReset)
     }
 
     function getFormData() {
@@ -79,17 +81,20 @@
       }
 
       const data = getFormData()
+      trigger(EVENT_FORM_SUBMIT, data)
       const response = await plugin.push(data)
       if (behaviour === 'hide') {
         plugin.hide()
+        plugin.show('reset')
       }
-      plugin.show(snippets.reset)
       if (response.status.code === 200) {
-        plugin.show(snippets.success)
-        plugin.hide(snippets.error)
+        trigger(EVENT_FORM_SUBMIT_SUCCESS, data)
+        plugin.show('success')
+        plugin.hide('error')
       } else {
-        plugin.hide(snippets.success)
-        plugin.show(snippets.error)
+        trigger(EVENT_FORM_SUBMIT_ERROR, data)
+        plugin.hide('success')
+        plugin.show('error')
       }
       DMF.refresh()
     }
