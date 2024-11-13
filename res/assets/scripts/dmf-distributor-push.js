@@ -1,6 +1,10 @@
 ;(async function () {
+  const EVENT_FORM_SUBMIT = 'dmf-form-submit'
+  const EVENT_FORM_SUBMIT_SUCCESS = 'dmf-form-submit-success'
+  const EVENT_FORM_SUBMIT_ERROR = 'dmf-form-submit-error'
+  const EVENT_FORM_SUBMIT_RESET = 'dmf-form-reset'
 
-  async function initDMF() {
+  async function loadDMF() {
     setTimeout(() => {
       document.dispatchEvent(new Event('dmf-request-ready'))
     }, 0)
@@ -11,21 +15,9 @@
     })
   }
 
-  const DMF = await initDMF()
+  const DMF = await loadDMF()
   const prefix = DMF.settings.prefix
   const listeners = []
-
-  function show(element) {
-    if (typeof element !== 'undefined') {
-      element.style.display = ''
-    }
-  }
-
-  function hide(element) {
-    if (typeof element !== 'undefined') {
-      element.style.display = 'none'
-    }
-  }
 
   function reset() {
     while (listeners.length > 0) {
@@ -39,38 +31,36 @@
     listeners.push({element, event, handler})
   }
 
-  function initElement(element, plugin) {
-    const form = element.closest('form')
-    const behaviour = element.dataset[prefix + 'PluginBehaviour'] || ''
-    const snippets = DMF.getPluginSnippets(element)
+  function initElement(plugin) {
+    const form = plugin.element.closest('form')
+    const behaviour = plugin.settings.behaviour
 
     if (form === null) {
       return
     }
 
-    function handleReset(event) {
-      event.preventDefault()
-      if (snippets.reset) {
-        hide(snippets.reset)
-      }
-      if (snippets.success) {
-        hide(snippets.success)
-      }
-      if (snippets.error) {
-        hide(snippets.error);
-      }
-      show(element)
+    function trigger(name, payload = {}) {
+      form.dispatchEvent(new CustomEvent(name, {detail: payload}));
     }
 
-    if (snippets.reset) {
-      addEventListener(snippets.reset, 'click', handleReset)
+    function handleReset(event) {
+      event.preventDefault()
+      plugin.hide('reset')
+      plugin.hide('success')
+      plugin.hide('error')
+      plugin.show()
+    }
+
+    const reset = plugin.snippet('reset')
+    if (reset) {
+      addEventListener(reset, 'click', handleReset)
     }
 
     function getFormData() {
       const formData = new FormData(form)
       const data = {}
-      for (const pair of formData.entries()) {
-        data[pair[0]] = pair[1]
+      for (let [name, value] of formData.entries()) {
+        data[name] = value
       }
       return data
     }
@@ -91,17 +81,20 @@
       }
 
       const data = getFormData()
+      trigger(EVENT_FORM_SUBMIT, data)
       const response = await plugin.push(data)
       if (behaviour === 'hide') {
-        hide(element)
+        plugin.hide()
+        plugin.show('reset')
       }
-      show(snippets.reset)
       if (response.status.code === 200) {
-        show(snippets.success)
-        hide(snippets.error)
+        trigger(EVENT_FORM_SUBMIT_SUCCESS, data)
+        plugin.show('success')
+        plugin.hide('error')
       } else {
-        hide(snippets.success)
-        show(snippets.error)
+        trigger(EVENT_FORM_SUBMIT_ERROR, data)
+        plugin.hide('success')
+        plugin.show('error')
       }
       DMF.refresh()
     }
@@ -111,11 +104,7 @@
 
   function initAllElements() {
     reset()
-    DMF.getAllPluginInstancesWithElements(
-      'distributor'
-    ).forEach(({ element, plugin }) => {
-      initElement(element, plugin)
-    })
+    DMF.plugins('distributor').forEach(initElement)
   }
 
   initAllElements()
