@@ -32,6 +32,10 @@
   }
 
   function initElement(plugin) {
+    if (plugin.settings.manualProcessing) {
+      return
+    }
+
     const form = plugin.element.closest('form')
     const behaviour = plugin.settings.behaviour
 
@@ -51,10 +55,9 @@
       plugin.show()
     }
 
-    const reset = plugin.snippet('reset')
-    if (reset) {
+    plugin.snippet('reset').forEach(reset => {
       addEventListener(reset, 'click', handleReset)
-    }
+    })
 
     function getFormData() {
       const formData = new FormData(form)
