@@ -17,21 +17,8 @@
 
   const DMF = await loadDMF()
   const prefix = DMF.settings.prefix
-  const listeners = []
 
-  function reset() {
-    while (listeners.length > 0) {
-      const { element, event, handler } = listeners.pop()
-      element.removeEventListener(event, handler)
-    }
-  }
-
-  function addEventListener(element, event, handler) {
-    element.addEventListener(event, handler)
-    listeners.push({element, event, handler})
-  }
-
-  function initElement(plugin) {
+  function initPushPlugin(plugin) {
     if (plugin.settings.manualProcessing) {
       return
     }
@@ -55,9 +42,7 @@
       plugin.show()
     }
 
-    plugin.snippet('reset').forEach(reset => {
-      addEventListener(reset, 'click', handleReset)
-    })
+    plugin.on('click', handleReset, 'reset')
 
     function getFormData() {
       const formData = new FormData(form)
@@ -102,14 +87,8 @@
       DMF.refresh()
     }
 
-    addEventListener(form, 'submit', handleSubmit)
+    plugin.on('submit', handleSubmit, form)
   }
 
-  function initAllElements() {
-    reset()
-    DMF.plugins('distributor').forEach(initElement)
-  }
-
-  initAllElements()
-  DMF.onRefresh(initAllElements);
+  DMF.plugins('distributor', initPushPlugin)
 })()
