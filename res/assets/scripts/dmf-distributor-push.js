@@ -4,6 +4,8 @@
   const EVENT_FORM_SUBMIT_ERROR = 'dmf-form-submit-error'
   const EVENT_FORM_SUBMIT_RESET = 'dmf-form-reset'
 
+  const CLASS_SUBMITTING = 'submitting-form'
+
   async function loadDMF() {
     setTimeout(() => {
       document.dispatchEvent(new Event('dmf-request-ready'))
@@ -70,11 +72,16 @@
 
       const data = getFormData()
       trigger(EVENT_FORM_SUBMIT, data)
+
+      form.classList.add(CLASS_SUBMITTING)
       const response = await plugin.push(data)
+      form.classList.remove(CLASS_SUBMITTING)
+
       if (behaviour === 'hide') {
         plugin.hide()
         plugin.show('reset')
       }
+
       if (response.status.code === 200) {
         trigger(EVENT_FORM_SUBMIT_SUCCESS, data)
         plugin.show('success')
@@ -84,6 +91,7 @@
         plugin.hide('success')
         plugin.show('error')
       }
+
       DMF.refresh()
     }
 
