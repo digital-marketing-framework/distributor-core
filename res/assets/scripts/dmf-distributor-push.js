@@ -18,7 +18,6 @@
   }
 
   const DMF = await loadDMF()
-  const prefix = DMF.settings.prefix
 
   function initPushPlugin(plugin) {
     if (plugin.settings.manualProcessing) {
@@ -32,10 +31,6 @@
       return
     }
 
-    function trigger(name, payload = {}) {
-      form.dispatchEvent(new CustomEvent(name, {detail: payload}));
-    }
-
     function handleReset(event) {
       event.preventDefault()
       plugin.hide('reset')
@@ -46,22 +41,21 @@
 
     plugin.on('click', handleReset, 'reset')
 
-    function getFormData() {
-      const formData = new FormData(form)
-      const data = {}
-      for (let [name, value] of formData.entries()) {
-        data[name] = value
-      }
-      return data
-    }
-
     async function handleSubmit(event) {
       event.preventDefault()
 
+      if (DMF.getPluginAttribute(form, 'disabled')) {
+        return
+      }
+
       const submitter = event.submitter
       if (submitter) {
-        const name = submitter.dataset[prefix + 'Name']
-        const value = submitter.dataset[prefix + 'Value']
+        if (DMF.getPluginAttribute(submitter, 'disabled')) {
+          return
+        }
+
+        const name = DMF.getPluginAttribute(submitter, 'name')
+        const value = DMF.getPluginAttribute(submitter, 'value')
         if (name && value) {
           const input = form.querySelector('input[name="' + name + '"]')
           if (input !== null) {
@@ -70,8 +64,8 @@
         }
       }
 
-      const data = getFormData()
-      trigger(EVENT_FORM_SUBMIT, data)
+      const data = DMF.getFormData(form)
+      DMF.trigger(form, EVENT_FORM_SUBMIT, data)
 
       form.classList.add(CLASS_SUBMITTING)
       const response = await plugin.push(data)
@@ -83,11 +77,11 @@
       }
 
       if (response.status.code === 200) {
-        trigger(EVENT_FORM_SUBMIT_SUCCESS, data)
+        DMF.trigger(form, EVENT_FORM_SUBMIT_SUCCESS, data)
         plugin.show('success')
         plugin.hide('error')
       } else {
-        trigger(EVENT_FORM_SUBMIT_ERROR, data)
+        DMF.trigger(form, EVENT_FORM_SUBMIT_ERROR, data)
         plugin.hide('success')
         plugin.show('error')
       }
