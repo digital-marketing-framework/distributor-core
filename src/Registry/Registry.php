@@ -12,6 +12,7 @@ use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
+use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryTrait;
@@ -33,7 +34,11 @@ class Registry extends CoreRegistry implements RegistryInterface
 
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
     {
-        return $this->createObject(QueueProcessor::class, [$queue, $worker]);
+        return $this->createObject(QueueProcessor::class, [
+            $queue,
+            $worker,
+            $this->getGlobalConfiguration()->getGlobalSettings(QueueSettings::class),
+        ]);
     }
 
     public function getDistributor(): DistributorInterface

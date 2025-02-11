@@ -3,6 +3,7 @@
 namespace DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema;
 
 use DigitalMarketingFramework\Core\GlobalConfiguration\Schema\GlobalConfigurationSchema;
+use DigitalMarketingFramework\Core\Queue\GlobalConfiguration\Schema\QueueSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\IntegerSchema;
@@ -10,12 +11,6 @@ use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
 
 class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
 {
-    public const KEY_QUEUE = 'queue';
-
-    public const KEY_QUEUE_EXPIRATION_TIME = 'expirationTime';
-
-    public const DEFAULT_QUEUE_EXPIRATION_TIME = 30;
-
     public const KEY_FILE_UPLOAD = 'fileUpload';
 
     public const KEY_FILE_UPLOAD_DISABLE_PROCESSING = 'disableProcessing';
@@ -51,8 +46,8 @@ class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
         parent::__construct();
         $this->getRenderingDefinition()->setLabel('Distributor');
 
-        $this->queueSchema = $this->getQueueSchema();
-        $this->addProperty(static::KEY_QUEUE, $this->queueSchema);
+        $this->queueSchema = new QueueSchema();
+        $this->addProperty(QueueSchema::KEY_QUEUE, $this->queueSchema);
 
         $this->fileUploadSchema = $this->getFileUploadSchema();
         $this->addProperty(static::KEY_FILE_UPLOAD, $this->fileUploadSchema);
@@ -69,6 +64,9 @@ class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
     protected function getQueueSchema(): ContainerSchema
     {
         $schema = new ContainerSchema();
+
+        $maximumExecutionTimeSchema = new IntegerSchema(static::DEFAULT_QUEUE_MAXIMUM_EXECUTION_TIME);
+        $schema->addProperty(static::KEY_QUEUE_MAXIMUM_EXECUTION_TIME, $maximumExecutionTimeSchema);
 
         $expirationTimeSchema = new IntegerSchema(static::DEFAULT_QUEUE_EXPIRATION_TIME);
         $schema->addProperty(static::KEY_QUEUE_EXPIRATION_TIME, $expirationTimeSchema);

@@ -5,6 +5,8 @@ namespace DigitalMarketingFramework\Distributor\Core\Service;
 use DigitalMarketingFramework\Core\Context\ContextAwareInterface;
 use DigitalMarketingFramework\Core\Context\ContextAwareTrait;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareTrait;
 use DigitalMarketingFramework\Core\Log\LoggerAwareInterface;
 use DigitalMarketingFramework\Core\Log\LoggerAwareTrait;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
@@ -13,19 +15,23 @@ use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\Custom\RestrictedTermsSchema;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
 
-class Distributor implements DistributorInterface, LoggerAwareInterface, ContextAwareInterface
+class Distributor implements DistributorInterface, LoggerAwareInterface, ContextAwareInterface, GlobalConfigurationAwareInterface
 {
     use LoggerAwareTrait;
     use ContextAwareTrait;
+    use GlobalConfigurationAwareTrait;
 
     protected QueueInterface $persistentQueue;
 
     protected QueueInterface $temporaryQueue;
 
     protected QueueDataFactoryInterface $queueDataFactory;
+
+    protected ?QueueSettings $queueSettings = null;
 
     public function __construct(protected RegistryInterface $registry)
     {
@@ -140,14 +146,25 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         }
     }
 
+    public function getQueueSettings(): QueueSettings
+    {
+        if (!$this->queueSettings instanceof QueueSettings) {
+            $this->queueSettings = $this->globalConfiguration->getGlobalSettings(QueueSettings::class);
+        }
+        return $this->queueSettings;
+    }
+
     public function process(SubmissionDataSetInterface $submission): array
     {
         $this->addContext($submission);
+
+        $queueSettings = $this->getQueueSettings();
 
         $syncPersistentJobs = [];
         $syncTemporaryJobs = [];
         $allJobs = [];
         $routes = $this->registry->getOutboundRoutes($submission);
+        $retryAmount = $queueSettings->rerunFailedJobEnabled() ? $queueSettings->getRerunFailedJobAmount() : 0;
 
         foreach ($routes as $route) {
             if (!$route->enabled()) {
@@ -171,6 +188,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
                 $route->getRouteId(),
                 $status
             );
+            $job->setRetryAmount($route->canRetryOnFail() ? $retryAmount : 0);
             $job = $queue->addJob($job);
             $allJobs[] = $job;
             if (!$async) {

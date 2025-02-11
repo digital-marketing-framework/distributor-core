@@ -29,7 +29,7 @@ trait QueueRegistryTrait
     public function getNonPersistentQueue(): QueueInterface
     {
         if (!isset($this->nonPersistentQueue)) {
-            $this->nonPersistentQueue = new NonPersistentQueue();
+            $this->nonPersistentQueue = $this->createObject(NonPersistentQueue::class);
         }
 
         return $this->nonPersistentQueue;
