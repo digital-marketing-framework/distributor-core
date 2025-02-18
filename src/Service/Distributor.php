@@ -151,6 +151,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         if (!$this->queueSettings instanceof QueueSettings) {
             $this->queueSettings = $this->globalConfiguration->getGlobalSettings(QueueSettings::class);
         }
+
         return $this->queueSettings;
     }
 
