@@ -6,7 +6,6 @@ use DigitalMarketingFramework\Core\GlobalConfiguration\Schema\GlobalConfiguratio
 use DigitalMarketingFramework\Core\Queue\GlobalConfiguration\Schema\QueueSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
-use DigitalMarketingFramework\Core\SchemaDocument\Schema\IntegerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
 
 class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
@@ -59,19 +58,6 @@ class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
     public function getWeight(): int
     {
         return 60;
-    }
-
-    protected function getQueueSchema(): ContainerSchema
-    {
-        $schema = new ContainerSchema();
-
-        $maximumExecutionTimeSchema = new IntegerSchema(static::DEFAULT_QUEUE_MAXIMUM_EXECUTION_TIME);
-        $schema->addProperty(static::KEY_QUEUE_MAXIMUM_EXECUTION_TIME, $maximumExecutionTimeSchema);
-
-        $expirationTimeSchema = new IntegerSchema(static::DEFAULT_QUEUE_EXPIRATION_TIME);
-        $schema->addProperty(static::KEY_QUEUE_EXPIRATION_TIME, $expirationTimeSchema);
-
-        return $schema;
     }
 
     protected function getFileUploadSchema(): ContainerSchema

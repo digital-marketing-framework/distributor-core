@@ -4,6 +4,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Service;
 
 use DigitalMarketingFramework\Core\Context\ContextInterface;
 use DigitalMarketingFramework\Core\Context\ContextStackInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationInterface;
 use DigitalMarketingFramework\Core\Integration\IntegrationInfo;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
@@ -13,6 +14,7 @@ use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
@@ -52,6 +54,10 @@ class DistributorTest extends TestCase
 
     protected DistributorConfigurationInterface&MockObject $submissionConfiguration;
 
+    protected GlobalConfigurationInterface&MockObject $globalConfiguration;
+
+    protected QueueSettings&MockObject $queueSettings;
+
     protected Distributor $subject;
 
     protected function setUp(): void
@@ -70,6 +76,10 @@ class DistributorTest extends TestCase
         $this->persistentQueueProcessor = $this->createMock(QueueProcessorInterface::class);
         $this->temporaryQueueProcessor = $this->createMock(QueueProcessorInterface::class);
 
+        $this->queueSettings = $this->createMock(QueueSettings::class);
+        $this->globalConfiguration = $this->createMock(GlobalConfigurationInterface::class);
+        $this->globalConfiguration->method('getGlobalSettings')->with(QueueSettings::class)->willReturn($this->queueSettings);
+
         $this->registry = $this->createMock(RegistryInterface::class);
         $this->registry->method('getContext')->willReturn($this->context);
         $this->registry->method('getPersistentQueue')->willReturn($this->persistentQueue);
@@ -83,6 +93,7 @@ class DistributorTest extends TestCase
         $this->subject = new Distributor($this->registry);
         $this->subject->setLogger($this->logger);
         $this->subject->setContext($this->context);
+        $this->subject->setGlobalConfiguration($this->globalConfiguration);
 
         $this->registry->method('getQueueProcessor')->willReturnMap([
             [$this->persistentQueue, $this->subject, $this->persistentQueueProcessor],
