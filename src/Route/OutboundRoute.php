@@ -103,6 +103,11 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         );
     }
 
+    public function canRetryOnFail(): bool
+    {
+        return true;
+    }
+
     public function allowed(): bool
     {
         $permission = $this->getConfig(static::KEY_REQUIRED_PERMISSION);

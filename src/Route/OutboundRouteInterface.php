@@ -57,4 +57,6 @@ interface OutboundRouteInterface extends RouteInterface
     public function preview(): string;
 
     public function addContext(WriteableContextInterface $context): void;
+
+    public function canRetryOnFail(): bool;
 }

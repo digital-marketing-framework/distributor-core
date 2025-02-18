@@ -34,7 +34,11 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
     {
         $this->registryCollection = new RegistryCollection();
         $this->registry = new Registry();
-        $this->registry->setRegistryCollection($this->registryCollection);
+
+        // TODO do we need to create a core registry for accurate tests?
+        $this->registryCollection->addRegistry(RegistryDomain::CORE, $this->registry);
+
+        $this->registryCollection->addRegistry(RegistryDomain::DISTRIBUTOR, $this->registry);
     }
 
     protected function initRegistry(): void
