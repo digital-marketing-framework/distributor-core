@@ -2,9 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core;
 
+use DigitalMarketingFramework\Core\Alert\AlertHandlerInterface;
 use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterface;
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
+use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
@@ -20,6 +22,9 @@ class DistributorCoreInitialization extends Initialization
         RegistryDomain::CORE => [
             ValueSourceInterface::class => [
                 DiscreteMultiValueValueSource::class,
+            ],
+            AlertHandlerInterface::class => [
+                JobWatchAlertHandler::class,
             ],
         ],
         RegistryDomain::DISTRIBUTOR => [
