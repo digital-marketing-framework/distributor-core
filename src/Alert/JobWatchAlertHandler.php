@@ -49,7 +49,7 @@ class JobWatchAlertHandler extends AlertHandler implements GlobalConfigurationAw
     }
 
     /**
-     * @param array<MessageInterface> $alerts
+     * @param array<AlertInterface> $alerts
      */
     protected function checkFailedJobs(array &$alerts): void
     {

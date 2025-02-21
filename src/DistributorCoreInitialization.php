@@ -2,10 +2,11 @@
 
 namespace DigitalMarketingFramework\Distributor\Core;
 
+use DigitalMarketingFramework\Core\Alert\AlertHandlerInterface;
 use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterface;
 use DigitalMarketingFramework\Core\Initialization;
-use DigitalMarketingFramework\Core\Alert\AlertHandlerInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
+use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
@@ -14,7 +15,6 @@ use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvide
 use DigitalMarketingFramework\Distributor\Core\DataProvider\RequestVariablesDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\TimestampDataProvider;
 use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\DistributorCoreGlobalConfigurationSchema;
-use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
 
 class DistributorCoreInitialization extends Initialization
 {
