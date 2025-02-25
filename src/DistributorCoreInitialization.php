@@ -11,9 +11,12 @@ use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\Discret
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\HostDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\RefererDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\RequestVariablesDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\TimestampDataProvider;
+use DigitalMarketingFramework\Distributor\Core\DataProvider\UriDataProvider;
 use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\DistributorCoreGlobalConfigurationSchema;
 
 class DistributorCoreInitialization extends Initialization
@@ -31,9 +34,12 @@ class DistributorCoreInitialization extends Initialization
             DataProviderInterface::class => [
                 CookieDataProvider::class,
                 DataPrivacyDataProvider::class,
+                HostDataProvider::class,
                 IpAddressDataProvider::class,
+                RefererDataProvider::class,
                 RequestVariablesDataProvider::class,
                 TimestampDataProvider::class,
+                UriDataProvider::class,
             ],
         ],
     ];
