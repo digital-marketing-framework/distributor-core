@@ -166,6 +166,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         $allJobs = [];
         $routes = $this->registry->getOutboundRoutes($submission);
         $retryAmount = $queueSettings->rerunFailedJobEnabled() ? $queueSettings->getRerunFailedJobAmount() : 0;
+        $host = $this->context->getHost() ?? '';
 
         foreach ($routes as $route) {
             if (!$route->enabled()) {
@@ -189,6 +190,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
                 $route->getRouteId(),
                 $status
             );
+            $job->setEnvironment($host);
             $job->setRetryAmount($route->canRetryOnFail() ? $retryAmount : 0);
             $job = $queue->addJob($job);
             $allJobs[] = $job;
