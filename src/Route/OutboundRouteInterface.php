@@ -52,6 +52,11 @@ interface OutboundRouteInterface extends RouteInterface
     public function process(): bool;
 
     /**
+     * @return array<string,mixed>
+     */
+    public function getPreviewData(bool $renderDispatcherPreview = false): array;
+
+    /**
      * @throws DigitalMarketingFrameworkException
      */
     public function preview(): string;

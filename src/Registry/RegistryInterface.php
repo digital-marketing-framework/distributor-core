@@ -10,6 +10,7 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherReg
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\ApiRegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\DistributorDataSourceRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
@@ -21,7 +22,8 @@ interface RegistryInterface extends
     DataDispatcherRegistryInterface,
     DataProviderRegistryInterface,
     OutboundRouteRegistryInterface,
-    ApiRegistryInterface
+    ApiRegistryInterface,
+    DistributorDataSourceRegistryInterface
 {
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface;
 

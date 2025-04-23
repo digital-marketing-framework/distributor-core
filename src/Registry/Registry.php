@@ -17,11 +17,13 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherReg
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\ApiRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\DistributorDataSourceRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
+use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
 
 class Registry extends CoreRegistry implements RegistryInterface
 {
@@ -31,6 +33,16 @@ class Registry extends CoreRegistry implements RegistryInterface
     use DataProviderRegistryTrait;
     use OutboundRouteRegistryTrait;
     use ApiRegistryTrait;
+    use DistributorDataSourceRegistryTrait;
+
+    public function processObjectAwareness(object $object): void
+    {
+        parent::processObjectAwareness($object);
+
+        if ($object instanceof DistributorDataSourceManagerAwareInterface) {
+            $object->setDistributorDataSourceManager($this->getDistributorDataSourceManager());
+        }
+    }
 
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
     {

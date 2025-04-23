@@ -40,12 +40,12 @@ class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
 
     protected ContainerSchema $debugSchema;
 
-    public function __construct()
+    public function __construct(?QueueSchema $queueSchema = null)
     {
         parent::__construct();
         $this->getRenderingDefinition()->setLabel('Distributor');
 
-        $this->queueSchema = new QueueSchema();
+        $this->queueSchema = $queueSchema ?? new QueueSchema();
         $this->addProperty(QueueSchema::KEY_QUEUE, $this->queueSchema);
 
         $this->fileUploadSchema = $this->getFileUploadSchema();

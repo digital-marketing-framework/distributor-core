@@ -198,13 +198,9 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         ];
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    protected function getPreviewData(): array
+    public function getPreviewData(bool $renderDispatcherPreview = false): array
     {
         $viewData = [
-            'outboundRoute' => $this,
             'keyword' => $this->getKeyword(),
             'class' => static::class,
             'skipped' => false,
@@ -229,7 +225,11 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
                 }
 
                 $dataDispatcher = $this->getDispatcher();
-                $viewData['dataDispatcherPreview'] = $dataDispatcher->preview($data->toArray());
+                if ($renderDispatcherPreview) {
+                    $viewData['dataDispatcherPreview'] = $dataDispatcher->preview($data->toArray());
+                } else {
+                    $viewData['dataDispatcherPreview'] = $dataDispatcher->getPreviewData($data->toArray());
+                }
             }
         } catch (DigitalMarketingFrameworkException $e) {
             $viewData['error'] = $e->getMessage();
@@ -240,7 +240,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
 
     public function preview(): string
     {
-        $viewData = $this->getPreviewData();
+        $viewData = $this->getPreviewData(true);
 
         $templateNameCandidates = $this->getPreviewTemplateNameCandidates();
 

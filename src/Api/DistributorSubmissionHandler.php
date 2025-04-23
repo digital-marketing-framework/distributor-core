@@ -17,6 +17,7 @@ use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSource\ApiEndPointDistributorDataSource;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
@@ -50,6 +51,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
     }
 
     public function submit(
+        string $dataSourceId,
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
@@ -64,7 +66,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
                 $this->registry->pushContext($context);
             }
 
-            $submission = new SubmissionDataSet($data, $configuration);
+            $submission = new SubmissionDataSet($dataSourceId, $data, $configuration);
             $submission->getContext()->setResponsive($responsive);
             $jobs = $this->distributor->process($submission);
             foreach ($jobs as $job) {
@@ -117,7 +119,15 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
             $this->handleException($e);
         }
 
-        $this->submit($configuration, $data, $context, responsive: !$endPoint->getDisableContext());
+        $dataSource = new ApiEndPointDistributorDataSource($endPoint);
+
+        $this->submit(
+            $dataSource->getIdentifier(),
+            $configuration,
+            $data,
+            $context,
+            responsive: !$endPoint->getDisableContext()
+        );
     }
 
     public function getEndPointNames(bool $frontend = false): array

@@ -34,15 +34,9 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface,
         return $data;
     }
 
-    /**
-     * @param array<string,string|ValueInterface> $data
-     *
-     * @return array<string,mixed>
-     */
-    protected function getPreviewData(array $data): array
+    public function getPreviewData(array $data): array
     {
         return [
-            'dataDispatcher' => $this,
             'keyword' => $this->getKeyword(),
             'class' => static::class,
             'config' => [],

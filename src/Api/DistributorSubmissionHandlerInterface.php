@@ -16,6 +16,7 @@ interface DistributorSubmissionHandlerInterface
      * @param array<string,mixed>|ContextInterface|null $context
      */
     public function submit(
+        string $dataSourceId,
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,

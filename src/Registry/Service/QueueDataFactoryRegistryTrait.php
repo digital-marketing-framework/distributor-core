@@ -11,15 +11,12 @@ trait QueueDataFactoryRegistryTrait
 {
     use ConfigurationDocumentManagerRegistryTrait;
 
-    abstract public function getConfigurationDocumentManager(): ConfigurationDocumentManagerInterface;
-
     protected QueueDataFactoryInterface $queueDataFactory;
 
     public function getQueueDataFactory(): QueueDataFactoryInterface
     {
         if (!isset($this->queueDataFactory)) {
-            $configurationDocumentManager = $this->getConfigurationDocumentManager();
-            $this->queueDataFactory = $this->createObject(QueueDataFactory::class, [$configurationDocumentManager]);
+            $this->queueDataFactory = $this->createObject(QueueDataFactory::class);
         }
 
         return $this->queueDataFactory;

@@ -128,7 +128,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
             $route = $this->registry->getOutboundRoute($submission, $integrationName, $routeId);
             if (!$route instanceof OutboundRouteInterface) {
-                return $this->registry->renderErrorMessage(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
+                throw new DigitalMarketingFrameworkException(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
             }
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders(), preview: true);
@@ -143,6 +143,38 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             }
 
             return $this->registry->renderErrorMessage($e->getMessage());
+        }
+    }
+
+    public function getJobPreviewData(JobInterface $job): array
+    {
+        $contextPushed = false;
+        try {
+            $submission = $this->queueDataFactory->convertJobToSubmission($job);
+            $submission->getContext()->setResponsive(false);
+
+            $this->registry->pushContext($submission->getContext());
+            $contextPushed = true;
+
+            $routeId = $this->queueDataFactory->getJobRouteId($job);
+            $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
+            $route = $this->registry->getOutboundRoute($submission, $integrationName, $routeId);
+            if (!$route instanceof OutboundRouteInterface) {
+                throw new DigitalMarketingFrameworkException(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
+            }
+
+            $this->processDataProviders($submission, $route->getEnabledDataProviders(), preview: true);
+
+            $result = $route->getPreviewData();
+            $this->registry->popContext();
+
+            return $result;
+        } catch (DigitalMarketingFrameworkException $e) {
+            if ($contextPushed) {
+                $this->registry->popContext();
+            }
+
+            throw new DigitalMarketingFrameworkException($e->getMessage(), $e->getCode(), $e);
         }
     }
 

@@ -2,18 +2,29 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Factory;
 
+use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerAwareInterface;
+use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerAwareTrait;
 use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareTrait;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
+use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\QueueSchema;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
+use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareTrait;
 
-class QueueDataFactory implements QueueDataFactoryInterface
+class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocumentManagerAwareInterface, DistributorDataSourceManagerAwareInterface, GlobalConfigurationAwareInterface
 {
+    use ConfigurationDocumentManagerAwareTrait;
+    use DistributorDataSourceManagerAwareTrait;
+    use GlobalConfigurationAwareTrait;
+
     public const KEY_INTEGRATION_NAME = 'integration';
 
     public const KEY_ROUTE_ID = 'routeId';
@@ -22,18 +33,13 @@ class QueueDataFactory implements QueueDataFactoryInterface
 
     public const DEFAULT_LABEL = 'undefined';
 
-    public function __construct(
-        protected ConfigurationDocumentManagerInterface $configurationDocumentManager,
-    ) {
-    }
-
     protected function createJob(): JobInterface
     {
         return new Job();
     }
 
     /**
-     * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $submissionData
+     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>} $submissionData
      */
     protected function getSubmissionDataHash(array $submissionData): string
     {
@@ -51,7 +57,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
     }
 
     /**
-     * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $submissionData
+     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>} $submissionData
      */
     protected function getSubmissionDataLabel(array $submissionData, string $integrationName, string $routeId, string $hash = ''): string
     {
@@ -89,7 +95,7 @@ class QueueDataFactory implements QueueDataFactoryInterface
     }
 
     /**
-     * @return array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>}
+     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>}
      */
     protected function getJobSubmissionData(JobInterface $job): array
     {
@@ -147,13 +153,13 @@ class QueueDataFactory implements QueueDataFactoryInterface
     }
 
     /**
-     * @return array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>}
+     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>}
      */
     protected function pack(SubmissionDataSetInterface $submission): array
     {
         return [
             'data' => $submission->getData()->pack(),
-            'configuration' => $submission->getConfiguration()->getRootConfiguration(),
+            'dataSourceId' => $submission->getDataSourceId(),
             'context' => $submission->getContext()->toArray(),
         ];
     }
@@ -173,8 +179,11 @@ class QueueDataFactory implements QueueDataFactoryInterface
             throw new DigitalMarketingFrameworkException('job has no valid submission data');
         }
 
-        if (!isset($data['configuration']) || !is_array($data['configuration'])) {
-            throw new DigitalMarketingFrameworkException('job has no valid submission configuration');
+        if (
+            (!isset($data['dataSourceId']) || !is_string($data['dataSourceId']))
+            && (!isset($data['configuration']) || !is_array($data['configuration'])) // TODO legacy job support, remove in future
+        ) {
+            throw new DigitalMarketingFrameworkException('job has no valid submission data source ID');
         }
 
         if (!isset($data['context']) || !is_array($data['context'])) {
@@ -183,16 +192,33 @@ class QueueDataFactory implements QueueDataFactoryInterface
     }
 
     /**
-     * @param array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $data
+     * @param array{dataSourceId:string}|array{configuration:array<string,mixed>} $data
+     *
+     * @return array<array<string,mixed>>
+     */
+    protected function unpackConfiguration(array $data): array
+    {
+        if (isset($data['dataSourceId'])) {
+            $dataSource = $this->distributorDataSourceManager->getDataSourceById($data['dataSourceId']);
+            return $this->configurationDocumentManager->getConfigurationStackFromDocument($dataSource->getConfigurationDocument());
+        }
+
+        // TODO legacy job support, remove in future
+        return $this->configurationDocumentManager->getConfigurationStackFromConfiguration($data['configuration']);
+    }
+
+    /**
+     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>} $data
      */
     protected function unpack(array $data): SubmissionDataSetInterface
     {
         $this->validatePackage($data);
 
         $submissionData = Data::unpack($data['data']);
-        $submissionConfiguration = $this->configurationDocumentManager->getConfigurationStackFromConfiguration($data['configuration']);
+        $submissionConfiguration = $this->unpackConfiguration($data);
 
         return new SubmissionDataSet(
+            $data['dataSourceId'] ?? '',
             $submissionData->toArray(),
             $submissionConfiguration,
             $data['context']

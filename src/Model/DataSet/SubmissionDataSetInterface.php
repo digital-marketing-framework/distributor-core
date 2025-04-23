@@ -8,4 +8,6 @@ use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorCo
 interface SubmissionDataSetInterface extends DataSetInterface
 {
     public function getConfiguration(): DistributorConfigurationInterface;
+
+    public function getDataSourceId(): string;
 }

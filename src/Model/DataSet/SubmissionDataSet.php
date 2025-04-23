@@ -24,6 +24,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
      * @param array<string,mixed>|WriteableContextInterface $context The context needed for processing the submission
      */
     public function __construct(
+        protected string $dataSourceId,
         array|DataInterface $data,
         array|DistributorConfigurationInterface $configurationList = [],
         array|WriteableContextInterface $context = [],
@@ -54,5 +55,10 @@ class SubmissionDataSet implements SubmissionDataSetInterface
     public function getContext(): WriteableContextInterface
     {
         return $this->context;
+    }
+
+    public function getDataSourceId(): string
+    {
+        return $this->dataSourceId;
     }
 }
