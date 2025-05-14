@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64">
+
+<defs>
+
+    <linearGradient id="Unbenannter_Verlauf_6" x1="32.9127" y1="31.0871" x2="56.8627" y2="7.1371" gradientUnits="userSpaceOnUse"><stop offset=".2" stop-color="#0f172a"/><stop offset="1" stop-color="#2ab7a8"/></linearGradient>
+
+    <linearGradient id="Unbenannter_Verlauf_14" x1="7.1376" y1="56.8622" x2="31.087" y2="32.9128" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2ab7a8"/><stop offset=".8" stop-color="#0f172a"/></linearGradient>
+
+    <linearGradient id="Unbenannter_Verlauf_13" x1="7.1373" y1="7.1371" x2="31.0873" y2="31.0871" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2ab7a8"/><stop offset=".8" stop-color="#0f172a"/></linearGradient>
+
+    <linearGradient id="Unbenannter_Verlauf_16" x1="32.913" y1="32.9128" x2="56.8624" y2="56.8622" gradientUnits="userSpaceOnUse"><stop offset=".2" stop-color="#0f172a"/><stop offset="1" stop-color="#2ab7a8"/></linearGradient>
+
+</defs>
+
+<g id="Ebene_2">
+
+<rect x="0" y="0" width="64" height="64" style="fill:#0f172a;"/>
+</g>
+
+<g id="Ebene_1">
+    <path d="M37.1553,32.8448c-1.5352,0-3.0713-.5859-4.2422-1.7573-2.3438-2.3433-2.3438-6.1421-.001-8.4854l15.4648-15.4653c2.3438-2.3428,6.1436-2.3428,8.4854,0,2.3438,2.3433,2.3438,6.1421.001,8.4854l-15.4648,15.4653c-1.1719,1.1714-2.708,1.7573-4.2432,1.7573Z" style="fill:url(#Unbenannter_Verlauf_6);"/>
+
+    <path d="M11.3799,58.6202c-1.5352,0-3.0713-.5859-4.2422-1.7578-2.3438-2.3428-2.3438-6.1416,0-8.4844l15.4648-15.4653c2.3418-2.3428,6.1426-2.3428,8.4844,0,2.3438,2.3433,2.3438,6.1421,0,8.4849l-15.4648,15.4648c-1.1709,1.1719-2.707,1.7578-4.2422,1.7578Z" style="fill:url(#Unbenannter_Verlauf_14);"/>
+
+    <path d="M26.8447,32.8448c-1.5361,0-3.0713-.5854-4.2432-1.7573L7.1367,15.6221c-2.3428-2.3433-2.3428-6.1421.001-8.4854,2.3428-2.3433,6.1426-2.3433,8.4854,0l15.4648,15.4653c2.3428,2.3433,2.3428,6.1421-.001,8.4854-1.1709,1.1714-2.707,1.7573-4.2422,1.7573Z" style="fill:url(#Unbenannter_Verlauf_13);"/>
+
+    <path d="M52.6201,58.6202c-1.5352,0-3.0713-.5859-4.2422-1.7578l-15.4648-15.4648c-2.3438-2.3428-2.3438-6.1416,0-8.4849,2.3418-2.3428,6.1426-2.3428,8.4844,0l15.4648,15.4653c2.3438,2.3428,2.3438,6.1416,0,8.4844-1.1709,1.1719-2.707,1.7578-4.2422,1.7578Z" style="fill:url(#Unbenannter_Verlauf_16);"/>
+
+        <circle cx="11.3794" cy="52.6207" r="6" style="fill:#2ab7a8;"/>
+
+        <circle cx="52.6206" cy="52.6207" r="6" style="fill:#2ab7a8;"/>
+
+        <circle cx="11.3794" cy="11.3795" r="6" style="fill:#2ab7a8;"/>
+
+        <circle cx="52.6206" cy="11.3795" r="6" style="fill:#2ab7a8;"/>
+</g>
+</svg>
