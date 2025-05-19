@@ -9,7 +9,8 @@ use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterfac
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
-use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorSectionController;
+use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorListSectionController;
+use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorStatisticsSectionController;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
@@ -33,7 +34,8 @@ class DistributorCoreInitialization extends Initialization
                 JobWatchAlertHandler::class,
             ],
             SectionControllerInterface::class => [
-                DistributorSectionController::class,
+                DistributorStatisticsSectionController::class,
+                DistributorListSectionController::class,
             ],
         ],
         RegistryDomain::DISTRIBUTOR => [
@@ -64,7 +66,7 @@ class DistributorCoreInitialization extends Initialization
             new Section(
                 'Distributor',
                 'DISTRIBUTOR',
-                'page.distributor.overview',
+                'page.distributor.show-statistics',
                 'Distributor Job Management',
                 'PKG:digital-marketing-framework/distributor-core/res/assets/icons/dashboard-distributor.svg',
                 'Show',

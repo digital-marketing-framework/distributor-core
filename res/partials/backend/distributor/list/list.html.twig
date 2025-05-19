@@ -1,0 +1,123 @@
+{% if navigationBounds.numberOfItems == 0 %}
+    <div>No jobs found.</div>
+{% else %}
+    {% set statusLabelMap = {
+        'stuck': 'stuck',
+        'expired': 'expired',
+        0: 'queued',
+        1: 'pending',
+        2: 'running',
+        3: 'done',
+        4: 'failed'
+    } %}
+    <div class="table-fit">
+        <table id="distributor-jobs-list" class="table table-striped table-hover">
+            <tr>
+                <th class="col-checkbox nowrap">
+                    <span class="form-check form-check-type-toggle">
+                        <input type="checkbox" class="form-check-input t3js-multi-record-selection-check" />
+                    </span>
+                </th>
+                <th>Label</th>
+                <th>Status</th>
+                <th>Changed</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+            {% for job in jobs %}
+                <tr>
+                    <td class="col-checkbox nowrap">
+                        <span class="form-check form-check-type-toggle">
+                            <input type="checkbox" name="list[{{ job.id }}]" value="{{ job.id }}" {% if list[job.id] %}checked="checked"{% endif %} class="form-check-input t3js-multi-record-selection-check"/>
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ uri('page.distributor.edit', {id:job.id,returnUrl:permanentUri}) }}">
+                            {{ job.label }}
+                        </a>
+                        {#<be:link.editRecord uid="{job.uid}" title="edit" table="tx_dmfdistributorcore_domain_model_queue_job" returnUrl="{f:uri.action(action:'list',arguments:'{filters:filters,navigation:navigation}')}">
+                            {job.label}
+                        </be:link.editRecord>#}
+                    </td>
+                    <td>
+                        {% if job.status == 0 %}
+                            <span class="badge badge-info">
+                                {{ statusLabelMap[job.status] ?? job.status }}
+                            </span>
+                            {% if job.changed < stuckDate %}
+                                <span class="badge badge-warning" title="not started for more than {{ maxExecutionTime }} seconds">
+                                    {{ statusLabelMap['stuck'] ?? 'stuck' }}
+                                </span>
+                            {% endif %}
+                        {% elseif job.status == 1 %}
+                            <span class="badge badge-primary">
+                                {{ statusLabelMap[job.status] ?? job.status }}
+                                <f:translate key="LLL:EXT:dmf_distributor_core/Resources/Private/Language/locallang.xlf:tag.status.id.{job.status}" default="{job.status}"/>
+                            </span>
+                            {% if job.changed < stuckDate %}
+                                <span class="badge badge-danger" title="pending for more than {{ maxExecutionTime }} seconds">
+                                    {{ statusLabelMap['stuck'] ?? 'stuck' }}
+                                </span>
+                            {% endif %}
+                        {% elseif job.status == 2 %}
+                            <span class="badge badge-warning">
+                                {{ statusLabelMap[job.status] ?? job.status }}
+                            </span>
+                            {% if job.changed < stuckDate %}
+                                <span class="badge badge-danger" title="running for more than {{ maxExecutionTime }} seconds">
+                                    {{ statusLabelMap['stuck'] ?? 'stuck' }}
+                                </span>
+                            {% endif %}
+                        {% elseif job.status == 3 %}
+                            <span class="badge badge-success">
+                                {{ statusLabelMap[job.status] ?? job.status }}
+                            </span>
+                            <span class="badge">
+                                {% if job.skipped %}
+                                    {{ statusLabelMap['skipped'] ?? 'skipped' }}
+                                {% else %}
+                                    {{ statusLabelMap['processed'] ?? 'processed' }}
+                                {% endif %}
+                            </span>
+                            {% if job.changed < expirationDate %}
+                                <span class="badge badge-warning" title="should have been deleted by now">
+                                    {{ statusLabelMap['expired'] ?? 'expired' }}
+                                </span>
+                            {% endif %}
+                        {% elseif job.status == 4 %}
+                            <span title="error: {{ job.statusMessage }}" class="badge badge-danger">
+                                {{ statusLabelMap[job.status] ?? job.status }}
+                            </span>
+                        {% else %}
+                            {{ statusLabelMap[job.status] ?? job.status }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ job.changed|date('Y-m-d H:i:s') }}
+                    </td>
+                    <td>
+                        {{ job.created|date('Y-m-d H:i:s') }}
+                    </td>
+                    <td>
+                        {% set args = {list:{(job.id):job.id},returnUrl:permanentUri} %}
+                        <a href="{{ uri('page.distributor.edit', {id:job.id,returnUrl:permanentUri}) }}" class="btn btn-default" title="edit">
+                            {{ include('t3-icon.html.twig', {name:'open'}) }}
+                        </a>
+                        <a href="{{ uri('page.distributor.preview', args) }}" title="preview" class="btn btn-default">
+                            {{ include('t3-icon.html.twig', {name:'document-view'}) }}
+                        </a>
+                        <a href="{{ uri('page.distributor.queue', args) }}" title="queue" class="btn btn-default" {% if job.status == 0 %}disabled="disabled"{% endif %} data-confirm="Do you want to queue this job?">
+                            {{ include('t3-icon.html.twig', {name:'clock'}) }}
+                        </a>
+                        <a href="{{ uri('page.distributor.run', args) }}" title="run" class="btn btn-default" data-confirm="Do you want to run this job?">
+                            {{ include('t3-icon.html.twig', {name:'play'}) }}
+                        </a>
+                        <a href="{{ uri('page.distibutor.delete', args) }}" title="delete" class="btn btn-default" data-confirm="Do you want to delete this job?">
+                            {{ include('t3-icon.html.twig', {name:'delete',class:'edit-delete'}) }}
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}

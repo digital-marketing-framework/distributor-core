@@ -188,29 +188,17 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
     }
 
     /**
-     * @return array<string>
-     */
-    protected function getPreviewTemplateNameCandidates(): array
-    {
-        return [
-            sprintf('preview/outbound-route/%s.html.twig', GeneralUtility::camelCaseToDashed($this->getKeyword())),
-            'preview/outbound-route/default.html.twig',
-        ];
-    }
-
-    /**
      * @return array<string,mixed>
      */
-    protected function getPreviewData(): array
+    public function preview(): array
     {
         $viewData = [
             'outboundRoute' => $this,
-            'keyword' => $this->getKeyword(),
+            'keyword' => GeneralUtility::camelCaseToDashed($this->getKeyword()),
             'class' => static::class,
             'skipped' => false,
             'enabled' => true,
             'allowed' => true,
-            'dataDispatcherPreview' => '',
             'error' => '',
             'formData' => $this->submission->getData()->toArray(),
             'formContext' => $this->submission->getContext()->toArray(),
@@ -229,27 +217,13 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
                 }
 
                 $dataDispatcher = $this->getDispatcher();
-                $viewData['dataDispatcherPreview'] = $dataDispatcher->preview($data->toArray());
+                $viewData['dispatcher'] = $dataDispatcher->preview($data->toArray());
             }
         } catch (DigitalMarketingFrameworkException $e) {
             $viewData['error'] = $e->getMessage();
         }
 
         return $viewData;
-    }
-
-    public function preview(): string
-    {
-        $viewData = $this->getPreviewData();
-
-        $templateNameCandidates = $this->getPreviewTemplateNameCandidates();
-
-        $config = [
-            TwigTemplateEngine::KEY_TEMPLATE => '',
-            TwigTemplateEngine::KEY_TEMPLATE_NAME => $templateNameCandidates,
-        ];
-
-        return $this->templateEngine->render($config, $viewData);
     }
 
     abstract protected function getDispatcher(): DataDispatcherInterface;

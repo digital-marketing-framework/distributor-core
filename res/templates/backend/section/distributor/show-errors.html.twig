@@ -1,0 +1,63 @@
+{% extends "module.html.twig" %}
+
+{% block section %}
+    {{ include('distributor/tabs.html.twig', {current}) }}
+
+    <h2>Errors</h2>
+
+    <form method="post" action="{{ uri('page.distributor.' ~ current) }}" data-module="dmf-distributor-backend" data-form-type="show-errors">
+        {{ include('distributor/filters/timing-filters.html.twig', {filters,filterBounds}) }}
+        {{ include('distributor/navigation/sorting.html.twig', {navigation,navigationBounds}) }}
+        {{ include('distributor/update-view.html.twig', {current,permanentUri,resetUri,filters,navigation}) }}
+    </form>
+
+    {% if errors %}
+        <div class="table-fit">
+            <table id="distributor-jobs-errors" class="table table-striped table-hover">
+                <tr>
+                    <th>Error</th>
+                    <th>Count</th>
+                    <th>First seen</th>
+                    <th>Last seen</th>
+                    <th>Route(s)</th>
+                </tr>
+                {% for error in errors %}
+                    <tr>
+                        <td>
+                            <a href="{{ uri('page.distributor.list', {filters,status:['failed'],additionalFilters:{search:error.message,searchExactMatch:1}}) }}">
+                                {{ error.message }}
+                            </a>
+                        </td>
+                        <td>{{ error.count }}</td>
+                        <td>
+                            <a href="{{ uri('page.distributor.edit', {id:error.firstSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ error.firstSeen.label }}">
+                                {{ error.firstSeen.changed|date('Y-m-d H:i:s') }}
+                            </a>
+                            {#<be:link.editRecord uid="{error.firstSeen.uid}" table="tx_dmfdistributorcore_domain_model_queue_job" returnUrl="{f:uri.action(action:'showErrors',arguments:'{filters:filters,navigation:navigation}')}" title="{error.firstSeen.label}">
+                                <f:format.date format="Y-m-d H:i:s">{error.firstSeen.changed}</f:format.date>
+                            </be:link.editRecord>#}
+                        </td>
+                        <td>
+                            <a href="{{ uri('page.distributor.edit', {id:error.lastSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ error.lastSeen.label }}">
+                                {{ error.lastSeen.changed|date('Y-m-d H:i:s') }}
+                            </a>
+                            {#<be:link.editRecord uid="{error.lastSeen.uid}" table="tx_dmfdistributorcore_domain_model_queue_job" returnUrl="{f:uri.action(action:'showErrors',arguments:'{filters:filters,navigation:navigation}')}" title="{error.lastSeen.label}">
+                                <f:format.date format="Y-m-d H:i:s">{error.lastSeen.changed}</f:format.date>
+                            </be:link.editRecord>#}
+                        </td>
+                        <td>
+                            {% for type,countPerType in error.types %}
+                                <a href="{{ uri('page.distributor.list', {filters,type:[type],status:['failed'],additionalFilters:{search:error.message,searchExactMatch:1}}) }}">
+                                    {{ type }} ({{ countPerType }})
+                                    {% if not loop.last %}<br/>{% endif %}
+                                </a>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <p>No errors found. Well done.</p>
+    {% endif %}
+{% endblock %}

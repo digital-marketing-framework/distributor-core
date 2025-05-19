@@ -1,5 +1,58 @@
 {% extends "module.html.twig" %}
 
 {% block section %}
+    {{ include('distributor/tabs.html.twig', {current}) }}
 
+    <h2>Jobs</h2>
+
+    <form method="post" action="{{ uri('page.distributor.list') }}" data-module="dmf-distributor-backend" data-form-type="list">
+        <h3>Filters</h3>
+        <input type="hidden" name="returnUrl" value="{{ permanentUri }}" />
+        {{ include('distributor/filters/search-filter.html.twig', {filters,filterBounds}) }}
+        {{ include('distributor/filters/timing-filters.html.twig', {filters,filterBounds}) }}
+        {{ include('distributor/filters/type-filters.html.twig', {filters,filterBounds}) }}
+        {{ include('distributor/filters/status-filters.html.twig', {filters,filterBounds}) }}
+
+        <h3>Navigation</h3>
+        <div>
+            {{ include('distributor/navigation/pagination-filter.html.twig', {navigation,navigationBounds}) }}
+            {{ include('distributor/navigation/sorting.html.twig', {navigation,navigationBounds}) }}
+        </div>
+
+        {{ include('distributor/update-view.html.twig', {permanentUri,resetUri,filters,navigation,current:'list'}) }}
+
+        <h3>
+            List
+            {% if navigationBounds.numberOfPages > 1 %}
+                {% set minItems = navigation.page * navigation.itemsPerPage + 1 %}
+                {% set maxItems = navigation.page * navigation.itemsPerPage + navigation.itemsPerPage %}
+                [page: {{ navigation.page + 1 }} / {{ navigationBounds.numberOfPages }}]
+                [results: {{ minItems }} - {% if maxItems > navigationBounds.numberOfItems %}{{ navigationBounds.numberOfItems }}{% else %}{{ maxItems }}{% endif %}]
+            {% endif %}
+            [total: {{ navigationBounds.numberOfItems }}]
+        </h3>
+
+        <div class="form-row justify-content-between my-3">
+            <div class="form-group">
+                <div class="input-group">
+                    {{ include('distributor/list/actions.html.twig', {navigationBounds}) }}
+                    <span class="mx-2"></span>
+                    {{ include('distributor/navigation/pagination.html.twig', {filters,navigation,navigationBounds,current:'list'}) }}
+                </div>
+            </div>
+        </div>
+
+        {{ include('distributor/list/list.html.twig', {jobs,filters,navigation,navigationBounds,expirationDate,stuckData,maxExecutionTime}) }}
+
+        <div class="form-row justify-content-between my-3">
+            <div class="form-group">
+                <div class="input-group">
+                    {{ include('distributor/list/actions.html.twig', {navigationBounds}) }}
+                    <span class="mx-2"></span>
+                    {{ include('distributor/navigation/pagination.html.twig', {filters,navigation,navigationBounds,current:'list'}) }}
+                </div>
+            </div>
+        </div>
+
+    </form>
 {% endblock %}

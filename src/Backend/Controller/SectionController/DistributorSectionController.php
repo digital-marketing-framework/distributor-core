@@ -2,63 +2,169 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController;
 
+use DateTime;
 use DigitalMarketingFramework\Core\Backend\Controller\SectionController\SectionController;
-use DigitalMarketingFramework\Core\Backend\Request;
-use DigitalMarketingFramework\Core\Backend\Response\Response;
+use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
+use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface as DistributorRegistryInterface;
 
-class DistributorSectionController extends SectionController
+abstract class DistributorSectionController extends SectionController
 {
-    public function __construct(
-        string $keyword,
-        RegistryInterface $registry
-    ) {
-        parent::__construct($keyword, $registry, 'distributor', ['overview', 'list', 'edit', 'errors', 'preview', 'save', 'delete', 'queue', 'run']);
+    protected const DISTRIBUTOR_LIST_SCRIPT = 'PKG:digital-marketing-framework/distributor-core/res/assets/scripts/backend/distributor-list.js';
+
+    protected DistributorRegistryInterface $distributorRegistry;
+
+    protected QueueSettings $queueSettings;
+
+    protected QueueInterface $queue;
+
+    public function __construct(string $keyword, RegistryInterface $registry, array $routes)
+    {
+        parent::__construct($keyword, $registry, 'distributor', $routes);
+
+        $this->distributorRegistry = $registry->getRegistryCollection()->getRegistryByClass(DistributorRegistryInterface::class);
+        $this->queueSettings = $registry->getGlobalConfiguration()->getGlobalSettings(QueueSettings::class);
+        $this->queue = $this->distributorRegistry->getPersistentQueue();
     }
 
-    protected function overviewAction(Request $request): Response
+    protected function addDistributorListScript(): void
     {
-        return $this->render($request);
+        $this->addScript(static::DISTRIBUTOR_LIST_SCRIPT, 'distributor-list');
     }
 
-    protected function listAction(Request $request): Response
+    protected function getFilters(): array
     {
-        return $this->render($request);
+        return $this->getParameters()['filters'] ?? [];
     }
 
-    protected function editAction(Request $request): Response
+    protected function getNavigation(): array
     {
-        return $this->render($request);
+        return $this->getParameters()['navigation'] ?? [];
     }
 
-    protected function errorsAction(Request $request): Response
+    protected function getList(): array
     {
-        return $this->render($request);
+        $list = $this->getParameters()['list'] ?? [];
+
+        return array_values(array_filter($list));
     }
 
-    protected function previewAction(Request $request): Response
+    protected function getPage(): ?int
     {
-        return $this->render($request);
+        return $this->getParameters()['page'] ?? null;
     }
 
-    protected function saveAction(Request $request): Response
+    protected function getCurrentAction(string $default): string
     {
-        $id = 42;
-        return $this->redirect('page.distributor.edit', ['id' => $id]);
+        return $this->getParameters()['currentAction'] ?? $default;
     }
 
-    protected function deleteAction(Request $request): Response
+    protected function cleanupArguments(array &$arguments): void
     {
-        return $this->redirect('page.distributor.list');
+        // TODO can we filter out default values in addition to empty values?
+        foreach (array_keys($arguments) as $key) {
+            if (is_array($arguments[$key])) {
+                $this->cleanupArguments($arguments[$key]);
+                if ($arguments[$key] === []) {
+                    unset($arguments[$key]);
+                }
+            } elseif ($arguments[$key] === '') {
+                unset($arguments[$key]);
+            }
+        }
     }
 
-    protected function queueAction(Request $request): Response
+    protected function getPermanentUri(string $action, array $filters = [], array $navigation = []): string
     {
-        return $this->redirect('page.distributor.list');
+        $arguments = ['filters' => $filters, 'navigation' => $navigation];
+        $this->cleanupArguments($arguments);
+
+        return $this->uriBuilder->build('page.distributor.' . $action, $arguments);
     }
 
-    protected function runAction(Request $request): Response
+    protected function assignCurrentRouteData(string $defaultAction, array $filters = [], array $navigation = []): void
     {
-        return $this->redirect('page.distributor.list');
+        $currentAction = $this->getCurrentAction($defaultAction);
+        $this->viewData['current'] = $currentAction;
+
+        $permanentUri = $this->getPermanentUri($defaultAction, $filters, $navigation);
+        $this->viewData['permanentUri'] = $permanentUri;
+
+        $resetUri = $this->getPermanentUri($defaultAction);
+        $this->viewData['resetUri'] = $resetUri;
+    }
+
+    /**
+     * @param array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
+     *
+     * @return array{search:string,advancedSearch:bool,searchExactMatch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool}
+     */
+    protected function transformInputFilters(array $filters): array
+    {
+        $result = [
+            'search' => $filters['search'] ?? '',
+            'advancedSearch' => $filters['advancedSearch'] ?? false,
+            'searchExactMatch' => $filters['searchExactMatch'] ?? false,
+            'minCreated' => isset($filters['minCreated']) && $filters['minCreated'] !== '' ? new DateTime($filters['minCreated']) : null,
+            'maxCreated' => isset($filters['maxCreated']) && $filters['maxCreated'] !== '' ? new DateTime($filters['maxCreated']) : null,
+            'minChanged' => isset($filters['minChanged']) && $filters['minChanged'] !== '' ? new DateTime($filters['minChanged']) : null,
+            'maxChanged' => isset($filters['maxChanged']) && $filters['maxChanged'] !== '' ? new DateTime($filters['maxChanged']) : null,
+            'type' => isset($filters['type']) ? array_keys(array_filter($filters['type'])) : [],
+        ];
+
+        $result['status'] = [];
+        $result['skipped'] = null;
+
+        $inputStatus = isset($filters['status']) ? array_keys(array_filter($filters['status'])) : [];
+        $skippedFound = false;
+        $notSkippedFound = false;
+        foreach ($inputStatus as $status) {
+            switch ($status) {
+                case 'queued':
+                    $result['status'][] = QueueInterface::STATUS_QUEUED;
+                    break;
+                case 'pending':
+                    $result['status'][] = QueueInterface::STATUS_PENDING;
+                    break;
+                case 'running':
+                    $result['status'][] = QueueInterface::STATUS_RUNNING;
+                    break;
+                case 'doneNotSkipped':
+                    $result['status'][] = QueueInterface::STATUS_DONE;
+                    $notSkippedFound = true;
+                    break;
+                case 'doneSkipped':
+                    $result['status'][] = QueueInterface::STATUS_DONE;
+                    $skippedFound = true;
+                    break;
+                case 'failed':
+                    $result['status'][] = QueueInterface::STATUS_FAILED;
+                    break;
+            }
+        }
+
+        if (!$skippedFound && $notSkippedFound) {
+            $result['skipped'] = false;
+        } elseif ($skippedFound && !$notSkippedFound) {
+            $result['skipped'] = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
+     * @param array<string,string> $defaultSorting
+     *
+     * @return array{page:int,itemsPerPage:int,sorting:array<string,string>}
+     */
+    protected function transformInputNavigation(array $navigation, array $defaultSorting): array
+    {
+        return [
+            'page' => (int)($navigation['page'] ?? 0),
+            'itemsPerPage' => (int)($navigation['itemsPerPage'] ?? 20),
+            'sorting' => $navigation['sorting'] ?? $defaultSorting,
+        ];
     }
 }

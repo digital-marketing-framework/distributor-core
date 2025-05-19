@@ -13,5 +13,5 @@ interface DistributorInterface extends WorkerInterface
      */
     public function process(SubmissionDataSetInterface $submission): array;
 
-    public function previewJobProcess(JobInterface $job): string;
+    public function getPreviewData(JobInterface $job): array;
 }

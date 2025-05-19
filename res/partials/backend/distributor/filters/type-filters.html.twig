@@ -1,0 +1,22 @@
+{% if filterBounds.typeCountNotEmpty > 1 or filterBounds.typeSelected %}
+    <div class="form-row justify-content-between">
+        <div class="form-group">
+            <div class="input-group">
+                <span class="btn btn-default disabled" style="min-width: 8rem">type</span>
+                {% for option,count in filterBounds.type %}
+                    {% if count > 0 or filters.type[option] %}
+                        <label class="form-control btn btn-default" style="width:auto">
+                                <span class="form-check form-check-type-toggle">
+                                    <input type="checkbox" name="filters[type][{{ option }}]"
+                                                     value="1"
+                                                     checked="{{ filters.type[option] }}"
+                                                     class="form-check-input" />
+                                </span>
+                            {{ option }} ({{ count }})
+                        </label>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}

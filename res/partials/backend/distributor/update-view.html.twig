@@ -1,0 +1,14 @@
+<div class="my-4">
+    <button type="submit" name="action" value="{{ current }}" class="btn btn-primary">
+        {{ include('t3-icon.html.twig', {name:'refresh'}) }}
+        update view
+    </button>
+    <a href="{{ resetUri }}" class="btn btn-default">
+        {{ include('t3-icon.html.twig', {name:'undo',class:'edit-undo'}) }}
+        reset view
+    </a>
+    <a href="{{ permanentUri }}" class="btn btn-default">
+        {{ include('t3-icon.html.twig', {name:'link'}) }}
+        perma-link to this view
+    </a>
+</div>
