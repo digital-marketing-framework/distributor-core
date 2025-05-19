@@ -33,16 +33,25 @@ abstract class DistributorSectionController extends SectionController
         $this->addScript(static::DISTRIBUTOR_LIST_SCRIPT, 'distributor-list');
     }
 
+    /**
+     * @return array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
+     */
     protected function getFilters(): array
     {
         return $this->getParameters()['filters'] ?? [];
     }
 
+    /**
+     * @return array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
+     */
     protected function getNavigation(): array
     {
         return $this->getParameters()['navigation'] ?? [];
     }
 
+    /**
+     * @return array<string|int,string|int>
+     */
     protected function getList(): array
     {
         $list = $this->getParameters()['list'] ?? [];
@@ -60,6 +69,9 @@ abstract class DistributorSectionController extends SectionController
         return $this->getParameters()['currentAction'] ?? $default;
     }
 
+    /**
+     * @param array<string,mixed> $arguments
+     */
     protected function cleanupArguments(array &$arguments): void
     {
         // TODO can we filter out default values in addition to empty values?
@@ -75,6 +87,10 @@ abstract class DistributorSectionController extends SectionController
         }
     }
 
+    /**
+     * @param array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
+     * @param array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
+     */
     protected function getPermanentUri(string $action, array $filters = [], array $navigation = []): string
     {
         $arguments = ['filters' => $filters, 'navigation' => $navigation];
@@ -83,6 +99,10 @@ abstract class DistributorSectionController extends SectionController
         return $this->uriBuilder->build('page.distributor.' . $action, $arguments);
     }
 
+    /**
+     * @param array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
+     * @param array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
+     */
     protected function assignCurrentRouteData(string $defaultAction, array $filters = [], array $navigation = []): void
     {
         $currentAction = $this->getCurrentAction($defaultAction);

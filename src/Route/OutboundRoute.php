@@ -33,7 +33,6 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Plugin\IntegrationPlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
-use DigitalMarketingFramework\TemplateEngineTwig\TemplateEngine\TwigTemplateEngine;
 
 abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface, TemplateEngineAwareInterface
 {

@@ -15,7 +15,7 @@ class DistributorListSectionController extends DistributorSectionController
 
     public function __construct(
         string $keyword,
-        RegistryInterface $registry
+        RegistryInterface $registry,
     ) {
         parent::__construct($keyword, $registry, ['list', 'list-expired', 'list-stuck', 'list-failed', 'preview', 'queue', 'run', 'delete', 'edit', 'save']);
     }
@@ -276,12 +276,12 @@ class DistributorListSectionController extends DistributorSectionController
         ]);
     }
 
-    protected function editAction(): Response
+    protected function editAction(): never
     {
         throw new BadMethodCallException('Distributor edit action not implemented in core package');
     }
 
-    protected function saveAction(): Response
+    protected function saveAction(): never
     {
         throw new BadMethodCallException('Distributor save action not implemented in core package');
     }

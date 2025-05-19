@@ -2,7 +2,6 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController;
 
-use DigitalMarketingFramework\Core\Backend\Request;
 use DigitalMarketingFramework\Core\Backend\Response\Response;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
 
@@ -10,7 +9,7 @@ class DistributorStatisticsSectionController extends DistributorSectionControlle
 {
     public function __construct(
         string $keyword,
-        RegistryInterface $registry
+        RegistryInterface $registry,
     ) {
         parent::__construct($keyword, $registry, ['show-statistics', 'show-errors']);
     }
