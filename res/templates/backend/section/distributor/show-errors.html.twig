@@ -24,7 +24,7 @@
                 {% for error in errors %}
                     <tr>
                         <td>
-                            <a href="{{ uri('page.distributor.list', {filters,status:['failed'],additionalFilters:{search:error.message,searchExactMatch:1}}) }}">
+                            <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1},search:error.message,searchExactMatch:1})}) }}">
                                 {{ error.message }}
                             </a>
                         </td>
@@ -33,21 +33,15 @@
                             <a href="{{ uri('page.distributor.edit', {id:error.firstSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ error.firstSeen.label }}">
                                 {{ error.firstSeen.changed|date('Y-m-d H:i:s') }}
                             </a>
-                            {#<be:link.editRecord uid="{error.firstSeen.uid}" table="tx_dmfdistributorcore_domain_model_queue_job" returnUrl="{f:uri.action(action:'showErrors',arguments:'{filters:filters,navigation:navigation}')}" title="{error.firstSeen.label}">
-                                <f:format.date format="Y-m-d H:i:s">{error.firstSeen.changed}</f:format.date>
-                            </be:link.editRecord>#}
                         </td>
                         <td>
                             <a href="{{ uri('page.distributor.edit', {id:error.lastSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ error.lastSeen.label }}">
                                 {{ error.lastSeen.changed|date('Y-m-d H:i:s') }}
                             </a>
-                            {#<be:link.editRecord uid="{error.lastSeen.uid}" table="tx_dmfdistributorcore_domain_model_queue_job" returnUrl="{f:uri.action(action:'showErrors',arguments:'{filters:filters,navigation:navigation}')}" title="{error.lastSeen.label}">
-                                <f:format.date format="Y-m-d H:i:s">{error.lastSeen.changed}</f:format.date>
-                            </be:link.editRecord>#}
                         </td>
                         <td>
                             {% for type,countPerType in error.types %}
-                                <a href="{{ uri('page.distributor.list', {filters,type:[type],status:['failed'],additionalFilters:{search:error.message,searchExactMatch:1}}) }}">
+                                <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1},status:{failed:1},search:error.message,searchExactMatch:1})}) }}">
                                     {{ type }} ({{ countPerType }})
                                     {% if not loop.last %}<br/>{% endif %}
                                 </a>
