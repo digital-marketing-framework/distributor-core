@@ -12,7 +12,7 @@ trait DataProcessorPluginTestTrait
         parent::initRegistry();
         $initialization = new DistributorCoreInitialization();
         $initialization->initMetaData($this->registry);
-        // NOTE core initialization has no global config or services to initialize customly
+        // NOTE core initialization has no global config or services to initialize
         //      but other integrations will want to call those methods on their init object
         // $initialization->initGlobalConfiguration(RegistryDomain::CORE, $this->registry);
         // $initialization->initServices(RegistryDomain::CORE, $this->registry);
