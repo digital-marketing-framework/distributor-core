@@ -94,7 +94,7 @@ abstract class DistributorSectionController extends SectionController
     protected function getPermanentUri(string $action, array $filters = [], array $navigation = []): string
     {
         $arguments = ['filters' => $filters, 'navigation' => $navigation];
-        $this->cleanupArguments($arguments);
+        $this->cleanupArguments($arguments['filters']);
 
         return $this->uriBuilder->build('page.distributor.' . $action, $arguments);
     }

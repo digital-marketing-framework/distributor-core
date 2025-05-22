@@ -7,10 +7,12 @@
                     {% if count > 0 or filters.type[option] %}
                         <label class="form-control btn btn-default" style="width:auto">
                                 <span class="form-check form-check-type-toggle">
-                                    <input type="checkbox" name="filters[type][{{ option }}]"
-                                                     value="1"
-                                                     checked="{{ filters.type[option] }}"
-                                                     class="form-check-input" />
+                                    <input
+                                        type="checkbox"
+                                        name="filters[type][{{ option }}]"
+                                        value="1"
+                                        {% if filters.type[option] %}checked="checked"{% endif %}
+                                        class="form-check-input" />
                                 </span>
                             {{ option }} ({{ count }})
                         </label>
