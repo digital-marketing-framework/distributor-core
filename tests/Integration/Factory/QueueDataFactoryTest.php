@@ -13,12 +13,13 @@ use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
 use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory
- */
+#[CoversClass(QueueDataFactory::class)]
 class QueueDataFactoryTest extends TestCase
 {
     use ListMapTestTrait;
@@ -31,16 +32,14 @@ class QueueDataFactoryTest extends TestCase
     {
         parent::setUp();
         $this->configurationDocumentManager = $this->createMock(ConfigurationDocumentManagerInterface::class);
-        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(static function (array $configuration) {
-            return [$configuration];
-        });
+        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(static fn (array $configuration) => [$configuration]);
         $this->subject = new QueueDataFactory($this->configurationDocumentManager);
     }
 
     /**
      * @return array<array{id:string,integration:string}>
      */
-    protected function routeIdProvider(): array
+    protected static function routeIdProvider(): array
     {
         return [
             [
@@ -57,7 +56,7 @@ class QueueDataFactoryTest extends TestCase
     /**
      * @return array<array{0:array<string,string|ValueInterface>,1:array<string,array{type:string,value:mixed}>}>
      */
-    protected function packDataProvider(): array
+    protected static function packDataProvider(): array
     {
         return [
             [[], []],
@@ -87,7 +86,7 @@ class QueueDataFactoryTest extends TestCase
     /**
      * @return array<array{0:array<string,mixed>,1:array<string,mixed>}>
      */
-    protected function packConfigurationProvider(): array
+    protected static function packConfigurationProvider(): array
     {
         return [
             [
@@ -95,7 +94,7 @@ class QueueDataFactoryTest extends TestCase
                     'integrations' => [
                         'integration1' => [
                             'outboundRoutes' => [
-                                'routeId1' => $this->createListItem([
+                                'routeId1' => static::createListItem([
                                     'type' => 'route1',
                                     'pass' => '',
                                     'config' => [
@@ -108,7 +107,7 @@ class QueueDataFactoryTest extends TestCase
                         ],
                         'integration2' => [
                             'outboundRoutes' => [
-                                'routeId2' => $this->createListItem([
+                                'routeId2' => static::createListItem([
                                     'type' => 'route1',
                                     'pass' => '',
                                     'config' => [
@@ -125,7 +124,7 @@ class QueueDataFactoryTest extends TestCase
                     'integrations' => [
                         'integration1' => [
                             'outboundRoutes' => [
-                                'routeId1' => $this->createListItem([
+                                'routeId1' => static::createListItem([
                                     'type' => 'route1',
                                     'pass' => '',
                                     'config' => [
@@ -138,7 +137,7 @@ class QueueDataFactoryTest extends TestCase
                         ],
                         'integration2' => [
                             'outboundRoutes' => [
-                                'routeId2' => $this->createListItem([
+                                'routeId2' => static::createListItem([
                                     'type' => 'route1',
                                     'pass' => '',
                                     'config' => [
@@ -158,7 +157,7 @@ class QueueDataFactoryTest extends TestCase
     /**
      * @return array<array{0:array<string,mixed>,1:array<string,mixed>}>
      */
-    protected function packContextProvider(): array
+    protected static function packContextProvider(): array
     {
         return [
             [['timestamp' => 1716482226], ['timestamp' => 1716482226]],
@@ -184,13 +183,13 @@ class QueueDataFactoryTest extends TestCase
      *   }
      * }>
      */
-    public function packProvider(): array
+    public static function packProvider(): array
     {
         $result = [];
-        foreach ($this->packDataProvider() as [$data, $packedData]) {
-            foreach ($this->packConfigurationProvider() as [$configuration, $packedConfiguration]) {
-                foreach ($this->packContextProvider() as [$context, $packedContext]) {
-                    foreach ($this->routeIdProvider() as $routeId) {
+        foreach (static::packDataProvider() as [$data, $packedData]) {
+            foreach (static::packConfigurationProvider() as [$configuration, $packedConfiguration]) {
+                foreach (static::packContextProvider() as [$context, $packedContext]) {
+                    foreach (static::routeIdProvider() as $routeId) {
                         $result[] = [
                             $data,
                             [$configuration],
@@ -228,11 +227,9 @@ class QueueDataFactoryTest extends TestCase
      *       context:array<string,mixed>
      *     }
      *   } $jobData
-     *
-     * @dataProvider packProvider
-     *
-     * @test
      */
+    #[Test]
+    #[DataProvider('packProvider')]
     public function pack(array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);
@@ -255,11 +252,9 @@ class QueueDataFactoryTest extends TestCase
      *   } $jobData
      *
      * @throws DigitalMarketingFrameworkException
-     *
-     * @dataProvider packProvider
-     *
-     * @test
      */
+    #[Test]
+    #[DataProvider('packProvider')]
     public function unpack(array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $job = new Job();
@@ -287,11 +282,9 @@ class QueueDataFactoryTest extends TestCase
      *   } $jobData
      *
      * @throws DigitalMarketingFrameworkException
-     *
-     * @dataProvider packProvider
-     *
-     * @test
      */
+    #[Test]
+    #[DataProvider('packProvider')]
     public function packUnpack(array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $submission = new SubmissionDataSet($data, $configuration, $context);

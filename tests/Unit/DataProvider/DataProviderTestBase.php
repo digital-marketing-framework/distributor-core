@@ -11,14 +11,13 @@ use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProvider;
-use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProviderInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-abstract class AbstractDataProviderTest extends TestCase
+abstract class DataProviderTestBase extends TestCase
 {
     use ListMapTestTrait;
 
@@ -45,7 +44,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     protected WriteableContextInterface $submissionContext;
 
-    protected DataProviderInterface $subject;
+    protected DataProvider $subject;
 
     protected function setUp(): void
     {

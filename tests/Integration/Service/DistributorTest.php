@@ -6,6 +6,7 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueException;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
+use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Integration\DistributorRegistryTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Tests\Integration\JobTestTrait;
@@ -16,12 +17,13 @@ use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\DataProvid
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\RouteSpyInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\SpiedOnGenericRoute;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \DigitalMarketingFramework\Distributor\Core\Service\Distributor
- */
+#[CoversClass(Distributor::class)]
 class DistributorTest extends TestCase
 {
     use DistributorRegistryTestTrait;
@@ -105,7 +107,7 @@ class DistributorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function processSyncOneRouteOnePassWithStorage(): void
     {
         $this->setSubmissionAsync(false);
@@ -121,9 +123,7 @@ class DistributorTest extends TestCase
             'field2' => 'value2',
         ];
 
-        $this->queue->expects($this->once())->method('addJob')->willReturnCallback(static function (JobInterface $job) {
-            return $job;
-        });
+        $this->queue->expects($this->once())->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
         $this->queue->expects($this->once())->method('markListAsPending');
         $this->queue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -142,7 +142,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->getSubmission());
     }
 
-    /** @test */
+    #[Test]
     public function processSyncOneRouteOnePassWithoutStorage(): void
     {
         $this->setSubmissionAsync(false);
@@ -158,9 +158,7 @@ class DistributorTest extends TestCase
             'field2' => 'value2',
         ];
 
-        $this->temporaryQueue->expects($this->once())->method('addJob')->willReturnCallback(static function (JobInterface $job) {
-            return $job;
-        });
+        $this->temporaryQueue->expects($this->once())->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
         $this->temporaryQueue->expects($this->once())->method('markListAsPending');
         $this->temporaryQueue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -179,7 +177,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->getSubmission());
     }
 
-    /** @test */
+    #[Test]
     public function processAsyncOneRouteOnePassWithStorage(): void
     {
         $this->setSubmissionAsync(true);
@@ -195,9 +193,7 @@ class DistributorTest extends TestCase
             'field2' => 'value2',
         ];
 
-        $this->queue->expects($this->once())->method('addJob')->willReturnCallback(static function (JobInterface $job) {
-            return $job;
-        });
+        $this->queue->expects($this->once())->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
 
         $this->routeSpy->expects($this->never())->method('send');
 
@@ -218,7 +214,7 @@ class DistributorTest extends TestCase
     /**
      * @return array<array{0:bool,1:bool,2:bool,3:bool}>
      */
-    public function processAddContextProvider(): array
+    public static function processAddContextProvider(): array
     {
         return [
             [false, false, false, false],
@@ -241,11 +237,8 @@ class DistributorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider processAddContextProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('processAddContextProvider')]
     public function processAddContext(bool $async, bool $enableStorage, bool $routeEnabled, bool $dataProviderEnabled): void
     {
         $this->setSubmissionAsync($async);
@@ -270,7 +263,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->getSubmission());
     }
 
-    /** @test */
+    #[Test]
     public function processSyncOneRouteWithMultiplePasses(): void
     {
         $this->setSubmissionAsync(false);
@@ -287,9 +280,7 @@ class DistributorTest extends TestCase
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
-        $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static function (JobInterface $job) {
-            return $job;
-        });
+        $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
         $this->queue->expects($this->once())->method('markListAsPending');
         $this->queue->expects($this->exactly(2))->method('markAsRunning');
         $this->routeSpy->expects($this->exactly(2))->method('send')->with([
@@ -301,7 +292,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->getSubmission());
     }
 
-    /** @test */
+    #[Test]
     public function processAsyncOneRouteWithMultiplePasses(): void
     {
         $this->setSubmissionAsync(true);
@@ -318,9 +309,7 @@ class DistributorTest extends TestCase
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
-        $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static function (JobInterface $job) {
-            return $job;
-        });
+        $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
         $this->queue->expects($this->never())->method('markListAsPending');
         $this->queue->expects($this->never())->method('markAsRunning');
         $this->routeSpy->expects($this->never())->method('send');
@@ -330,7 +319,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->getSubmission());
     }
 
-    /** @test */
+    #[Test]
     public function processJobThatSucceeds(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -363,7 +352,7 @@ class DistributorTest extends TestCase
     /**
      * @return array<array{0:string}>
      */
-    public function processJobFromSubmissionWithTwoPassesThatBothSucceedProvider(): array
+    public static function processJobFromSubmissionWithTwoPassesThatBothSucceedProvider(): array
     {
         return [
             'first pass' =>  ['routeId1'],
@@ -373,11 +362,9 @@ class DistributorTest extends TestCase
 
     /**
      * @throws QueueException
-     *
-     * @dataProvider processJobFromSubmissionWithTwoPassesThatBothSucceedProvider
-     *
-     * @test
      */
+    #[Test]
+    #[DataProvider('processJobFromSubmissionWithTwoPassesThatBothSucceedProvider')]
     public function processJobFromSubmissionWithTwoPassesThatBothSucceed(string $routeId): void
     {
         $expectedDataPerRoutePass = [
@@ -434,7 +421,7 @@ class DistributorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobThatSucceedsButIsSkipped(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -459,7 +446,7 @@ class DistributorTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobThatSucceedsButIsSkippedBecauseOfItsGate(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -493,7 +480,7 @@ class DistributorTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobThatSucceedsAndIsNotSkippedBecauseOfAReferencedCondition(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -532,7 +519,7 @@ class DistributorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobThatFails(): void
     {
         $errorMessage = 'my error message';
@@ -559,7 +546,7 @@ class DistributorTest extends TestCase
         $this->subject->processJob($job);
     }
 
-    /** @test */
+    #[Test]
     public function processJobWithDataProviderThatIsEnabled(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -596,7 +583,7 @@ class DistributorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobWithDataProviderThatIsNotEnabled(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -633,7 +620,7 @@ class DistributorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobWithDataProviderThatIsNotAllowed(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -670,7 +657,7 @@ class DistributorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobWithDataProviderThatIsEnabledButRouteIsDisabled(): void
     {
         $this->routeSpy = $this->registerRouteSpy();
@@ -707,7 +694,7 @@ class DistributorTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    #[Test]
     public function processJobWhichProducesNoDataCausesQueueException(): void
     {
         $this->routeSpy = $this->registerRouteSpy();

@@ -112,14 +112,10 @@ class DistributorListSectionController extends DistributorSectionController
         $types = $this->getTypeFilterBounds($filters);
         $status = $this->getStatusFilterBounds($filters);
 
-        $typeCountNotEmpty = count(array_filter($types, static function (int $count) {
-            return $count > 0;
-        }));
+        $typeCountNotEmpty = count(array_filter($types, static fn (int $count) => $count > 0));
         $typeSelected = $filters['type'] !== [];
 
-        $statusCountNotEmpty = count(array_filter($status, static function (int $count) {
-            return $count > 0;
-        }));
+        $statusCountNotEmpty = count(array_filter($status, static fn (int $count) => $count > 0));
         $statusSelected = $filters['status'] !== [];
 
         return [

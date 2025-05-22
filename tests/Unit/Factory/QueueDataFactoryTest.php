@@ -16,12 +16,13 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\InvalidValue;
 use DigitalMarketingFramework\Distributor\Core\Tests\Model\Data\Value\StringValue;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory
- */
+#[CoversClass(QueueDataFactory::class)]
 class QueueDataFactoryTest extends TestCase
 {
     use ListMapTestTrait;
@@ -41,9 +42,7 @@ class QueueDataFactoryTest extends TestCase
         parent::setUp();
 
         $this->configurationDocumentManager = $this->createMock(ConfigurationDocumentManagerInterface::class);
-        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(static function ($configuration) {
-            return [$configuration];
-        });
+        $this->configurationDocumentManager->method('getConfigurationStackFromConfiguration')->willReturnCallback(static fn ($configuration) => [$configuration]);
 
         $this->subject = new QueueDataFactory($this->configurationDocumentManager);
     }
@@ -53,7 +52,7 @@ class QueueDataFactoryTest extends TestCase
      *
      * @return array<int,array<string,mixed>>
      */
-    protected function createRouteConfig(string $integrationName, string $routeName, array $routeConfigs): array
+    protected static function createRouteConfig(string $integrationName, string $routeName, array $routeConfigs): array
     {
         $config = [
             'integrations' => [
@@ -64,7 +63,7 @@ class QueueDataFactoryTest extends TestCase
         ];
         $weight = 10;
         foreach ($routeConfigs as $routeId => $routeConfig) {
-            $config['integrations'][$integrationName]['outboundRoutes'][$routeId] = $this->createListItem([
+            $config['integrations'][$integrationName]['outboundRoutes'][$routeId] = static::createListItem([
                 'type' => $routeName,
                 'pass' => '',
                 'config' => [
@@ -77,7 +76,7 @@ class QueueDataFactoryTest extends TestCase
         return [$config];
     }
 
-    /** @test */
+    #[Test]
     public function convertSubmissionWithStringValueToJob(): void
     {
         $data = [
@@ -101,7 +100,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('626B9#route1#2', $job->getLabel());
     }
 
-    /** @test */
+    #[Test]
     public function convertSubmissionWithComplexFieldToJob(): void
     {
         $data = [
@@ -125,7 +124,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('16876#route1#2', $job->getLabel());
     }
 
-    /** @test */
+    #[Test]
     public function convertSubmissionWithInvalidValueToJob(): void
     {
         $data = [
@@ -138,7 +137,7 @@ class QueueDataFactoryTest extends TestCase
         $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
     }
 
-    /** @test */
+    #[Test]
     public function convertSubmissionWithDataConfigurationAndContextToJob(): void
     {
         $data = [
@@ -185,7 +184,7 @@ class QueueDataFactoryTest extends TestCase
      *   context:array<string,mixed>
      * } $submissionData
      */
-    protected function createJob(array $submissionData, string $integration, string $routeId, string $hash = ''): JobInterface
+    protected static function createJob(array $submissionData, string $integration, string $routeId, string $hash = ''): JobInterface
     {
         return new Job(
             data: [
@@ -197,7 +196,7 @@ class QueueDataFactoryTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function convertJobWithStringValueToSubmission(): void
     {
         $job = $this->createJob([
@@ -212,7 +211,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('value1', $submission->getData()['field1']);
     }
 
-    /** @test */
+    #[Test]
     public function convertJobWithComplexFieldToSubmission(): void
     {
         $job = $this->createJob([
@@ -229,7 +228,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals(['value' => 'value1'], $submission->getData()['field1']->pack());
     }
 
-    /** @test */
+    #[Test]
     public function convertJobWithInvalidValueToSubmission(): void
     {
         $job = $this->createJob([
@@ -243,7 +242,7 @@ class QueueDataFactoryTest extends TestCase
         $this->subject->convertJobToSubmission($job);
     }
 
-    /** @test */
+    #[Test]
     public function convertJobWithUnknownFieldToSubmission(): void
     {
         $job = $this->createJob([
@@ -260,9 +259,9 @@ class QueueDataFactoryTest extends TestCase
     /**
      * @return array<array{0:SubmissionDataSetInterface,1:JobInterface,2:string}>
      */
-    public function hashDataProvider(): array
+    public static function hashDataProvider(): array
     {
-        $config = $this->createRouteConfig('integration1', 'route1', ['routeId1' => []]);
+        $config = static::createRouteConfig('integration1', 'route1', ['routeId1' => []]);
 
         return [
             [
@@ -271,7 +270,7 @@ class QueueDataFactoryTest extends TestCase
                     $config,
                     ['timestamp' => 1716482226, 'context1' => 'contextValue1']
                 ),
-                $this->createJob(
+                static::createJob(
                     [
                         'data' => ['field1' => ['type' => 'string', 'value' => 'value1']],
                         'configuration' => $config[0],
@@ -284,35 +283,24 @@ class QueueDataFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider hashDataProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('hashDataProvider')]
     public function getSubmissionHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash): void
     {
         $hash = $this->subject->getSubmissionHash($submission);
         $this->assertEquals($expectedHash, $hash);
     }
 
-    /**
-     * @dataProvider hashDataProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('hashDataProvider')]
     public function getJobHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash): void
     {
         $hash = $this->subject->getJobHash($job);
         $this->assertEquals($expectedHash, $hash);
     }
 
-    /**
-     * @throws DigitalMarketingFrameworkException
-     *
-     * @dataProvider hashDataProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('hashDataProvider')]
     public function getSubmissionAndConvertedJobHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash): void
     {
         $submissionHash = $this->subject->getSubmissionHash($submission);
@@ -327,11 +315,9 @@ class QueueDataFactoryTest extends TestCase
 
     /**
      * @throws DigitalMarketingFrameworkException
-     *
-     * @dataProvider hashDataProvider
-     *
-     * @test
      */
+    #[Test]
+    #[DataProvider('hashDataProvider')]
     public function getJobAndConvertedSubmissionHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash): void
     {
         $jobHash = $this->subject->getJobHash($job);
@@ -344,7 +330,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals($convertedSubmissionHash, $convertedJobHash);
     }
 
-    /** @test */
+    #[Test]
     public function getSubmissionLabel(): void
     {
         $submission = new SubmissionDataSet(
@@ -371,7 +357,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('B31F5#route1', $label);
     }
 
-    /** @test */
+    #[Test]
     public function getJobLabel(): void
     {
         $job = $this->createJob([
@@ -396,7 +382,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('ABCDE#route1', $label);
     }
 
-    /** @test */
+    #[Test]
     public function getJobLabelWithoutOwnHash(): void
     {
         $job = $this->createJob([
@@ -421,7 +407,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('B31F5#route1', $label);
     }
 
-    /** @test */
+    #[Test]
     public function getJobRouteId(): void
     {
         $job = $this->createJob([
@@ -446,7 +432,7 @@ class QueueDataFactoryTest extends TestCase
         $this->assertEquals('routeId1', $route);
     }
 
-    /** @test */
+    #[Test]
     public function getJobIntegrationName(): void
     {
         $job = $this->createJob([
