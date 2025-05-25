@@ -11,12 +11,12 @@ class DistributorStatisticsSectionController extends DistributorSectionControlle
         string $keyword,
         RegistryInterface $registry,
     ) {
-        parent::__construct($keyword, $registry, ['show-statistics', 'show-errors']);
+        parent::__construct($keyword, $registry, ['show-statistics']);
     }
 
     protected function showStatisticsAction(): Response
     {
-        $this->addDistributorListScript();
+        $this->addListScript();
 
         $filters = $this->getFilters();
 
@@ -27,34 +27,6 @@ class DistributorStatisticsSectionController extends DistributorSectionControlle
 
         $this->viewData['filters'] = $filters;
         $this->viewData['statistics'] = $statistics;
-
-        return $this->render();
-    }
-
-    protected function showErrorsAction(): Response
-    {
-        $this->addDistributorListScript();
-
-        $filters = $this->getFilters();
-        $navigation = $this->getNavigation();
-
-        $transformedFilters = $this->transformInputFilters($filters);
-        $transformedNavigation = $this->transformInputNavigation($navigation, defaultSorting: ['count' => 'DESC', 'lastSeen' => 'DESC', 'firstSeen' => '']);
-
-        $navigationBounds = [
-            'sort' => ['count', 'firstSeen', 'lastSeen'],
-            'sortDirection' => ['', 'ASC', 'DESC'],
-        ];
-
-        $this->assignCurrentRouteData('show-errors', $filters, $transformedNavigation);
-
-        $this->viewData['current'] = 'show-errors';
-        $this->viewData['filters'] = $filters;
-        $this->viewData['navigation'] = $transformedNavigation;
-        $this->viewData['navigationBounds'] = $navigationBounds;
-
-        $errors = $this->queue->getErrorMessages($transformedFilters, $transformedNavigation);
-        $this->viewData['errors'] = $errors;
 
         return $this->render();
     }

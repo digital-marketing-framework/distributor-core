@@ -3,16 +3,14 @@
 namespace DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController;
 
 use DateTime;
-use DigitalMarketingFramework\Core\Backend\Controller\SectionController\SectionController;
+use DigitalMarketingFramework\Core\Backend\Controller\SectionController\ListSectionController;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface as DistributorRegistryInterface;
 
-abstract class DistributorSectionController extends SectionController
+abstract class DistributorSectionController extends ListSectionController
 {
-    protected const DISTRIBUTOR_LIST_SCRIPT = 'PKG:digital-marketing-framework/distributor-core/res/assets/scripts/backend/distributor-list.js';
-
     protected DistributorRegistryInterface $distributorRegistry;
 
     protected QueueSettings $queueSettings;
@@ -28,91 +26,14 @@ abstract class DistributorSectionController extends SectionController
         $this->queue = $this->distributorRegistry->getPersistentQueue();
     }
 
-    protected function addDistributorListScript(): void
+    protected function fetchFilteredCount(array $filters): int
     {
-        $this->addScript(static::DISTRIBUTOR_LIST_SCRIPT, 'distributor-list');
+        return $this->queue->countFiltered($filters);
     }
 
-    /**
-     * @return array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
-     */
-    protected function getFilters(): array
+    protected function fetchFiltered(array $filters, array $navigation): array
     {
-        return $this->getParameters()['filters'] ?? [];
-    }
-
-    /**
-     * @return array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
-     */
-    protected function getNavigation(): array
-    {
-        return $this->getParameters()['navigation'] ?? [];
-    }
-
-    /**
-     * @return array<string|int,string|int>
-     */
-    protected function getList(): array
-    {
-        $list = $this->getParameters()['list'] ?? [];
-
-        return array_values(array_filter($list));
-    }
-
-    protected function getPage(): ?int
-    {
-        return $this->getParameters()['page'] ?? null;
-    }
-
-    protected function getCurrentAction(string $default): string
-    {
-        return $this->getParameters()['currentAction'] ?? $default;
-    }
-
-    /**
-     * @param array<string,mixed> $arguments
-     */
-    protected function cleanupArguments(array &$arguments): void
-    {
-        // TODO can we filter out default values in addition to empty values?
-        foreach (array_keys($arguments) as $key) {
-            if (is_array($arguments[$key])) {
-                $this->cleanupArguments($arguments[$key]);
-                if ($arguments[$key] === []) {
-                    unset($arguments[$key]);
-                }
-            } elseif ($arguments[$key] === '') {
-                unset($arguments[$key]);
-            }
-        }
-    }
-
-    /**
-     * @param array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
-     * @param array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
-     */
-    protected function getPermanentUri(string $action, array $filters = [], array $navigation = []): string
-    {
-        $arguments = ['filters' => $filters, 'navigation' => $navigation];
-        $this->cleanupArguments($arguments['filters']);
-
-        return $this->uriBuilder->build('page.distributor.' . $action, $arguments);
-    }
-
-    /**
-     * @param array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
-     * @param array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
-     */
-    protected function assignCurrentRouteData(string $defaultAction, array $filters = [], array $navigation = []): void
-    {
-        $currentAction = $this->getCurrentAction($defaultAction);
-        $this->viewData['current'] = $currentAction;
-
-        $permanentUri = $this->getPermanentUri($defaultAction, $filters, $navigation);
-        $this->viewData['permanentUri'] = $permanentUri;
-
-        $resetUri = $this->getPermanentUri($defaultAction);
-        $this->viewData['resetUri'] = $resetUri;
+        return $this->queue->fetchFiltered($filters, $navigation);
     }
 
     /**
@@ -171,20 +92,5 @@ abstract class DistributorSectionController extends SectionController
         }
 
         return $result;
-    }
-
-    /**
-     * @param array{page?:int|string,itemsPerPage?:int|string,sorting?:array<string,string>} $navigation
-     * @param array<string,string> $defaultSorting
-     *
-     * @return array{page:int,itemsPerPage:int,sorting:array<string,string>}
-     */
-    protected function transformInputNavigation(array $navigation, array $defaultSorting): array
-    {
-        return [
-            'page' => (int)($navigation['page'] ?? 0),
-            'itemsPerPage' => (int)($navigation['itemsPerPage'] ?? 20),
-            'sorting' => $navigation['sorting'] ?? $defaultSorting,
-        ];
     }
 }

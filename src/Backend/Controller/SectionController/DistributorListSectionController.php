@@ -128,110 +128,13 @@ class DistributorListSectionController extends DistributorSectionController
         ];
     }
 
-    /**
-     * @param array{search:string,advancedSearch:bool,searchExactMatch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
-     * @param array{page:int,itemsPerPage:int,sorting:array<string,string>} $navigation
-     *
-     * @return array{numberOfPages:int,pages:array<int>,sort:array<string>,sortDirection:array<string>}
-     */
-    protected function getNavigationBounds(array $filters, array $navigation): array
-    {
-        $numberOfPages = 1;
-        $count = $this->queue->countFiltered($filters);
-        if ($navigation['itemsPerPage'] > 0 && $count > $navigation['itemsPerPage']) {
-            $numberOfPages = ceil($count / $navigation['itemsPerPage']);
-        }
-
-        return [
-            'numberOfPages' => $numberOfPages,
-            'numberOfItems' => $count,
-            'pages' => array_keys(array_fill(0, $numberOfPages, 1)),
-            'sort' => ['changed', 'created', 'type', 'status'],
-            'sortDirection' => ['', 'ASC', 'DESC'],
-        ];
-    }
-
-    /**
-     * @param array<int> $pages
-     *
-     * @return array<string|int>
-     */
-    protected function getPagesForPagination(array $pages, int $currentPage, int $totalPages): array
-    {
-        // Limit Pagination page links
-        if ($totalPages > (4 * static::PAGINATION_ITEMS_EACH_SIDE + 3)) {
-            $pages = [];
-            $startPage = $currentPage - static::PAGINATION_ITEMS_EACH_SIDE;
-            $endPage = $currentPage + static::PAGINATION_ITEMS_EACH_SIDE;
-
-            if ($currentPage <= 2 * static::PAGINATION_ITEMS_EACH_SIDE + 1) {
-                // Current page close to beginning
-                $startPage = 0;
-                $endPage = (3 * static::PAGINATION_ITEMS_EACH_SIDE) + 1;
-            } elseif ($currentPage >= $totalPages - (2 * static::PAGINATION_ITEMS_EACH_SIDE + 2)) {
-                // Current page close to end
-                $startPage = $totalPages - (3 * static::PAGINATION_ITEMS_EACH_SIDE) - 2;
-                $endPage = $totalPages - 1;
-            }
-
-            if ($startPage > 0) {
-                $pages = array_keys(array_fill(0, static::PAGINATION_ITEMS_EACH_SIDE, 1));
-            }
-
-            if ($startPage > 1) {
-                $pages[] = '...';
-            }
-
-            $pages = [...$pages, ...array_keys(array_fill($startPage, $endPage - $startPage + 1, 1))];
-            if ($endPage < $totalPages - static::PAGINATION_ITEMS_EACH_SIDE) {
-                $pages[] = '...';
-            }
-
-            if ($endPage < $totalPages - 1) {
-                $pages = [...$pages, ...array_keys(array_fill($totalPages - static::PAGINATION_ITEMS_EACH_SIDE, static::PAGINATION_ITEMS_EACH_SIDE, 1))];
-            }
-        }
-
-        return $pages;
-    }
-
     public function listAction(): Response
     {
-        $this->addDistributorListScript();
-
-        $page = $this->getPage();
-        $filters = $this->getFilters();
-        $navigation = $this->getNavigation();
-
-        $transformedFilters = $this->transformInputFilters($filters);
-        $transformedNavigation = $this->transformInputNavigation($navigation, defaultSorting: ['changed' => 'DESC', 'created' => '', 'type' => '', 'status' => '']);
-        $filterBounds = $this->getFilterBounds($transformedFilters);
-        $navigationBounds = $this->getNavigationBounds($transformedFilters, $transformedNavigation);
-
-        if ($page !== null) {
-            $transformedNavigation['page'] = $page;
-        }
-
-        if ($transformedNavigation['page'] >= $navigationBounds['numberOfPages']) {
-            $transformedNavigation['page'] = $navigationBounds['numberOfPages'] - 1;
-        }
-
-        $navigationBounds['pages'] = $this->getPagesForPagination($navigationBounds['pages'], $transformedNavigation['page'], $navigationBounds['numberOfPages']);
-
-        $this->assignCurrentRouteData('list', $filters, $transformedNavigation);
+        $this->setUpListView('list', ['changed' => 'DESC', 'created' => '', 'type' => '', 'status' => '']);
 
         $this->viewData['expirationDate'] = $this->getExpirationDate();
         $this->viewData['maxExecutionTime'] = $this->queueSettings->getMaximumExecutionTime();
         $this->viewData['stuckDate'] = $this->getStuckDate();
-
-        $this->viewData['filters'] = $filters;
-        $this->viewData['navigation'] = $transformedNavigation;
-
-        $this->viewData['filterBounds'] = $filterBounds;
-        $this->viewData['navigationBounds'] = $navigationBounds;
-
-        $jobs = $this->queue->fetchFiltered($transformedFilters, $transformedNavigation);
-        $this->viewData['jobs'] = $jobs;
 
         return $this->render();
     }
@@ -284,7 +187,7 @@ class DistributorListSectionController extends DistributorSectionController
 
     protected function previewAction(): Response
     {
-        $list = $this->getList();
+        $list = $this->getSelectedItems();
         $records = [];
         if ($list !== []) {
             $jobs = $this->queue->fetchByIdList($list);
@@ -306,7 +209,7 @@ class DistributorListSectionController extends DistributorSectionController
 
     protected function deleteAction(): Response
     {
-        $list = $this->getList();
+        $list = $this->getSelectedItems();
         $returnUrl = $this->getReturnUrl($this->uriBuilder->build('page.distributor.list'));
 
         if ($list !== []) {
@@ -321,7 +224,7 @@ class DistributorListSectionController extends DistributorSectionController
 
     protected function queueAction(): Response
     {
-        $list = $this->getList();
+        $list = $this->getSelectedItems();
         $returnUrl = $this->getReturnUrl($this->uriBuilder->build('page.distributor.list'));
 
         if ($list !== []) {
@@ -334,7 +237,7 @@ class DistributorListSectionController extends DistributorSectionController
 
     protected function runAction(): Response
     {
-        $list = $this->getList();
+        $list = $this->getSelectedItems();
         $returnUrl = $this->getReturnUrl($this->uriBuilder->build('page.distributor.list'));
 
         if ($list !== []) {

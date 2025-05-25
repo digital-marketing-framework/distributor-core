@@ -5,53 +5,54 @@
 
     <h2>Errors</h2>
 
-    <form method="post" action="{{ uri('page.distributor.' ~ current) }}" data-module="dmf-distributor-backend" data-form-type="show-errors">
-        {{ include('distributor/filters/timing-filters.html.twig', {filters,filterBounds}) }}
-        {{ include('distributor/navigation/sorting.html.twig', {navigation,navigationBounds}) }}
-        {{ include('distributor/update-view.html.twig', {current,permanentUri,resetUri,filters,navigation}) }}
-    </form>
+    {% embed 'list/list.html.twig' with {
+        route: 'page.distributor',
+        listAction: 'show-errors',
+        useSorting: true,
+        usePagination: true,
+        useFilters: true,
+        filterNames: ['timing'],
+        listLabel: 'Results',
+        noResultsText: 'No errors found. Well done.',
+        list,
+        filters,
+        navigation,
+        filterBounds,
+        navigationBounds,
+    } %}
+        {% block tableHead %}
+            <th>Error</th>
+            <th>Count</th>
+            <th>First seen</th>
+            <th>Last seen</th>
+            <th>Route(s)</th>
+        {% endblock %}
 
-    {% if errors %}
-        <div class="table-fit">
-            <table id="distributor-jobs-errors" class="table table-striped table-hover">
-                <tr>
-                    <th>Error</th>
-                    <th>Count</th>
-                    <th>First seen</th>
-                    <th>Last seen</th>
-                    <th>Route(s)</th>
-                </tr>
-                {% for error in errors %}
-                    <tr>
-                        <td>
-                            <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1},search:error.message,searchExactMatch:1})}) }}">
-                                {{ error.message }}
-                            </a>
-                        </td>
-                        <td>{{ error.count }}</td>
-                        <td>
-                            <a href="{{ uri('page.distributor.edit', {id:error.firstSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ error.firstSeen.label }}">
-                                {{ error.firstSeen.changed|date('Y-m-d H:i:s') }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{{ uri('page.distributor.edit', {id:error.lastSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ error.lastSeen.label }}">
-                                {{ error.lastSeen.changed|date('Y-m-d H:i:s') }}
-                            </a>
-                        </td>
-                        <td>
-                            {% for type,countPerType in error.types %}
-                                <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1},status:{failed:1},search:error.message,searchExactMatch:1})}) }}">
-                                    {{ type }} ({{ countPerType }})
-                                    {% if not loop.last %}<br/>{% endif %}
-                                </a>
-                            {% endfor %}
-                        </td>
-                    </tr>
+        {% block tableRow %}
+            <td>
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1},search:item.message,searchExactMatch:1})}) }}">
+                    {{ item.message }}
+                </a>
+            </td>
+            <td>{{ item.count }}</td>
+            <td>
+                <a href="{{ uri('page.distributor.edit', {id:error.firstSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ item.firstSeen.label }}">
+                    {{ item.firstSeen.changed|date('Y-m-d H:i:s') }}
+                </a>
+            </td>
+            <td>
+                <a href="{{ uri('page.distributor.edit', {id:error.lastSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ item.lastSeen.label }}">
+                    {{ item.lastSeen.changed|date('Y-m-d H:i:s') }}
+                </a>
+            </td>
+            <td>
+                {% for type,countPerType in item.types %}
+                    <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1},status:{failed:1},search:item.message,searchExactMatch:1})}) }}">
+                        {{ type }} ({{ countPerType }})
+                        {% if not loop.last %}<br/>{% endif %}
+                    </a>
                 {% endfor %}
-            </table>
-        </div>
-    {% else %}
-        <p>No errors found. Well done.</p>
-    {% endif %}
+            </td>
+        {% endblock %}
+    {% endembed %}
 {% endblock %}

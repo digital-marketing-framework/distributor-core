@@ -5,54 +5,128 @@
 
     <h2>Jobs</h2>
 
-    <form method="post" action="{{ uri('page.distributor.list') }}" data-module="dmf-distributor-backend" data-form-type="list">
-        <h3>Filters</h3>
-        <input type="hidden" name="returnUrl" value="{{ permanentUri }}" />
-        {{ include('distributor/filters/search-filter.html.twig', {filters,filterBounds}) }}
-        {{ include('distributor/filters/timing-filters.html.twig', {filters,filterBounds}) }}
-        {{ include('distributor/filters/type-filters.html.twig', {filters,filterBounds}) }}
-        {{ include('distributor/filters/status-filters.html.twig', {filters,filterBounds}) }}
+    {% embed 'list/list.html.twig' with {
+        route: 'page.distributor',
+        useActions: true,
+        useBulkActions: true,
+        usePagination: true,
+        useFilters: true,
+        useSorting: true,
+        filterNames: ['search', 'timing', 'distributor/type', 'distributor/status'],
+        listLabel: 'Results',
+        noResultsText: 'No jobs found.',
+        showLabel: true,
+        labelClass: '',
+        linkLabelAction: 'edit',
+        actionsClass: '',
+        list,
+        filters,
+        navigation,
+        filterBounds,
+        navigationBounds
+    } %}
 
-        <h3>Navigation</h3>
-        <div>
-            {{ include('distributor/navigation/pagination-filter.html.twig', {navigation,navigationBounds}) }}
-            {{ include('distributor/navigation/sorting.html.twig', {navigation,navigationBounds}) }}
-        </div>
+        {% block listBulkActionsCustom %}
+            <button type="submit" title="queue" name="action" value="queue" class="btn btn-default" disabled="disabled" data-action-type="bulk" data-confirm="Do you want to queue the selected jobs?">
+                {{ include('t3-icon.html.twig', {name:'clock'}) }}
+            </button>
 
-        {{ include('distributor/update-view.html.twig', {permanentUri,resetUri,filters,navigation,current:'list'}) }}
+            <button type="submit" title="run" name="action" value="run" class="btn btn-default" disabled="disabled" data-action-type="bulk" data-confirm="Do you want to run the selected jobs?">
+                {{ include('t3-icon.html.twig', {name:'play'}) }}
+            </button>
+        {% endblock %}
 
-        <h3>
-            List
-            {% if navigationBounds.numberOfPages > 1 %}
-                {% set minItems = navigation.page * navigation.itemsPerPage + 1 %}
-                {% set maxItems = navigation.page * navigation.itemsPerPage + navigation.itemsPerPage %}
-                [page: {{ navigation.page + 1 }} / {{ navigationBounds.numberOfPages }}]
-                [results: {{ minItems }} - {% if maxItems > navigationBounds.numberOfItems %}{{ navigationBounds.numberOfItems }}{% else %}{{ maxItems }}{% endif %}]
-            {% endif %}
-            [total: {{ navigationBounds.numberOfItems }}]
-        </h3>
+        {% block tableHeadCustom %}
+            <th class="nowrap">Status</th>
+            <th class="nowrap">Changed</th>
+            <th class="nowrap">Created</th>
+        {% endblock %}
 
-        <div class="form-row justify-content-between my-3">
-            <div class="form-group">
-                <div class="input-group">
-                    {{ include('distributor/list/actions.html.twig', {navigationBounds}) }}
-                    <span class="mx-2"></span>
-                    {{ include('distributor/navigation/pagination.html.twig', {filters,navigation,navigationBounds,current:'list'}) }}
-                </div>
-            </div>
-        </div>
+        {% block tableRowCustom %}
+            {% set statusLabelMap = {
+                'stuck': 'stuck',
+                'expired': 'expired',
+                0: 'queued',
+                1: 'pending',
+                2: 'running',
+                3: 'done',
+                4: 'failed'
+            } %}
+            <td>
+                {% set statusLabel = statusLabelMap[item.status] ?? item.status %}
+                {% set stuckLabel = statusLabelMap['stuck'] ?? 'stuck' %}
+                {% set expiredLabel = statusLabelMap['expired'] ?? 'expired' %}
+                {% set skippedLabel = statusLabelMap['skipped'] ?? 'skipped' %}
+                {% set processedLabel = statusLabelMap['processed'] ?? 'processed' %}
+                {% set stuck = item.changed < stuckDate %}
+                {% set expired = item.changed < expirationDate %}
+                {% if item.status == 0 %}
+                    <span class="badge badge-info">{{ statusLabel }}</span>
+                    {% if stuck %}
+                        <span class="badge badge-warning" title="not started for more than {{ maxExecutionTime }} seconds">
+                                {{ stuckLabel }}
+                            </span>
+                    {% endif %}
+                {% elseif item.status == 1 %}
+                    <span class="badge badge-primary">{{ statusLabel }}</span>
+                    {% if stuck %}
+                        <span class="badge badge-danger" title="pending for more than {{ maxExecutionTime }} seconds">
+                                {{ stuckLabel }}
+                            </span>
+                    {% endif %}
+                {% elseif item.status == 2 %}
+                    <span class="badge badge-warning">
+                            {{ statusLabel }}
+                        </span>
+                    {% if stuck %}
+                        <span class="badge badge-danger" title="running for more than {{ maxExecutionTime }} seconds">
+                                {{ stuckLabel }}
+                            </span>
+                    {% endif %}
+                {% elseif item.status == 3 %}
+                    <span class="badge badge-success">
+                            {{ statusLabel }}
+                        </span>
+                    <span class="badge">
+                            {% if item.skipped %}
+                                {{ skippedLabel }}
+                            {% else %}
+                                {{ processedLabel }}
+                            {% endif %}
+                        </span>
+                    {% if expired %}
+                        <span class="badge badge-warning" title="should have been deleted by now">
+                            {{ expiredLabel }}
+                        </span>
+                    {% endif %}
+                {% elseif item.status == 4 %}
+                    <span title="error: {{ item.statusMessage }}" class="badge badge-danger">
+                            {{ statusLabel }}
+                        </span>
+                {% else %}
+                    {{ statusLabel }}
+                {% endif %}
+            </td>
+            <td class="nowrap">
+                {{ item.changed|date('Y-m-d H:i:s') }}
+            </td>
+            <td class="nowrap">
+                {{ item.created|date('Y-m-d H:i:s') }}
+            </td>
+        {% endblock %}
 
-        {{ include('distributor/list/list.html.twig', {jobs,filters,navigation,navigationBounds,expirationDate,stuckData,maxExecutionTime}) }}
+        {% block tableRowActionsCustom %}
+            {% set args = {list:{(job.id):job.id},returnUrl:permanentUri} %}
+            <a href="{{ uri('page.distributor.preview', args) }}" title="preview" class="btn btn-default">
+                {{ include('t3-icon.html.twig', {name:'document-view'}) }}
+            </a>
+            <a href="{{ uri('page.distributor.queue', args) }}" title="queue" class="btn btn-default" {% if job.status == 0 %}disabled="disabled"{% endif %} data-confirm="Do you want to queue this job?">
+                {{ include('t3-icon.html.twig', {name:'clock'}) }}
+            </a>
+            <a href="{{ uri('page.distributor.run', args) }}" title="run" class="btn btn-default" data-confirm="Do you want to run this job?">
+                {{ include('t3-icon.html.twig', {name:'play'}) }}
+            </a>
+        {% endblock %}
 
-        <div class="form-row justify-content-between my-3">
-            <div class="form-group">
-                <div class="input-group">
-                    {{ include('distributor/list/actions.html.twig', {navigationBounds}) }}
-                    <span class="mx-2"></span>
-                    {{ include('distributor/navigation/pagination.html.twig', {filters,navigation,navigationBounds,current:'list'}) }}
-                </div>
-            </div>
-        </div>
-
-    </form>
+    {% endembed %}
 {% endblock %}

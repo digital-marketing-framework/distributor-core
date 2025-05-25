@@ -9,6 +9,7 @@ use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterfac
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
+use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorErrorMonitorSectionController;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorListSectionController;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorStatisticsSectionController;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
@@ -36,6 +37,7 @@ class DistributorCoreInitialization extends Initialization
             SectionControllerInterface::class => [
                 DistributorStatisticsSectionController::class,
                 DistributorListSectionController::class,
+                DistributorErrorMonitorSectionController::class,
             ],
         ],
         RegistryDomain::DISTRIBUTOR => [
