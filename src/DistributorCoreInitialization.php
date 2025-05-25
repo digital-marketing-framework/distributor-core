@@ -3,10 +3,15 @@
 namespace DigitalMarketingFramework\Distributor\Core;
 
 use DigitalMarketingFramework\Core\Alert\AlertHandlerInterface;
+use DigitalMarketingFramework\Core\Backend\Controller\SectionController\SectionControllerInterface;
+use DigitalMarketingFramework\Core\Backend\Section\Section;
 use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterface;
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
 use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
+use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorErrorMonitorSectionController;
+use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorListSectionController;
+use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorStatisticsSectionController;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
@@ -28,6 +33,11 @@ class DistributorCoreInitialization extends Initialization
             ],
             AlertHandlerInterface::class => [
                 JobWatchAlertHandler::class,
+            ],
+            SectionControllerInterface::class => [
+                DistributorStatisticsSectionController::class,
+                DistributorListSectionController::class,
+                DistributorErrorMonitorSectionController::class,
             ],
         ],
         RegistryDomain::DISTRIBUTOR => [
@@ -51,6 +61,21 @@ class DistributorCoreInitialization extends Initialization
     ];
 
     protected const SCHEMA_MIGRATIONS = [];
+
+    protected function getBackendSections(): array
+    {
+        return [
+            new Section(
+                'Distributor',
+                'DISTRIBUTOR',
+                'page.distributor.show-statistics',
+                'Distributor Job Management',
+                'PKG:digital-marketing-framework/distributor-core/res/assets/icons/dashboard-distributor.svg',
+                'Show',
+                50
+            ),
+        ];
+    }
 
     public function __construct(string $packageAlias = '')
     {

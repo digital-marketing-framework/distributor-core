@@ -11,6 +11,7 @@ use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
+use DigitalMarketingFramework\Core\Tests\TestUtilityTrait;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactoryInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
@@ -18,12 +19,14 @@ use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Setting
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRouteInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DistributorTest extends TestCase
 {
     use ListMapTestTrait;
+    use TestUtilityTrait;
 
     protected RegistryInterface&MockObject $registry;
 
@@ -86,9 +89,7 @@ class DistributorTest extends TestCase
         $this->registry->method('getNonPersistentQueue')->willReturn($this->temporaryQueue);
         $this->registry->method('getQueueDataFactory')->willReturn($this->queueDataFactory);
 
-        $this->registry->method('getOutboundRoutes')->willReturnCallback(function () {
-            return $this->routes;
-        });
+        $this->registry->method('getOutboundRoutes')->willReturnCallback(fn () => $this->routes);
 
         $this->subject = new Distributor($this->registry);
         $this->subject->setLogger($this->logger);
@@ -132,7 +133,7 @@ class DistributorTest extends TestCase
         $this->jobs[$id] = $job;
     }
 
-    /** @test */
+    #[Test]
     public function processSyncOneRouteOnePassWithStorage(): void
     {
         $this->initSubmission();
@@ -146,20 +147,14 @@ class DistributorTest extends TestCase
         $this->queueDataFactory
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING]
-            )
+            ->with($this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING)
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
         $this->persistentQueue
             ->expects($this->exactly(1))
             ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+            ->with($this->jobs['routeId1'])
+            ->willReturnCallback(static fn (JobInterface $job) => $job);
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -179,7 +174,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processSyncOneRouteOnePassWithoutStorage(): void
     {
         $this->initSubmission();
@@ -193,9 +188,7 @@ class DistributorTest extends TestCase
         $this->queueDataFactory
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING]
-            )
+            ->with($this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING)
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
         $this->persistentQueue
@@ -205,12 +198,8 @@ class DistributorTest extends TestCase
         $this->temporaryQueue
             ->expects($this->exactly(1))
             ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+            ->with($this->jobs['routeId1'])
+            ->willReturnCallback(static fn (JobInterface $job) => $job);
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -226,7 +215,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processAsyncOneRouteOnePassWithStorage(): void
     {
         $this->initSubmission();
@@ -240,20 +229,14 @@ class DistributorTest extends TestCase
         $this->queueDataFactory
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_QUEUED]
-            )
+            ->with($this->submission, 'generic', 'routeId1', QueueInterface::STATUS_QUEUED)
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
         $this->persistentQueue
             ->expects($this->exactly(1))
             ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+            ->with($this->jobs['routeId1'])
+            ->willReturnCallback(static fn (JobInterface $job) => $job);
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -270,7 +253,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processSyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
@@ -285,25 +268,15 @@ class DistributorTest extends TestCase
 
         $this->logger->expects($this->never())->method('error');
 
-        $this->queueDataFactory
-            ->expects($this->exactly(2))
-            ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING],
-                [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_PENDING]
-            )
-            ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
+        $this->withConsecutiveWillReturn($this->queueDataFactory, 'convertSubmissionToJob', [
+            [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING],
+            [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_PENDING],
+        ], array_values($this->jobs), true);
 
-        $this->persistentQueue
-            ->expects($this->exactly(2))
-            ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']],
-                [$this->jobs['routeId2']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+            [$this->jobs['routeId1']],
+            [$this->jobs['routeId2']],
+        ], static fn (JobInterface $job) => $job, true);
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -324,7 +297,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processAsyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
@@ -339,25 +312,15 @@ class DistributorTest extends TestCase
 
         $this->logger->expects($this->never())->method('error');
 
-        $this->queueDataFactory
-            ->expects($this->exactly(2))
-            ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_QUEUED],
-                [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED]
-            )
-            ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
+        $this->withConsecutiveWillReturn($this->queueDataFactory, 'convertSubmissionToJob', [
+            [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_QUEUED],
+            [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED],
+        ], array_values($this->jobs), true);
 
-        $this->persistentQueue
-            ->expects($this->exactly(2))
-            ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']],
-                [$this->jobs['routeId2']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+            [$this->jobs['routeId1']],
+            [$this->jobs['routeId2']],
+        ], static fn (JobInterface $job) => $job, true);
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -374,7 +337,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processSyncAndAsyncOneRouteWithMultiplePasses(): void
     {
         $this->initSubmission();
@@ -389,25 +352,15 @@ class DistributorTest extends TestCase
 
         $this->logger->expects($this->never())->method('error');
 
-        $this->queueDataFactory
-            ->expects($this->exactly(2))
-            ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING],
-                [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED]
-            )
-            ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
+        $this->withConsecutiveWillReturn($this->queueDataFactory, 'convertSubmissionToJob', [
+            [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING],
+            [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED],
+        ], array_values($this->jobs), true);
 
-        $this->persistentQueue
-            ->expects($this->exactly(2))
-            ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']],
-                [$this->jobs['routeId2']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+            [$this->jobs['routeId1']],
+            [$this->jobs['routeId2']],
+        ], static fn (JobInterface $job) => $job, true);
 
         $this->temporaryQueue
             ->expects($this->never())
@@ -427,7 +380,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processAsyncWithoutStorageLogsErrorConvertsToSync(): void
     {
         $this->initSubmission();
@@ -441,9 +394,7 @@ class DistributorTest extends TestCase
         $this->queueDataFactory
             ->expects($this->exactly(1))
             ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING]
-            )
+            ->with($this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING)
             ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
 
         $this->persistentQueue
@@ -453,12 +404,8 @@ class DistributorTest extends TestCase
         $this->temporaryQueue
             ->expects($this->exactly(1))
             ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']],
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+            ->with($this->jobs['routeId1'])
+            ->willReturnCallback(static fn (JobInterface $job) => $job);
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -474,7 +421,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function processMixedSyncMixedStorageMultipleRoutesWithMultiplePasses(): void
     {
         $this->initSubmission();
@@ -497,38 +444,22 @@ class DistributorTest extends TestCase
 
         $this->logger->expects($this->once())->method('error')->with('Async submissions without storage are not possible. Using sync submission instead.');
 
-        $this->queueDataFactory
-            ->expects($this->exactly(4))
-            ->method('convertSubmissionToJob')
-            ->withConsecutive(
-                [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING],
-                [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED],
-                [$this->submission, 'generic', 'routeId3', QueueInterface::STATUS_PENDING],
-                [$this->submission, 'generic', 'routeId4', QueueInterface::STATUS_PENDING]
-            )
-            ->willReturnOnConsecutiveCalls(...array_values($this->jobs));
+        $this->withConsecutiveWillReturn($this->queueDataFactory, 'convertSubmissionToJob', [
+            [$this->submission, 'generic', 'routeId1', QueueInterface::STATUS_PENDING],
+            [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED],
+            [$this->submission, 'generic', 'routeId3', QueueInterface::STATUS_PENDING],
+            [$this->submission, 'generic', 'routeId4', QueueInterface::STATUS_PENDING],
+        ], array_values($this->jobs), true);
 
-        $this->persistentQueue
-            ->expects($this->exactly(2))
-            ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId1']],
-                [$this->jobs['routeId2']]
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+            [$this->jobs['routeId1']],
+            [$this->jobs['routeId2']],
+        ], static fn (JobInterface $job) => $job, true);
 
-        $this->temporaryQueue
-            ->expects($this->exactly(2))
-            ->method('addJob')
-            ->withConsecutive(
-                [$this->jobs['routeId3']],
-                [$this->jobs['routeId4']],
-            )
-            ->willReturnCallback(static function (JobInterface $job) {
-                return $job;
-            });
+        $this->withConsecutiveWillReturn($this->temporaryQueue, 'addJob', [
+            [$this->jobs['routeId3']],
+            [$this->jobs['routeId4']],
+        ], static fn (JobInterface $job) => $job, true);
 
         $this->persistentQueueProcessor
             ->expects($this->once())
@@ -548,7 +479,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function disabledRouteAsyncWithStorageDoesNotCreateAJobAndIsNotProcessed(): void
     {
         $this->initSubmission();
@@ -568,7 +499,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function disabledRouteSyncWithStorageDoesNotCreateAJobAndIsNotProcessed(): void
     {
         $this->initSubmission();
@@ -588,7 +519,7 @@ class DistributorTest extends TestCase
         $this->subject->process($this->submission);
     }
 
-    /** @test */
+    #[Test]
     public function disabledRouteSyncWithoutStorageDoesNotCreateAJobAndIsNotProcessed(): void
     {
         $this->initSubmission();

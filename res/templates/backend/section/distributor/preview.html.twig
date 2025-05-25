@@ -1,0 +1,28 @@
+{% extends "module.html.twig" %}
+
+{% block section %}
+    {% block previewHeader %}
+        <div class="container">
+            <a href="{{ returnUrl }}" class="btn btn-primary">Back</a>
+
+            {% embed 'note.html.twig' with {type:'info'} %}
+                {% block body %}
+                    <p>This is a job preview, not a review. It shows what will happen if a job was processed right now, but not necessarily what had happened when the job was last processed.</p>
+                    <p>If the job was processed in the past, the associated configuration might have been different which could have changed the specifics of the process.</p>
+                {% endblock %}
+            {% endembed %}
+        </div>
+    {% endblock %}
+
+    {% for record in records %}
+        <div class="container">
+            <h2>Preview: {{ record.job.label }} ({{ record.job.id }})</h2>
+
+            {% if record.preview.fatal %}
+                {{ include('note.html.twig', { type:'error', body:record.preview.fatal }) }}
+            {% else %}
+                {{ include(['distributor/preview/outbound-route/' ~ record.preview.keyword ~ '.html.twig', 'distributor/preview/outbound-route/default.html.twig'], record.preview) }}
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

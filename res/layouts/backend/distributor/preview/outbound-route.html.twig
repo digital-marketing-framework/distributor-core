@@ -1,0 +1,32 @@
+<h3>Outbound Route Preview ({{ keyword }})</h3>
+
+<h4>Status</h4>
+
+{% block previewSummary %}
+    {% set infoType = error ? 'error' : (skipped ? 'warning' : 'success') %}
+    {% embed 'note.html.twig' with {type:infoType} %}
+        {% block body %}
+            {{ include('distributor/preview/summary.html.twig') }}
+        {% endblock %}
+    {% endembed %}
+{% endblock %}
+
+{% block previewCustom %}{% endblock %}
+
+{% if not error and not skipped %}
+    {% block previewDataDispatcher %}
+        {{ include(['distributor/preview/data-dispatcher/' ~ dispatcher.keyword ~ '.html.twig', 'distributor/preview/data-dispatcher/default.html.twig'], dispatcher) }}
+    {% endblock %}
+{% endif %}
+
+{% block previewOriginalData %}
+    {% block previewOriginalFormData %}
+        <h4>Original form data</h4>
+        {% include 'data-table.html.twig' with {'tableData': formData, 'tableKeyHeader': 'Field', 'tableValueHeader': 'Value' } %}
+    {% endblock %}
+
+    {% block previewOriginalContextData %}
+        <h4>Original form context</h4>
+        {% include 'data-table.html.twig' with {'tableData': formContext, 'tableKeyHeader': 'Field', 'tableValueHeader': 'Value' } %}
+    {% endblock %}
+{% endblock %}

@@ -114,7 +114,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         }
     }
 
-    public function previewJobProcess(JobInterface $job): string
+    public function getPreviewData(JobInterface $job): array
     {
         $contextPushed = false;
         try {
@@ -128,7 +128,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
             $route = $this->registry->getOutboundRoute($submission, $integrationName, $routeId);
             if (!$route instanceof OutboundRouteInterface) {
-                return $this->registry->renderErrorMessage(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
+                throw new DigitalMarketingFrameworkException(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
             }
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders(), preview: true);
@@ -142,7 +142,9 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
                 $this->registry->popContext();
             }
 
-            return $this->registry->renderErrorMessage($e->getMessage());
+            return [
+                'fatal' => $e->getMessage(),
+            ];
         }
     }
 

@@ -1,6 +1,6 @@
 {
     "name": "digital-marketing-framework/distributor-core",
-    "description": "Digital Marketing Framework - Distributor",
+    "description": "Anyrel - Distributor",
     "license": "GPL-2.0-or-later",
     "type": "library",
     "keywords": [
@@ -21,12 +21,12 @@
     ],
     "homepage": "https://www.mediatis.de",
     "require": {
-        "php": "^8.1",
-        "digital-marketing-framework/core": "^2.6",
-        "digital-marketing-framework/template-engine-twig": "^2.1"
+        "php": "^8.2",
+        "digital-marketing-framework/core": "^3.0",
+        "digital-marketing-framework/template-engine-twig": "^3.0"
     },
     "require-dev": {
-        "mediatis/coding-standards": "^1.0"
+        "mediatis/coding-standards": "^2.0"
     },
     "autoload": {
         "psr-4": {

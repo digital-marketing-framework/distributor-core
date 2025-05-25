@@ -3,8 +3,9 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
 use DigitalMarketingFramework\Distributor\Core\DataProvider\TimestampDataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
-class TimestampDataProviderTest extends AbstractDataProviderTest
+class TimestampDataProviderTest extends DataProviderTestBase
 {
     protected const DATA_PROVIDER_CLASS = TimestampDataProvider::class;
 
@@ -13,7 +14,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         TimestampDataProvider::KEY_FORMAT => TimestampDataProvider::DEFAULT_FORMAT,
     ];
 
-    /** @test */
+    #[Test]
     public function addsContextEvenIfDisabled(): void
     {
         $this->setDataProviderConfiguration(['enabled' => false]);
@@ -28,7 +29,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function doesNotDoAnythingIfTimestampIsNotAvailable(): void
     {
         $this->setDataProviderConfiguration(['enabled' => true]);
@@ -44,7 +45,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function timestampIsAddedToContextAndFields(): void
     {
         $this->setDataProviderConfiguration(['enabled' => true]);
@@ -61,7 +62,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function customFormFieldCanBeUsed(): void
     {
         $this->setDataProviderConfiguration([
@@ -81,7 +82,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function customFormatCanBeUsed(): void
     {
         $this->setDataProviderConfiguration([
@@ -101,7 +102,7 @@ class TimestampDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function doesNotOverwriteFieldByDefault(): void
     {
         $this->setDataProviderConfiguration(['enabled' => true]);

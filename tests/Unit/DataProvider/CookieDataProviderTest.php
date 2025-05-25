@@ -3,8 +3,9 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
-class CookieDataProviderTest extends AbstractDataProviderTest
+class CookieDataProviderTest extends DataProviderTestBase
 {
     protected const DATA_PROVIDER_CLASS = CookieDataProvider::class;
 
@@ -12,7 +13,7 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         CookieDataProvider::KEY_COOKIE_FIELD_MAP => CookieDataProvider::DEFAULT_COOKIE_FIELD_MAP,
     ];
 
-    /** @test */
+    #[Test]
     public function doesNotDoAnythingIfDisabled(): void
     {
         $this->setDataProviderConfiguration([
@@ -30,7 +31,7 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function doesNotDoAnythingIfCookieIsNotAvailable(): void
     {
         $this->setDataProviderConfiguration([
@@ -51,7 +52,7 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function cookiesAreAddedToContextAndFields(): void
     {
         $this->setDataProviderConfiguration([
@@ -84,7 +85,7 @@ class CookieDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function doesNotOverwriteFieldByDefault(): void
     {
         $this->setDataProviderConfiguration([

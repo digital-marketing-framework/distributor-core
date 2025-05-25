@@ -8,7 +8,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiVal
 
 class GeneralUtilityTest extends CoreGeneralUtilityTest
 {
-    public function valueIsEmptyProvider(): array
+    public static function valueIsEmptyProvider(): array
     {
         return [
             [new DiscreteMultiValue(['']), false],
@@ -19,7 +19,7 @@ class GeneralUtilityTest extends CoreGeneralUtilityTest
         ];
     }
 
-    public function valueIsTrueProvider(): array
+    public static function valueIsTrueProvider(): array
     {
         return [
             [new DiscreteMultiValue([]), false],
@@ -31,7 +31,7 @@ class GeneralUtilityTest extends CoreGeneralUtilityTest
         ];
     }
 
-    public function isListProvider(): array
+    public static function isListProvider(): array
     {
         return [
             [new DiscreteMultiValue(), true],
@@ -39,7 +39,7 @@ class GeneralUtilityTest extends CoreGeneralUtilityTest
         ];
     }
 
-    public function castValueToArrayProvider(): array
+    public static function castValueToArrayProvider(): array
     {
         return [
             [new DiscreteMultiValue([]), null, null, []],
@@ -48,7 +48,7 @@ class GeneralUtilityTest extends CoreGeneralUtilityTest
         ];
     }
 
-    public function compareListsProvider(): array
+    public static function compareListsProvider(): array
     {
         // values in one group are considered to be equal
         $valueGroups = [
@@ -66,6 +66,6 @@ class GeneralUtilityTest extends CoreGeneralUtilityTest
             [new DiscreteMultiValue(['205', '207', '213']), new MultiValue(['213', '207', '205']), '205,207,213'],
         ];
 
-        return $this->generateComparisonPairs($valueGroups);
+        return static::generateComparisonPairs($valueGroups);
     }
 }

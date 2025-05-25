@@ -1,0 +1,108 @@
+{% macro tableCell(filters, type, count, status=[]) %}
+    {% if count == 0 %}
+        0
+    {% else %}
+        <a href="{{ uri('page.distributor.list', {filters,status,type:[type]}) }}">
+            {{ count }}
+        </a>
+    {% endif %}
+{% endmacro %}
+
+{% macro tableRow(row, filters, type=null) %}
+    <tr>
+        <td class="col-title">
+            <a href="{{ uri('page.distributo.list', {filters,type:[type]}) }}">
+                {% if type %}{{ type }}{% else %}All{% endif %}
+            </a>
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.all) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.queued, ['queued']) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.pending, ['pending']) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.running, ['running']) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.done, ['doneNotSkipped','doneSkipped']) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.doneNotSkipped, ['doneNotSkipped']) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.doneSkipped, ['doneSkipped']) }}
+        </td>
+        <td>
+            {{ _self.tableCell(filters, type, row.failed, ['failed']) }}
+        </td>
+    </tr>
+{% endmacro %}
+
+<div class="table-fit">
+    <table id="distributor-jobs-statistics"
+           class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>Route</th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters}) }}">
+                    Total
+                </a>
+                <div class="progress">&nbsp;</div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:{0:'queued'}}) }}">
+                    Queued
+                </a>
+                <div class="progress"><div class="progress-bar bg-info" style="width:100%"></div></div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:{0:'pending'}}) }}">
+                    Pending
+                </a>
+                <div class="progress"><div class="progress-bar" style="width:100%"></div></div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:['running']}) }}">
+                    Running
+                </a>
+                <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div></div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:['doneNotSkipped','doneSkipped']}) }}">
+                    Done
+                </a>
+                <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:['doneNotSkipped']}) }}">
+                    Processed
+                </a>
+                <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:['doneSkipped']}) }}">
+                    Skipped
+                </a>
+                <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
+            </th>
+            <th style="min-width:6rem">
+                <a href="{{ uri('page.distributor.list', {filters,status:['failed']}) }}">
+                    Failed
+                </a>
+                <div class="progress"><div class="progress-bar bg-danger" style="width:100%"></div></div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ _self.tableRow(statistics,filters) }}
+        {% for type,groupStatistics in statistics.groupedByType %}
+            {{ _self.tableRow(groupStatistics,filters,type) }}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

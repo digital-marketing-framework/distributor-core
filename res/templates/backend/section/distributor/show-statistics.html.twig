@@ -1,0 +1,27 @@
+{% extends "module.html.twig" %}
+
+{% block section %}
+    {{ include('distributor/tabs.html.twig', {current}) }}
+
+    <h2>Statistics</h2>
+
+    <form method="post" action="{{ uri('page.distributor.' ~ current) }}" data-form-type="list">
+        <h3>{% embed 'collapse/trigger.html.twig' with { name: 'filters', label: 'Filters' } %}{% endembed %}</h3>
+        {% embed 'collapse/target.html.twig' with { name: 'filters' } %}
+            {% block content %}
+                {{ include('list/filters/timing.html.twig', {filters,filterBounds}) }}
+                {{ include('list/update-view.html.twig', {current,permanentUri,resetUri,filters,navigation}) }}
+            {% endblock %}
+        {% endembed %}
+    </form>
+
+    <h2>{{ statistics.all }} Jobs from {{ statistics.hashes }} Submissions</h2>
+
+    <div class="my-4">
+        {{ include('distributor/statistics/progress.html.twig', {statistics}) }}
+    </div>
+
+    <div>
+        {{ include('distributor/statistics/overview-table.html.twig', {statistics,filters}) }}
+    </div>
+{% endblock %}
