@@ -116,11 +116,11 @@
         {% endblock %}
 
         {% block tableRowActionsCustom %}
-            {% set args = {list:{(job.id):job.id},returnUrl:permanentUri} %}
+            {% set args = {list:{(item.id):item.id},returnUrl:permanentUri} %}
             <a href="{{ uri('page.distributor.preview', args) }}" title="preview" class="btn btn-default">
                 {{ include('t3-icon.html.twig', {name:'document-view'}) }}
             </a>
-            <a href="{{ uri('page.distributor.queue', args) }}" title="queue" class="btn btn-default" {% if job.status == 0 %}disabled="disabled"{% endif %} data-confirm="Do you want to queue this job?">
+            <a href="{{ uri('page.distributor.queue', args) }}" title="queue" class="btn btn-default" {% if item.status == 0 %}disabled="disabled"{% endif %} data-confirm="Do you want to queue this job?">
                 {{ include('t3-icon.html.twig', {name:'clock'}) }}
             </a>
             <a href="{{ uri('page.distributor.run', args) }}" title="run" class="btn btn-default" data-confirm="Do you want to run this job?">
