@@ -33,7 +33,6 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Plugin\IntegrationPlugin;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
-use DigitalMarketingFramework\TemplateEngineTwig\TemplateEngine\TwigTemplateEngine;
 
 abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteInterface, DataProcessorAwareInterface, ContextAwareInterface, DataPrivacyManagerAwareInterface, TemplateEngineAwareInterface
 {
@@ -188,25 +187,17 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
     }
 
     /**
-     * @return array<string>
+     * @return array<string,mixed>
      */
-    protected function getPreviewTemplateNameCandidates(): array
-    {
-        return [
-            sprintf('preview/outbound-route/%s.html.twig', GeneralUtility::camelCaseToDashed($this->getKeyword())),
-            'preview/outbound-route/default.html.twig',
-        ];
-    }
-
-    public function getPreviewData(bool $renderDispatcherPreview = false): array
+    public function preview(): array
     {
         $viewData = [
-            'keyword' => $this->getKeyword(),
+            'outboundRoute' => $this,
+            'keyword' => GeneralUtility::camelCaseToDashed($this->getKeyword()),
             'class' => static::class,
             'skipped' => false,
             'enabled' => true,
             'allowed' => true,
-            'dataDispatcherPreview' => '',
             'error' => '',
             'formData' => $this->submission->getData()->toArray(),
             'formContext' => $this->submission->getContext()->toArray(),
@@ -225,31 +216,13 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
                 }
 
                 $dataDispatcher = $this->getDispatcher();
-                if ($renderDispatcherPreview) {
-                    $viewData['dataDispatcherPreview'] = $dataDispatcher->preview($data->toArray());
-                } else {
-                    $viewData['dataDispatcherPreview'] = $dataDispatcher->getPreviewData($data->toArray());
-                }
+                $viewData['dispatcher'] = $dataDispatcher->preview($data->toArray());
             }
         } catch (DigitalMarketingFrameworkException $e) {
             $viewData['error'] = $e->getMessage();
         }
 
         return $viewData;
-    }
-
-    public function preview(): string
-    {
-        $viewData = $this->getPreviewData(true);
-
-        $templateNameCandidates = $this->getPreviewTemplateNameCandidates();
-
-        $config = [
-            TwigTemplateEngine::KEY_TEMPLATE => '',
-            TwigTemplateEngine::KEY_TEMPLATE_NAME => $templateNameCandidates,
-        ];
-
-        return $this->templateEngine->render($config, $viewData);
     }
 
     abstract protected function getDispatcher(): DataDispatcherInterface;

@@ -3,8 +3,9 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
 use DigitalMarketingFramework\Distributor\Core\DataProvider\IpAddressDataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
-class IpAddressDataProviderTest extends AbstractDataProviderTest
+class IpAddressDataProviderTest extends DataProviderTestBase
 {
     protected const DATA_PROVIDER_CLASS = IpAddressDataProvider::class;
 
@@ -12,7 +13,7 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         IpAddressDataProvider::KEY_FIELD => IpAddressDataProvider::DEFAULT_FIELD,
     ];
 
-    /** @test */
+    #[Test]
     public function doesNotDoAnythingIfDisabled(): void
     {
         $this->setDataProviderConfiguration([
@@ -30,7 +31,7 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function doesNotDoAnythingIfIpAddressIsNotAvailable(): void
     {
         $this->setDataProviderConfiguration([
@@ -48,7 +49,7 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function ipAddressIsAddedToContextAndFields(): void
     {
         $this->setDataProviderConfiguration([
@@ -68,7 +69,7 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function customFormFieldCanBeUsed(): void
     {
         $this->setDataProviderConfiguration([
@@ -89,7 +90,7 @@ class IpAddressDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function doesNotOverwriteFieldByDefault(): void
     {
         $this->setDataProviderConfiguration([

@@ -114,7 +114,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         }
     }
 
-    public function previewJobProcess(JobInterface $job): string
+    public function getPreviewData(JobInterface $job): array
     {
         $contextPushed = false;
         try {
@@ -142,7 +142,9 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
                 $this->registry->popContext();
             }
 
-            return $this->registry->renderErrorMessage($e->getMessage());
+            return [
+                'fatal' => $e->getMessage(),
+            ];
         }
     }
 

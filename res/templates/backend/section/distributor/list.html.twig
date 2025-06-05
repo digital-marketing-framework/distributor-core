@@ -1,0 +1,132 @@
+{% extends "module.html.twig" %}
+
+{% block section %}
+    {{ include('distributor/tabs.html.twig', {current}) }}
+
+    <h2>Jobs</h2>
+
+    {% embed 'list/list.html.twig' with {
+        route: 'page.distributor',
+        useActions: true,
+        useBulkActions: true,
+        usePagination: true,
+        useFilters: true,
+        useSorting: true,
+        filterNames: ['search', 'timing', 'distributor/type', 'distributor/status'],
+        listLabel: 'Results',
+        noResultsText: 'No jobs found.',
+        showLabel: true,
+        labelClass: '',
+        linkLabelAction: 'edit',
+        actionsClass: '',
+        list,
+        filters,
+        navigation,
+        filterBounds,
+        navigationBounds
+    } %}
+
+        {% block listBulkActionsCustom %}
+            <button type="submit" title="queue" name="action" value="queue" class="btn btn-default" disabled="disabled" data-action-type="bulk" data-confirm="Do you want to queue the selected jobs?">
+                {{ include('t3-icon.html.twig', {name:'clock'}) }}
+            </button>
+
+            <button type="submit" title="run" name="action" value="run" class="btn btn-default" disabled="disabled" data-action-type="bulk" data-confirm="Do you want to run the selected jobs?">
+                {{ include('t3-icon.html.twig', {name:'play'}) }}
+            </button>
+        {% endblock %}
+
+        {% block tableHeadCustom %}
+            <th class="nowrap">Status</th>
+            <th class="nowrap">Changed</th>
+            <th class="nowrap">Created</th>
+        {% endblock %}
+
+        {% block tableRowCustom %}
+            {% set statusLabelMap = {
+                'stuck': 'stuck',
+                'expired': 'expired',
+                0: 'queued',
+                1: 'pending',
+                2: 'running',
+                3: 'done',
+                4: 'failed'
+            } %}
+            <td>
+                {% set statusLabel = statusLabelMap[item.status] ?? item.status %}
+                {% set stuckLabel = statusLabelMap['stuck'] ?? 'stuck' %}
+                {% set expiredLabel = statusLabelMap['expired'] ?? 'expired' %}
+                {% set skippedLabel = statusLabelMap['skipped'] ?? 'skipped' %}
+                {% set processedLabel = statusLabelMap['processed'] ?? 'processed' %}
+                {% set stuck = item.changed < stuckDate %}
+                {% set expired = item.changed < expirationDate %}
+                {% if item.status == 0 %}
+                    <span class="badge badge-info">{{ statusLabel }}</span>
+                    {% if stuck %}
+                        <span class="badge badge-warning" title="not started for more than {{ maxExecutionTime }} seconds">
+                                {{ stuckLabel }}
+                            </span>
+                    {% endif %}
+                {% elseif item.status == 1 %}
+                    <span class="badge badge-primary">{{ statusLabel }}</span>
+                    {% if stuck %}
+                        <span class="badge badge-danger" title="pending for more than {{ maxExecutionTime }} seconds">
+                                {{ stuckLabel }}
+                            </span>
+                    {% endif %}
+                {% elseif item.status == 2 %}
+                    <span class="badge badge-warning">
+                            {{ statusLabel }}
+                        </span>
+                    {% if stuck %}
+                        <span class="badge badge-danger" title="running for more than {{ maxExecutionTime }} seconds">
+                                {{ stuckLabel }}
+                            </span>
+                    {% endif %}
+                {% elseif item.status == 3 %}
+                    <span class="badge badge-success">
+                            {{ statusLabel }}
+                        </span>
+                    <span class="badge">
+                            {% if item.skipped %}
+                                {{ skippedLabel }}
+                            {% else %}
+                                {{ processedLabel }}
+                            {% endif %}
+                        </span>
+                    {% if expired %}
+                        <span class="badge badge-warning" title="should have been deleted by now">
+                            {{ expiredLabel }}
+                        </span>
+                    {% endif %}
+                {% elseif item.status == 4 %}
+                    <span title="error: {{ item.statusMessage }}" class="badge badge-danger">
+                            {{ statusLabel }}
+                        </span>
+                {% else %}
+                    {{ statusLabel }}
+                {% endif %}
+            </td>
+            <td class="nowrap">
+                {{ item.changed|date('Y-m-d H:i:s') }}
+            </td>
+            <td class="nowrap">
+                {{ item.created|date('Y-m-d H:i:s') }}
+            </td>
+        {% endblock %}
+
+        {% block tableRowActionsCustom %}
+            {% set args = {list:{(item.id):item.id},returnUrl:permanentUri} %}
+            <a href="{{ uri('page.distributor.preview', args) }}" title="preview" class="btn btn-default">
+                {{ include('t3-icon.html.twig', {name:'document-view'}) }}
+            </a>
+            <a href="{{ uri('page.distributor.queue', args) }}" title="queue" class="btn btn-default" {% if item.status == 0 %}disabled="disabled"{% endif %} data-confirm="Do you want to queue this job?">
+                {{ include('t3-icon.html.twig', {name:'clock'}) }}
+            </a>
+            <a href="{{ uri('page.distributor.run', args) }}" title="run" class="btn btn-default" data-confirm="Do you want to run this job?">
+                {{ include('t3-icon.html.twig', {name:'play'}) }}
+            </a>
+        {% endblock %}
+
+    {% endembed %}
+{% endblock %}

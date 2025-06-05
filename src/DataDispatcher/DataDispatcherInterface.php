@@ -19,13 +19,8 @@ interface DataDispatcherInterface extends PluginInterface
      * @param array<string,string|ValueInterface> $data
      *
      * @return array<string,mixed>
-     */
-    public function getPreviewData(array $data): array;
-
-    /**
-     * @param array<string,string|ValueInterface> $data
      *
      * @throws DigitalMarketingFrameworkException
      */
-    public function preview(array $data): string;
+    public function preview(array $data): array;
 }

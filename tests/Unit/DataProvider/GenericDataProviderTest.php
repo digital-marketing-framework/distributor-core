@@ -3,8 +3,9 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\DataProvider;
 
 use DigitalMarketingFramework\Distributor\Core\Tests\DataProvider\GenericDataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
-class GenericDataProviderTest extends AbstractDataProviderTest
+class GenericDataProviderTest extends DataProviderTestBase
 {
     protected const DATA_PROVIDER_CLASS = GenericDataProvider::class;
 
@@ -17,7 +18,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->createDataProvider($keyword, [$contextToAdd, $fieldsToAdd]);
     }
 
-    /** @test */
+    #[Test]
     public function disabledDataProviderDoesNotDoAnything(): void
     {
         $this->setDataProviderConfiguration([
@@ -34,7 +35,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderAddsFieldsToContextAndToData(): void
     {
         $this->setDataProviderConfiguration([
@@ -62,7 +63,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderWillNotOverwriteFieldsByDefault(): void
     {
         $this->setDataProviderConfiguration([
@@ -89,7 +90,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderWillOverwriteEmptyFieldsByDefault(): void
     {
         $this->setDataProviderConfiguration([
@@ -116,7 +117,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderWillOverwriteFieldsIfConfiguredThusly(): void
     {
         $this->setDataProviderConfiguration([
@@ -144,7 +145,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderWillAddNonExistentFieldsByDefault(): void
     {
         $this->setDataProviderConfiguration([
@@ -167,7 +168,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         ], $this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderWillNotAddNonExistentFieldsIfConfiguredThusly(): void
     {
         $this->setDataProviderConfiguration([
@@ -189,7 +190,7 @@ class GenericDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty($this->submissionData->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function enabledDataProviderWillOverwriteEverythingIfConfiguredThusly(): void
     {
         $this->setDataProviderConfiguration([

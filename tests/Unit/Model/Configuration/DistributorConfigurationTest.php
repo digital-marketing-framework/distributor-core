@@ -5,6 +5,7 @@ namespace DigitalMarketingFramework\Distributor\Core\Tests\Unit\Model\Configurat
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class DistributorConfigurationTest extends TestCase
@@ -13,7 +14,7 @@ class DistributorConfigurationTest extends TestCase
 
     protected DistributorConfiguration $subject;
 
-    /** @test */
+    #[Test]
     public function dataProviderFound(): void
     {
         $conf = [
@@ -34,7 +35,7 @@ class DistributorConfigurationTest extends TestCase
         $this->assertEquals($conf, $result);
     }
 
-    /** @test */
+    #[Test]
     public function dataProviderNotFound(): void
     {
         $conf = [
@@ -71,7 +72,7 @@ class DistributorConfigurationTest extends TestCase
         ], $routeId, $weight);
     }
 
-    /** @test */
+    #[Test]
     public function routeFound(): void
     {
         $conf = [
@@ -95,7 +96,7 @@ class DistributorConfigurationTest extends TestCase
         $this->assertEquals($conf, $result);
     }
 
-    /** @test */
+    #[Test]
     public function routeNotFound(): void
     {
         $conf = [
@@ -118,7 +119,7 @@ class DistributorConfigurationTest extends TestCase
         $this->subject->getOutboundRouteConfiguration('integration1', 'routeId2');
     }
 
-    /** @test */
+    #[Test]
     public function routeLabelSinglePass(): void
     {
         $configList = [
@@ -138,7 +139,7 @@ class DistributorConfigurationTest extends TestCase
         $this->assertEquals('route2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 
-    /** @test */
+    #[Test]
     public function routeLabelMultiplePassesWithoutPassNames(): void
     {
         $configList = [
@@ -158,7 +159,7 @@ class DistributorConfigurationTest extends TestCase
         $this->assertEquals('route1#2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 
-    /** @test */
+    #[Test]
     public function routeLabelSinglePassWithPassName(): void
     {
         $configList = [
@@ -178,7 +179,7 @@ class DistributorConfigurationTest extends TestCase
         $this->assertEquals('route2', $this->subject->getOutboundRouteLabel('integration1', 'routeId2'));
     }
 
-    /** @test */
+    #[Test]
     public function routeLabelMultiplePassesWithPassName(): void
     {
         $configList = [

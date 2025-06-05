@@ -1,0 +1,27 @@
+{% macro progressBar(label,value,total,class) %}
+    <div class="progress-bar {{ class }}"
+         role="progressbar"
+         aria-valuenow="{{ value }}"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         style="width: {{ value / total * 100 }}%;"
+         title="{{ label }} {{ value }}/{{ total }}">{{ label }}</div>
+{% endmacro %}
+
+<div class="progress">
+    {% if statistics.queued %}
+        {{ _self.progressbar('Queued', statistics.queued, statistics.all, 'bg-info') }}
+    {% endif %}
+    {% if statistics.pending %}
+        {{ _self.progressbar('Pending', statistics.pending, statistics.all, '') }}
+    {% endif %}
+    {% if statistics.running %}
+        {{ _self.progressbar('Running', statistics.running, statistics.all, 'progress-bar-striped progress-bar-animated') }}
+    {% endif %}
+    {% if statistics.done %}
+        {{ _self.progressbar('Done', statistics.done, statistics.all, 'bg-success') }}
+    {% endif %}
+    {% if statistics.failed %}
+        {{ _self.progressbar('Failed', statistics.failed, statistics.all, 'bg-danger') }}
+    {% endif %}
+</div>

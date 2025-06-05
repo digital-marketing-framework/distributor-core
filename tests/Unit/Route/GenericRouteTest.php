@@ -16,6 +16,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
 use DigitalMarketingFramework\Distributor\Core\Tests\Route\GenericRoute;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -84,7 +85,7 @@ class GenericRouteTest extends TestCase
         $this->subject->setDefaultConfiguration(static::DEFAULT_CONFIG);
     }
 
-    /** @test */
+    #[Test]
     public function useCorrectKeyword(): void
     {
         $this->submissionConfiguration->expects($this->once())->method('getOutboundRouteConfiguration')->willReturn([
@@ -94,7 +95,7 @@ class GenericRouteTest extends TestCase
         $this->assertEquals('myCustomKeyword', $this->subject->getKeyword());
     }
 
-    /** @test */
+    #[Test]
     public function addContext(): void
     {
         $this->submissionData['field1'] = 'value1';
@@ -110,7 +111,7 @@ class GenericRouteTest extends TestCase
         $this->assertEquals($contextBefore, $this->submissionContext->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function processPassGateFails(): void
     {
         $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(true);
@@ -130,7 +131,7 @@ class GenericRouteTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    #[Test]
     public function processPassGatePermissionFails(): void
     {
         $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(false);
@@ -150,7 +151,7 @@ class GenericRouteTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /** @test */
+    #[Test]
     public function processPassEmptyInputDataWillCauseException(): void
     {
         $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(true);
@@ -170,7 +171,7 @@ class GenericRouteTest extends TestCase
         $this->subject->process();
     }
 
-    /** @test */
+    #[Test]
     public function processPassWithFieldConfigWillSendProcessedData(): void
     {
         $this->dataPrivacyManager->expects($this->once())->method('getPermission')->with('testPermission')->willReturn(true);

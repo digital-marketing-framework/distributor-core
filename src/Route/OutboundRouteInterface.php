@@ -53,13 +53,10 @@ interface OutboundRouteInterface extends RouteInterface
 
     /**
      * @return array<string,mixed>
-     */
-    public function getPreviewData(bool $renderDispatcherPreview = false): array;
-
-    /**
+     *
      * @throws DigitalMarketingFrameworkException
      */
-    public function preview(): string;
+    public function preview(): array;
 
     public function addContext(WriteableContextInterface $context): void;
 

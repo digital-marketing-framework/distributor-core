@@ -1,0 +1,28 @@
+<div class="my-4">
+    <a class="btn btn-default{% if current == 'show-statistics' %} active{% endif %}" href="{{ uri('page.distributor.show-statistics') }}">
+        Statistics
+    </a>
+
+    <a class="btn btn-default{% if current == 'show-errors' %} active{% endif %}" href="{{ uri('page.distributor.show-errors') }}">
+        Errors
+    </a>
+
+    <a class="btn btn-default{% if current == 'list' %} active{% endif %}" href="{{ uri('page.distributor.list') }}">
+        List
+    </a>
+
+    <a class="btn btn-default{% if current == 'list-failed' %} active{% endif %}" href="{{ uri('page.distributor.list-failed') }}">
+        {{ include('t3-icon.html.twig', {name:'link'}) }}
+        List failed
+    </a>
+
+    <a class="btn btn-default{% if current == 'list-stuck' %} active{% endif %}" href="{{ uri('page.distributor.list-stuck') }}">
+        {{ include('t3-icon.html.twig', {name:'link'}) }}
+        List stuck
+    </a>
+
+    <a class="btn btn-default{% if current == 'list-expired' %} active{% endif %}" href="{{ uri('page.distributor.list-expired') }}">
+        {{ include('t3-icon.html.twig', {name:'link'}) }}
+        List expired
+    </a>
+</div>
