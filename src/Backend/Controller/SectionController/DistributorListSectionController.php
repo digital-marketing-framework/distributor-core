@@ -13,11 +13,15 @@ class DistributorListSectionController extends DistributorSectionController
 {
     protected const PAGINATION_ITEMS_EACH_SIDE = 3;
 
+    /**
+     * @param array<string> $routes
+     */
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
+        array $routes = [],
     ) {
-        parent::__construct($keyword, $registry, ['list', 'list-expired', 'list-stuck', 'list-failed', 'preview', 'queue', 'run', 'delete', 'edit', 'save']);
+        parent::__construct($keyword, $registry, ['list', 'list-expired', 'list-stuck', 'list-failed', 'preview', 'queue', 'run', 'delete', 'edit', 'save', ...$routes]);
     }
 
     protected function getExpirationDate(): DateTime

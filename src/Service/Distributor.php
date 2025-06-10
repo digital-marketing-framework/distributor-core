@@ -167,7 +167,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
 
             $this->processDataProviders($submission, $route->getEnabledDataProviders(), preview: true);
 
-            $result = $route->getPreviewData();
+            $result = $route->preview();
             $this->registry->popContext();
 
             return $result;
