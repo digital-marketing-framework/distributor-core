@@ -14,7 +14,7 @@ use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 class DistributorTestCaseProcessor extends TestCaseProcessor
 {
     public const TEST_CASE_TYPE = 'distributor';
-    
+
     protected DistributorRegistryInterface $distributorRegistry;
 
     protected DistributorInterface $distributor;
@@ -42,12 +42,13 @@ class DistributorTestCaseProcessor extends TestCaseProcessor
     {
         $job = new Job(data: $input);
         $dataSourceId = $input['submission']['dataSourceId'] ?? '';
+        $dataSourceContext = $input['submission']['dataSourceContext'] ?? [];
 
         if ($dataSourceId === '') {
             return '';
         }
 
-        $dataSource = $this->dataSourceManager->getDataSourceById($dataSourceId);
+        $dataSource = $this->dataSourceManager->getDataSourceById($dataSourceId, $dataSourceContext);
 
         if (!$dataSource instanceof DataSourceInterface) {
             return '';

@@ -39,7 +39,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>} $submissionData
+     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<sting,mixed>,context:array<string,mixed>} $submissionData
      */
     protected function getSubmissionDataHash(array $submissionData): string
     {
@@ -57,7 +57,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>} $submissionData
+     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<string,mixed>,context:array<string,mixed>} $submissionData
      */
     protected function getSubmissionDataLabel(array $submissionData, string $integrationName, string $routeId, string $hash = ''): string
     {
@@ -95,7 +95,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>}
+     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<string,mixed>,context:array<string,mixed>}
      */
     protected function getJobSubmissionData(JobInterface $job): array
     {
@@ -153,13 +153,14 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>}
+     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<string,mixed>,context:array<string,mixed>}
      */
     protected function pack(SubmissionDataSetInterface $submission): array
     {
         return [
             'data' => $submission->getData()->pack(),
             'dataSourceId' => $submission->getDataSourceId(),
+            'dataSourceContext' => $submission->getDataSourceContext(),
             'context' => $submission->getContext()->toArray(),
         ];
     }
@@ -192,14 +193,14 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @param array{dataSourceId:string}|array{configuration:array<string,mixed>} $data
+     * @param array{dataSourceId:string,dataSourceContext?:array<string,mixed>}|array{configuration:array<string,mixed>} $data
      *
      * @return array<array<string,mixed>>
      */
     protected function unpackConfiguration(array $data): array
     {
         if (isset($data['dataSourceId'])) {
-            $dataSource = $this->distributorDataSourceManager->getDataSourceById($data['dataSourceId']);
+            $dataSource = $this->distributorDataSourceManager->getDataSourceById($data['dataSourceId'], $data['dataSourceContext'] ?? []);
             return $this->configurationDocumentManager->getConfigurationStackFromDocument($dataSource->getConfigurationDocument());
         }
 
@@ -219,6 +220,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
 
         return new SubmissionDataSet(
             $data['dataSourceId'] ?? '',
+            $data['dataSourceContext'] ?? [],
             $submissionData->toArray(),
             $submissionConfiguration,
             $data['context']

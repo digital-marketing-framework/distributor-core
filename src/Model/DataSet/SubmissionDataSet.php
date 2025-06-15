@@ -25,6 +25,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
      */
     public function __construct(
         protected string $dataSourceId,
+        protected array $dataSourceContext,
         array|DataInterface $data,
         array|DistributorConfigurationInterface $configurationList = [],
         array|WriteableContextInterface $context = [],
@@ -60,5 +61,10 @@ class SubmissionDataSet implements SubmissionDataSetInterface
     public function getDataSourceId(): string
     {
         return $this->dataSourceId;
+    }
+
+    public function getDataSourceContext(): array
+    {
+        return $this->dataSourceContext;
     }
 }

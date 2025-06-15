@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Registry\Plugin;
 
+use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Registry\Plugin\PluginRegistryTrait;
 use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldDefinition;
 use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefinition;
@@ -31,7 +32,13 @@ trait OutboundRouteRegistryTrait
         $routes = [];
         foreach ($submission->getConfiguration()->getOutboundRouteIds() as $integrationName => $routeIds) {
             foreach ($routeIds as $routeId) {
-                $routes[] = $this->getOutboundRoute($submission, $integrationName, $routeId);
+                $route = $this->getOutboundRoute($submission, $integrationName, $routeId);
+
+                if (!$route instanceof OutboundRouteInterface) {
+                    throw new DigitalMarketingFrameworkException(sprintf('Route with ID "%s" not found', $routeId));
+                }
+
+                $routes[] = $route;
             }
         }
 

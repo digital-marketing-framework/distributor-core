@@ -34,7 +34,7 @@ class ApiEndPointDistributorDataSourceStorage extends DistributorDataSourceStora
         return $endPoint;
     }
 
-    public function getDataSourceById(string $id): ?DistributorDataSourceInterface
+    public function getDataSourceById(string $id, array $dataSourceContext): ?DistributorDataSourceInterface
     {
         if (!$this->matches($id)) {
             return null;
