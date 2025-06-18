@@ -4,10 +4,9 @@ namespace DigitalMarketingFramework\Distributor\Core\TestCase;
 
 use DigitalMarketingFramework\Core\Model\DataSource\DataSourceInterface;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
-use DigitalMarketingFramework\Core\TestCase\TestCaseProcessor;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
-
-use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManager;
+use DigitalMarketingFramework\Core\TestCase\TestCaseProcessor;
+use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface as DistributorRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
 
@@ -19,7 +18,7 @@ class DistributorTestCaseProcessor extends TestCaseProcessor
 
     protected DistributorInterface $distributor;
 
-    protected DistributorDataSourceManager $dataSourceManager;
+    protected DistributorDataSourceManagerInterface $dataSourceManager;
 
     public function __construct(
         string $keyword,
@@ -34,13 +33,14 @@ class DistributorTestCaseProcessor extends TestCaseProcessor
 
     public function processInput(array $input): array
     {
-        $job = new Job(data: $input);
-        return $this->distributor->getJobPreviewData($job);
+        $job = new Job();
+        $job->setData($input);
+
+        return $this->distributor->getPreviewData($job);
     }
 
     public function calculateHash(array $input): string
     {
-        $job = new Job(data: $input);
         $dataSourceId = $input['submission']['dataSourceId'] ?? '';
         $dataSourceContext = $input['submission']['dataSourceContext'] ?? [];
 

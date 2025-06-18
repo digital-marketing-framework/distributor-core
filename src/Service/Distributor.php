@@ -148,38 +148,6 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         }
     }
 
-    public function getJobPreviewData(JobInterface $job): array
-    {
-        $contextPushed = false;
-        try {
-            $submission = $this->queueDataFactory->convertJobToSubmission($job);
-            $submission->getContext()->setResponsive(false);
-
-            $this->registry->pushContext($submission->getContext());
-            $contextPushed = true;
-
-            $routeId = $this->queueDataFactory->getJobRouteId($job);
-            $integrationName = $this->queueDataFactory->getJobRouteIntegrationName($job);
-            $route = $this->registry->getOutboundRoute($submission, $integrationName, $routeId);
-            if (!$route instanceof OutboundRouteInterface) {
-                throw new DigitalMarketingFrameworkException(sprintf('Route with ID "%s" not found in integration "%s"', $routeId, $integrationName));
-            }
-
-            $this->processDataProviders($submission, $route->getEnabledDataProviders(), preview: true);
-
-            $result = $route->preview();
-            $this->registry->popContext();
-
-            return $result;
-        } catch (DigitalMarketingFrameworkException $e) {
-            if ($contextPushed) {
-                $this->registry->popContext();
-            }
-
-            throw new DigitalMarketingFrameworkException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
     public function getQueueSettings(): QueueSettings
     {
         if (!$this->queueSettings instanceof QueueSettings) {
@@ -226,7 +194,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             );
             $job->setEnvironment($host);
             $job->setRetryAmount($route->canRetryOnFail() ? $retryAmount : 0);
-            $job = $queue->addJob($job);
+            $queue->add($job);
             $allJobs[] = $job;
             if (!$async) {
                 if ($enableStorage) {

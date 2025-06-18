@@ -12,7 +12,7 @@ use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 class DistributorDataSourceManager extends DataSourceManager implements DistributorDataSourceManagerInterface
 {
     /**
-     * @var ?array<DistributorDataSourceStorageInterface>
+     * @var ?array<DistributorDataSourceStorageInterface<DistributorDataSourceInterface>>
      */
     protected ?array $sourceStorages = null;
 

@@ -135,7 +135,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
     public function getEndPointNames(bool $frontend = false): array
     {
         $names = [];
-        foreach ($this->endPointStorage->getAllEndPoints() as $endPoint) {
+        foreach ($this->endPointStorage->fetchAll() as $endPoint) {
             if (!$endPoint->getEnabled()) {
                 continue;
             }

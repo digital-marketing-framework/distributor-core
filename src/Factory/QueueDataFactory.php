@@ -4,7 +4,6 @@ namespace DigitalMarketingFramework\Distributor\Core\Factory;
 
 use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerAwareInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerAwareTrait;
-use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareInterface;
 use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareTrait;
@@ -13,11 +12,11 @@ use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
-use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\QueueSchema;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareTrait;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSourceInterface;
 
 class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocumentManagerAwareInterface, DistributorDataSourceManagerAwareInterface, GlobalConfigurationAwareInterface
 {
@@ -201,6 +200,10 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     {
         if (isset($data['dataSourceId'])) {
             $dataSource = $this->distributorDataSourceManager->getDataSourceById($data['dataSourceId'], $data['dataSourceContext'] ?? []);
+            if (!$dataSource instanceof DistributorDataSourceInterface) {
+                throw new DigitalMarketingFrameworkException(sprintf('Distributor data source with ID "%s" not found', $data['dataSourceId']));
+            }
+
             return $this->configurationDocumentManager->getConfigurationStackFromDocument($dataSource->getConfigurationDocument());
         }
 
@@ -209,7 +212,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>} $data
+     * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<string,mixed>,context:array<string,mixed>}|array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $data
      */
     protected function unpack(array $data): SubmissionDataSetInterface
     {

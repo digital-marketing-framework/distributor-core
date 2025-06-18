@@ -11,5 +11,8 @@ interface SubmissionDataSetInterface extends DataSetInterface
 
     public function getDataSourceId(): string;
 
+    /**
+     * @return array<string,mixed>
+     */
     public function getDataSourceContext(): array;
 }

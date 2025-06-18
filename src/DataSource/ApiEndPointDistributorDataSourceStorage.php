@@ -4,7 +4,6 @@ namespace DigitalMarketingFramework\Distributor\Core\DataSource;
 
 use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageAwareInterface;
 use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageAwareTrait;
-use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageInterface;
 use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSource\ApiEndPointDistributorDataSource;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSourceInterface;
@@ -41,7 +40,7 @@ class ApiEndPointDistributorDataSourceStorage extends DistributorDataSourceStora
         }
 
         $name = $this->getInnerIdentifier($id);
-        $endPoint = $this->endPointStorage->getEndPointByName($name);
+        $endPoint = $this->endPointStorage->fetchByName($name);
         $endPoint = $this->updateEndPoint($endPoint);
 
         if ($endPoint instanceof EndPointInterface) {
@@ -54,8 +53,8 @@ class ApiEndPointDistributorDataSourceStorage extends DistributorDataSourceStora
     public function getAllDataSources(): array
     {
         $result = [];
-        foreach ($this->endPointStorage->getAllEndPoints() as $endPoint) {
-            $endPoints = $this->updateEndPoint($endPoint);
+        foreach ($this->endPointStorage->fetchAll() as $endPoint) {
+            $endPoint = $this->updateEndPoint($endPoint);
             if ($endPoint instanceof EndPointInterface) {
                 $result[] = new ApiEndPointDistributorDataSource($endPoint);
             }

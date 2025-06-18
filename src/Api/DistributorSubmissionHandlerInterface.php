@@ -11,6 +11,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorCo
 interface DistributorSubmissionHandlerInterface
 {
     /**
+     * @param array<string,mixed> $dataSourceContext
      * @param array<string,mixed>|DistributorConfigurationInterface $configuration
      * @param array<string,string|ValueInterface>|DataInterface $data
      * @param array<string,mixed>|ContextInterface|null $context

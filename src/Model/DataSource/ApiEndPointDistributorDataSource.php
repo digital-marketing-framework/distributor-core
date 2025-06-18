@@ -3,7 +3,6 @@
 namespace DigitalMarketingFramework\Distributor\Core\Model\DataSource;
 
 use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSource;
 
 class ApiEndPointDistributorDataSource extends DistributorDataSource
 {
@@ -12,7 +11,7 @@ class ApiEndPointDistributorDataSource extends DistributorDataSource
     public function __construct(
         protected EndPointInterface $endPoint,
     ) {
-        $hasData = [
+        $hashData = [
             'name' => $this->endPoint->getName(),
             'enabled' => $this->endPoint->getEnabled(),
             'pushEnabled' => $this->endPoint->getPushEnabled(),

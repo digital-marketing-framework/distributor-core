@@ -11,15 +11,20 @@ trait DistributorDataSourceRegistryTrait
 {
     use PluginRegistryTrait;
 
-    protected ?DistributorDataSourceManagerInterface $distributorSourceManager = null;
+    protected ?DistributorDataSourceManagerInterface $distributorDataSourceManager = null;
 
     public function getDistributorDataSourceManager(): DistributorDataSourceManagerInterface
     {
-        if ($this->distributorSourceManager === null) {
-            $this->distributorSourceManager = $this->createObject(DistributorDataSourceManager::class, [$this]);
+        if ($this->distributorDataSourceManager === null) {
+            $this->distributorDataSourceManager = $this->createObject(DistributorDataSourceManager::class, [$this]);
         }
 
-        return $this->distributorSourceManager;
+        return $this->distributorDataSourceManager;
+    }
+
+    public function setDistributorDataSourceManager(DistributorDataSourceManagerInterface $distributorDataSourceManager): void
+    {
+        $this->distributorDataSourceManager = $distributorDataSourceManager;
     }
 
     public function registerDistributorSourceStorage(string $class, array $additionalArguments = [], string $keyword = ''): void

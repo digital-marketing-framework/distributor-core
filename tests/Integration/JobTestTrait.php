@@ -65,6 +65,9 @@ trait JobTestTrait // extends \PHPUnit\Framework\TestCase
             $weight += 10;
         }
 
-        return new Job(data: $data);
+        $job = new Job();
+        $job->setData($data);
+
+        return $job;
     }
 }

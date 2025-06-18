@@ -10,6 +10,7 @@ use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
+use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
@@ -23,7 +24,6 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTra
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
 use DigitalMarketingFramework\Distributor\Core\Service\DistributorInterface;
-use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
 
 class Registry extends CoreRegistry implements RegistryInterface
 {
@@ -63,7 +63,7 @@ class Registry extends CoreRegistry implements RegistryInterface
         parent::addConfigurationSchemaDocument($schemaDocument);
 
         // distributor API endpoints
-        foreach ($this->getEndPointStorage()->getAllEndPoints() as $endpoint) {
+        foreach ($this->getEndPointStorage()->fetchAll() as $endpoint) {
             $schemaDocument->addValueToValueSet('distributorEndPoints/all', $endpoint->getName());
         }
 

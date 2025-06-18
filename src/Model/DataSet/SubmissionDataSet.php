@@ -19,6 +19,7 @@ class SubmissionDataSet implements SubmissionDataSetInterface
     protected WriteableContextInterface $context;
 
     /**
+     * @param array<string,mixed> $dataSourceContext
      * @param array<string,string|ValueInterface>|DataInterface $data The form fields and their values as associative array
      * @param array<int,array<string,mixed>>|DistributorConfigurationInterface $configurationList An array of (override) configurations
      * @param array<string,mixed>|WriteableContextInterface $context The context needed for processing the submission

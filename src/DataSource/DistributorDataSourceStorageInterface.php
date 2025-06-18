@@ -7,6 +7,7 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataS
 
 /**
  * @template DataSourceClass of DistributorDataSourceInterface
+ *
  * @extends DataSourceStorageInterface<DataSourceClass>
  */
 interface DistributorDataSourceStorageInterface extends DataSourceStorageInterface
