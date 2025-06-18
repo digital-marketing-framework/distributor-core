@@ -14,10 +14,10 @@ class SpiedOnDistributorDataSourceStorage extends DistributorDataSourceStorage
 {
     public function __construct(
         string $keyword,
-        protected RegistryInterface $registry,
+        RegistryInterface $registry,
         public DistributorDataSourceStorageSpy $spy,
     ) {
-        parent::__construct($keyword);
+        parent::__construct($keyword, $registry);
     }
 
     public function getType(): string
