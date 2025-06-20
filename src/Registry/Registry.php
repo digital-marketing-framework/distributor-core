@@ -10,6 +10,7 @@ use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
+use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfiguration;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
@@ -17,6 +18,7 @@ use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataDispatcherReg
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\DataProviderRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Plugin\OutboundRouteRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\ApiRegistryTrait;
+use DigitalMarketingFramework\Distributor\Core\Registry\Service\DistributorDataSourceRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueDataFactoryRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\Registry\Service\QueueRegistryTrait;
 use DigitalMarketingFramework\Distributor\Core\SchemaDocument\RenderingDefinition\Icon;
@@ -31,6 +33,16 @@ class Registry extends CoreRegistry implements RegistryInterface
     use DataProviderRegistryTrait;
     use OutboundRouteRegistryTrait;
     use ApiRegistryTrait;
+    use DistributorDataSourceRegistryTrait;
+
+    public function processObjectAwareness(object $object): void
+    {
+        parent::processObjectAwareness($object);
+
+        if ($object instanceof DistributorDataSourceManagerAwareInterface) {
+            $object->setDistributorDataSourceManager($this->getDistributorDataSourceManager());
+        }
+    }
 
     public function getQueueProcessor(QueueInterface $queue, WorkerInterface $worker): QueueProcessorInterface
     {
@@ -51,7 +63,7 @@ class Registry extends CoreRegistry implements RegistryInterface
         parent::addConfigurationSchemaDocument($schemaDocument);
 
         // distributor API endpoints
-        foreach ($this->getEndPointStorage()->getAllEndPoints() as $endpoint) {
+        foreach ($this->getEndPointStorage()->fetchAll() as $endpoint) {
             $schemaDocument->addValueToValueSet('distributorEndPoints/all', $endpoint->getName());
         }
 

@@ -192,9 +192,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
     public function preview(): array
     {
         $viewData = [
-            'outboundRoute' => $this,
             'keyword' => GeneralUtility::camelCaseToDashed($this->getKeyword()),
-            'class' => static::class,
             'skipped' => false,
             'enabled' => true,
             'allowed' => true,

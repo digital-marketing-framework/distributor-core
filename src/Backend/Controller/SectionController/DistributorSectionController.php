@@ -4,11 +4,17 @@ namespace DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionC
 
 use DateTime;
 use DigitalMarketingFramework\Core\Backend\Controller\SectionController\ListSectionController;
+use DigitalMarketingFramework\Core\Model\ItemInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface as DistributorRegistryInterface;
 
+/**
+ * @template ItemClass of ItemInterface
+ *
+ * @extends ListSectionController<ItemClass>
+ */
 abstract class DistributorSectionController extends ListSectionController
 {
     protected DistributorRegistryInterface $distributorRegistry;

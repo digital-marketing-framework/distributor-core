@@ -11,13 +11,12 @@ interface QueueDataFactoryInterface
 {
     /**
      * Returns a hash built over the form data and the context of the submission.
-     * Does not contain submission configuration.
      */
     public function getSubmissionHash(SubmissionDataSetInterface $submission): string;
 
     /**
      * Returns a hash built over the form data and the context of the submission.
-     * Does not contain submission configuration or the route name or the route pass.
+     * Does not contain the route name or the route pass.
      */
     public function getJobHash(JobInterface $job): string;
 

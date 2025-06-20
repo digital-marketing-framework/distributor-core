@@ -3,7 +3,6 @@
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration\Service;
 
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
-use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueException;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
 use DigitalMarketingFramework\Distributor\Core\Service\Distributor;
@@ -15,6 +14,8 @@ use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\DataDisp
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\SpiedOnDataDispatcher;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\DataProviderSpyInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataProvider\SpiedOnGenericDataProvider;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataSource\DistributorDataSourceStorageSpy;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataSource\SpiedOnDistributorDataSourceStorage;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\RouteSpyInterface;
 use DigitalMarketingFramework\Distributor\Core\Tests\Spy\Route\SpiedOnGenericRoute;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,6 +37,11 @@ class DistributorTest extends TestCase
 
     protected DataDispatcherSpyInterface&MockObject $dataDispatcherSpy;
 
+    protected DistributorDataSourceStorageSpy $distributorDataSourceStorageSpy;
+
+    /** @var array<string,array<string,mixed>> */
+    protected array $configurationDocuments = [];
+
     protected DistributorInterface $subject;
 
     protected function setUp(): void
@@ -43,7 +49,23 @@ class DistributorTest extends TestCase
         parent::setUp();
         $this->initRegistry();
         $this->initSubmission();
+
+        $this->configurationDocumentManager->method('getConfigurationStackFromDocument')
+            ->willReturnCallback(fn (string $configurationDocument) => $this->configurationDocuments[$configurationDocument] ?? []);
+
+        $this->distributorDataSourceStorageSpy = new DistributorDataSourceStorageSpy();
+        $this->registry->registerDistributorSourceStorage(SpiedOnDistributorDataSourceStorage::class, [$this->distributorDataSourceStorageSpy]);
+
         $this->subject = $this->registry->getDistributor();
+    }
+
+    /**
+     * @param array<array<string,mixed>> $configurationStack
+     */
+    protected function addDataSource(string $dataSourceId, string $configurationDocument, array $configurationStack): void
+    {
+        $this->configurationDocuments[$configurationDocument] = $configurationStack;
+        $this->distributorDataSourceStorageSpy->addDataSource($dataSourceId, $configurationDocument);
     }
 
     protected function registerRouteSpy(): RouteSpyInterface&MockObject
@@ -113,17 +135,21 @@ class DistributorTest extends TestCase
         $this->setSubmissionAsync(false);
         $this->setStorageEnabled(true);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
+
         $this->addRouteSpy([
             'enabled' => true,
             'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
+
         $this->submissionData = [
             'field1' => 'value1',
             'field2' => 'value2',
         ];
 
-        $this->queue->expects($this->once())->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
+        $this->addDataSource($this->dataSourceId, 'configurationDocument1', $this->submissionConfiguration);
+
+        $this->queue->expects($this->once())->method('add');
         $this->queue->expects($this->once())->method('markListAsPending');
         $this->queue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -133,7 +159,7 @@ class DistributorTest extends TestCase
         $this->queue->expects($this->never())->method('markAsFailed');
         $this->queue->expects($this->once())->method('markAsDone');
 
-        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->temporaryQueue->expects($this->never())->method('add');
         $this->temporaryQueue->expects($this->never())->method('markListAsPending');
         $this->temporaryQueue->expects($this->never())->method('markAsRunning');
         $this->temporaryQueue->expects($this->never())->method('markAsFailed');
@@ -148,17 +174,21 @@ class DistributorTest extends TestCase
         $this->setSubmissionAsync(false);
         $this->setStorageEnabled(false);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
+
         $this->addRouteSpy([
             'enabled' => true,
             'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
+
         $this->submissionData = [
             'field1' => 'value1',
             'field2' => 'value2',
         ];
 
-        $this->temporaryQueue->expects($this->once())->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
+        $this->addDataSource($this->dataSourceId, 'configurationDocument1', $this->submissionConfiguration);
+
+        $this->temporaryQueue->expects($this->once())->method('add');
         $this->temporaryQueue->expects($this->once())->method('markListAsPending');
         $this->temporaryQueue->expects($this->once())->method('markAsRunning');
         $this->routeSpy->expects($this->once())->method('send')->with([
@@ -168,7 +198,7 @@ class DistributorTest extends TestCase
         $this->temporaryQueue->expects($this->never())->method('markAsFailed');
         $this->temporaryQueue->expects($this->once())->method('markAsDone');
 
-        $this->queue->expects($this->never())->method('addJob');
+        $this->queue->expects($this->never())->method('add');
         $this->queue->expects($this->never())->method('markListAsPending');
         $this->queue->expects($this->never())->method('markAsRunning');
         $this->queue->expects($this->never())->method('markAsFailed');
@@ -193,7 +223,7 @@ class DistributorTest extends TestCase
             'field2' => 'value2',
         ];
 
-        $this->queue->expects($this->once())->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
+        $this->queue->expects($this->once())->method('add');
 
         $this->routeSpy->expects($this->never())->method('send');
 
@@ -202,7 +232,7 @@ class DistributorTest extends TestCase
         $this->queue->expects($this->never())->method('markAsFailed');
         $this->queue->expects($this->never())->method('markAsDone');
 
-        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->temporaryQueue->expects($this->never())->method('add');
         $this->temporaryQueue->expects($this->never())->method('markListAsPending');
         $this->temporaryQueue->expects($this->never())->method('markAsRunning');
         $this->temporaryQueue->expects($this->never())->method('markAsFailed');
@@ -269,18 +299,24 @@ class DistributorTest extends TestCase
         $this->setSubmissionAsync(false);
         $this->setStorageEnabled(true);
         $this->configurePassthroughDataMapperGroup('passthroughDataMapperGroupId1');
+
         $this->addRouteSpy([
             'enabled' => true,
             'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId1', 10);
+
         $this->addRouteSpy([
             'enabled' => true,
             'requiredPermission' => 'unregulated:allowed',
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId2', 20);
+
         $this->submissionData = ['field1' => 'value1'];
-        $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
+
+        $this->addDataSource($this->dataSourceId, 'configurationDocument1', $this->submissionConfiguration);
+
+        $this->queue->expects($this->exactly(2))->method('add');
         $this->queue->expects($this->once())->method('markListAsPending');
         $this->queue->expects($this->exactly(2))->method('markAsRunning');
         $this->routeSpy->expects($this->exactly(2))->method('send')->with([
@@ -309,7 +345,7 @@ class DistributorTest extends TestCase
             'data' => 'passthroughDataMapperGroupId1',
         ], 'routeId2', 20);
         $this->submissionData = ['field1' => 'value1'];
-        $this->queue->expects($this->exactly(2))->method('addJob')->willReturnCallback(static fn (JobInterface $job) => $job);
+        $this->queue->expects($this->exactly(2))->method('add');
         $this->queue->expects($this->never())->method('markListAsPending');
         $this->queue->expects($this->never())->method('markAsRunning');
         $this->routeSpy->expects($this->never())->method('send');

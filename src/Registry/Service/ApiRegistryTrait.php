@@ -52,7 +52,7 @@ trait ApiRegistryTrait
         $distributorRouteResolver = $this->getDistributorApiRouteResolver();
 
         $endPointRoute = $distributorRouteResolver->getEndPointRoute();
-        $endPoints = $endPointStorage->getAllEndPoints();
+        $endPoints = $endPointStorage->fetchAll();
         foreach ($endPoints as $endPoint) {
             if (!$endPoint->getEnabled()) {
                 continue;

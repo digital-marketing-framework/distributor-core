@@ -15,14 +15,6 @@
     {% endblock %}
 
     {% for record in records %}
-        <div class="container">
-            <h2>Preview: {{ record.job.label }} ({{ record.job.id }})</h2>
-
-            {% if record.preview.fatal %}
-                {{ include('note.html.twig', { type:'error', body:record.preview.fatal }) }}
-            {% else %}
-                {{ include(['distributor/preview/outbound-route/' ~ record.preview.keyword ~ '.html.twig', 'distributor/preview/outbound-route/default.html.twig'], record.preview) }}
-            {% endif %}
-        </div>
+        {{ include('distributor/preview/record.html.twig', {record}) }}
     {% endfor %}
 {% endblock %}

@@ -26,9 +26,7 @@ abstract class DataDispatcher extends Plugin implements DataDispatcherInterface
     public function preview(array $data): array
     {
         return [
-            'dataDispatcher' => $this,
             'keyword' => GeneralUtility::camelCaseToDashed($this->getKeyword()),
-            'class' => static::class,
             'config' => [],
             'data' => $this->transformDataForPreview($data),
         ];

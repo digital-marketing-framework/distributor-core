@@ -194,7 +194,7 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
             );
             $job->setEnvironment($host);
             $job->setRetryAmount($route->canRetryOnFail() ? $retryAmount : 0);
-            $job = $queue->addJob($job);
+            $queue->add($job);
             $allJobs[] = $job;
             if (!$async) {
                 if ($enableStorage) {

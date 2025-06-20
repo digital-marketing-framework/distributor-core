@@ -2,6 +2,7 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\Tests\Integration;
 
+use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageInterface;
 use DigitalMarketingFramework\Core\DataPrivacy\UnregulatedDataPrivacyPlugin;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryCollection;
@@ -30,6 +31,8 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
 
     protected QueueDataFactoryInterface $queueDataFactory;
 
+    protected EndPointStorageInterface&MockObject $endPointStorage;
+
     protected function createRegistry(): void
     {
         $this->registryCollection = new RegistryCollection();
@@ -48,9 +51,14 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
         // mock everything from the outside world
         $this->queue = $this->createMock(QueueInterface::class);
         $this->temporaryQueue = $this->createMock(QueueInterface::class);
+        $this->endPointStorage = $this->createMock(EndPointStorageInterface::class);
 
         // initialize the rest regularly
-        $this->queueDataFactory = new QueueDataFactory($this->configurationDocumentManager);
+        $this->queueDataFactory = new QueueDataFactory();
+        $this->queueDataFactory->setConfigurationDocumentManager($this->configurationDocumentManager);
+        $this->queueDataFactory->setDistributorDataSourceManager($this->registry->getDistributorDataSourceManager());
+
+        $this->registry->setEndPointStorage($this->endPointStorage);
         $this->registry->setPersistentQueue($this->queue);
         $this->registry->setNonPersistentQueue($this->temporaryQueue);
         $this->registry->setQueueDataFactory($this->queueDataFactory);
