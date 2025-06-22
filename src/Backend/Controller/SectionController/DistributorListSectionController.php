@@ -17,6 +17,8 @@ class DistributorListSectionController extends DistributorSectionController
 {
     protected const PAGINATION_ITEMS_EACH_SIDE = 3;
 
+    protected const DATE_TIME_FORMAT = 'Y-m-d\\TH:i';
+
     /**
      * @param array<string> $routes
      */
@@ -47,7 +49,7 @@ class DistributorListSectionController extends DistributorSectionController
     }
 
     /**
-     * @param array{search:string,advancedSearch:bool,searchExactMatch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
+     * @param array{search:string,advancedSearch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
      *
      * @return array<string,int>
      */
@@ -67,7 +69,7 @@ class DistributorListSectionController extends DistributorSectionController
     }
 
     /**
-     * @param array{search:string,advancedSearch:bool,searchExactMatch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
+     * @param array{search:string,advancedSearch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
      *
      * @return array<string,int>
      */
@@ -111,9 +113,9 @@ class DistributorListSectionController extends DistributorSectionController
     }
 
     /**
-     * @param array{search:string,advancedSearch:bool,searchExactMatch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
+     * @param array{search:string,advancedSearch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
      *
-     * @return array{type:array<string,int>,status:array<string,int>,typeCountNotEmpty:int,typeSelected:bool,statusCountNotEmpty:int,statusSelected:bool}
+     * @return array{type:array<string,int>,status:array<string,int>,countNotEmpty:array{type:int,status:int},selected:array{type:bool,status:bool}}
      */
     protected function getFilterBounds(array $filters): array
     {
@@ -128,17 +130,21 @@ class DistributorListSectionController extends DistributorSectionController
 
         return [
             'type' => $types,
-            'typeCountNotEmpty' => $typeCountNotEmpty,
-            'typeSelected' => $typeSelected,
             'status' => $status,
-            'statusCountNotEmpty' => $statusCountNotEmpty,
-            'statusSelected' => $statusSelected,
+            'countNotEmpty' => [
+                'type' => $typeCountNotEmpty,
+                'status' => $statusCountNotEmpty,
+            ],
+            'selected' => [
+                'type' => $typeSelected,
+                'status' => $statusSelected,
+            ],
         ];
     }
 
     protected function listAction(): Response
     {
-        $this->setUpListView('list', ['changed' => 'DESC', 'created' => '', 'type' => '', 'status' => '']);
+        $this->setUpListView(['changed' => 'DESC', 'created' => '', 'type' => '', 'status' => '']);
 
         $this->viewData['expirationDate'] = $this->getExpirationDate();
         $this->viewData['maxExecutionTime'] = $this->queueSettings->getMaximumExecutionTime();
@@ -154,7 +160,7 @@ class DistributorListSectionController extends DistributorSectionController
         return $this->redirect('page.distributor.list', [
             'currentAction' => 'list-stuck',
             'filters' => [
-                'maxChanged' => $maxChanged->format('Y-m-d\\TH:i'),
+                'maxChanged' => $maxChanged->format(static::DATE_TIME_FORMAT),
                 'status' => ['queued' => 1, 'pending' => 1, 'running' => 1],
             ],
         ]);
@@ -167,7 +173,7 @@ class DistributorListSectionController extends DistributorSectionController
         return $this->redirect('page.distributor.list', [
             'currentAction' => 'list-expired',
             'filters' => [
-                'maxChanged' => $maxChanged->format('Y-m-d\\TH:i'),
+                'maxChanged' => $maxChanged->format(static::DATE_TIME_FORMAT),
                 'status' => ['doneNotSkipped' => '1', 'doneSkipped' => '1'],
             ],
         ]);
@@ -208,8 +214,7 @@ class DistributorListSectionController extends DistributorSectionController
             }
         }
 
-        $this->assignCurrentRouteData('preview');
-        $this->viewData['returnUrl'] = $this->getReturnUrl();
+        $this->assignCurrentRouteData();
         $this->viewData['records'] = $records;
 
         return $this->render();

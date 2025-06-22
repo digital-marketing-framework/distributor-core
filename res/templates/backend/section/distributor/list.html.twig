@@ -12,7 +12,7 @@
         usePagination: true,
         useFilters: true,
         useSorting: true,
-        filterNames: ['search', 'timing', 'distributor/type', 'distributor/status'],
+        filterNames: ['distributor/search', 'timing', 'distributor/type', 'distributor/status'],
         listLabel: 'Results',
         noResultsText: 'No jobs found.',
         showLabel: true,
@@ -43,69 +43,8 @@
         {% endblock %}
 
         {% block tableRowCustom %}
-            {% set statusLabelMap = {
-                'stuck': 'stuck',
-                'expired': 'expired',
-                0: 'queued',
-                1: 'pending',
-                2: 'running',
-                3: 'done',
-                4: 'failed'
-            } %}
             <td>
-                {% set statusLabel = statusLabelMap[item.status] ?? item.status %}
-                {% set stuckLabel = statusLabelMap['stuck'] ?? 'stuck' %}
-                {% set expiredLabel = statusLabelMap['expired'] ?? 'expired' %}
-                {% set skippedLabel = statusLabelMap['skipped'] ?? 'skipped' %}
-                {% set processedLabel = statusLabelMap['processed'] ?? 'processed' %}
-                {% set stuck = item.changed < stuckDate %}
-                {% set expired = item.changed < expirationDate %}
-                {% if item.status == 0 %}
-                    <span class="badge badge-info">{{ statusLabel }}</span>
-                    {% if stuck %}
-                        <span class="badge badge-warning" title="not started for more than {{ maxExecutionTime }} seconds">
-                                {{ stuckLabel }}
-                            </span>
-                    {% endif %}
-                {% elseif item.status == 1 %}
-                    <span class="badge badge-primary">{{ statusLabel }}</span>
-                    {% if stuck %}
-                        <span class="badge badge-danger" title="pending for more than {{ maxExecutionTime }} seconds">
-                                {{ stuckLabel }}
-                            </span>
-                    {% endif %}
-                {% elseif item.status == 2 %}
-                    <span class="badge badge-warning">
-                            {{ statusLabel }}
-                        </span>
-                    {% if stuck %}
-                        <span class="badge badge-danger" title="running for more than {{ maxExecutionTime }} seconds">
-                                {{ stuckLabel }}
-                            </span>
-                    {% endif %}
-                {% elseif item.status == 3 %}
-                    <span class="badge badge-success">
-                            {{ statusLabel }}
-                        </span>
-                    <span class="badge">
-                            {% if item.skipped %}
-                                {{ skippedLabel }}
-                            {% else %}
-                                {{ processedLabel }}
-                            {% endif %}
-                        </span>
-                    {% if expired %}
-                        <span class="badge badge-warning" title="should have been deleted by now">
-                            {{ expiredLabel }}
-                        </span>
-                    {% endif %}
-                {% elseif item.status == 4 %}
-                    <span title="error: {{ item.statusMessage }}" class="badge badge-danger">
-                            {{ statusLabel }}
-                        </span>
-                {% else %}
-                    {{ statusLabel }}
-                {% endif %}
+                {{ include('distributor/status.html.twig', {item,expirationDate,stuckDate,maxExecutionTime}) }}
             </td>
             <td class="nowrap">
                 {{ item.changed|date('Y-m-d H:i:s') }}

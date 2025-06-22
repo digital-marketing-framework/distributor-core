@@ -3,7 +3,7 @@
 {% block section %}
     {% block previewHeader %}
         <div class="container">
-            <a href="{{ returnUrl }}" class="btn btn-primary">Back</a>
+            <a href="{{ returnUrl ?? uri('page.distributor.list') }}" class="btn btn-primary">Back</a>
 
             {% embed 'note.html.twig' with {type:'info'} %}
                 {% block body %}

@@ -30,7 +30,7 @@
 
         {% block tableRow %}
             <td>
-                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1},search:item.message,searchExactMatch:1})}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1},search:item.message})}) }}">
                     {{ item.message }}
                 </a>
             </td>
@@ -47,7 +47,7 @@
             </td>
             <td>
                 {% for type,countPerType in item.types %}
-                    <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1},status:{failed:1},search:item.message,searchExactMatch:1})}) }}">
+                    <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1},status:{failed:1},search:item.message})}) }}">
                         {{ type }} ({{ countPerType }})
                         {% if not loop.last %}<br/>{% endif %}
                     </a>

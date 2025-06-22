@@ -29,7 +29,8 @@ class DistributorStatisticsSectionController extends DistributorSectionControlle
         $transformedFilters = $this->transformInputFilters($filters);
         $statistics = $this->queue->getStatistics($transformedFilters);
 
-        $this->assignCurrentRouteData('show-statistics', $filters);
+        $arguments = $this->getListArguments($filters);
+        $this->assignCurrentRouteData($arguments);
 
         $this->viewData['filters'] = $filters;
         $this->viewData['statistics'] = $statistics;

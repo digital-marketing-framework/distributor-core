@@ -34,7 +34,7 @@ class DistributorErrorMonitorSectionController extends DistributorSectionControl
 
     protected function showErrorsAction(): Response
     {
-        $this->setUpListView('show-errors', ['count' => 'DESC', 'lastSeen' => 'DESC', 'firstSeen' => '']);
+        $this->setUpListView(['count' => 'DESC', 'lastSeen' => 'DESC', 'firstSeen' => '']);
 
         return $this->render();
     }
