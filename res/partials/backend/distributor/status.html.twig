@@ -54,9 +54,9 @@
         </span>
     {% endif %}
 {% elseif item.status == 4 %}
-    <span title="error: {{ item.statusMessage }}" class="badge badge-danger">
-            {{ statusLabel }}
-        </span>
+    <span title="{{ item.latestErrorMessage }}" class="badge badge-danger">
+        {{ statusLabel }}
+    </span>
 {% else %}
     {{ statusLabel }}
 {% endif %}
