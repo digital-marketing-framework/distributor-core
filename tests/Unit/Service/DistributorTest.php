@@ -152,13 +152,12 @@ class DistributorTest extends TestCase
 
         $this->persistentQueue
             ->expects($this->exactly(1))
-            ->method('addJob')
-            ->with($this->jobs['routeId1'])
-            ->willReturnCallback(static fn (JobInterface $job) => $job);
+            ->method('add')
+            ->with($this->jobs['routeId1']);
 
         $this->temporaryQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->persistentQueueProcessor
             ->expects($this->once())
@@ -193,11 +192,11 @@ class DistributorTest extends TestCase
 
         $this->persistentQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->temporaryQueue
             ->expects($this->exactly(1))
-            ->method('addJob')
+            ->method('add')
             ->with($this->jobs['routeId1'])
             ->willReturnCallback(static fn (JobInterface $job) => $job);
 
@@ -234,13 +233,13 @@ class DistributorTest extends TestCase
 
         $this->persistentQueue
             ->expects($this->exactly(1))
-            ->method('addJob')
+            ->method('add')
             ->with($this->jobs['routeId1'])
             ->willReturnCallback(static fn (JobInterface $job) => $job);
 
         $this->temporaryQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -273,14 +272,14 @@ class DistributorTest extends TestCase
             [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_PENDING],
         ], array_values($this->jobs), true);
 
-        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'add', [
             [$this->jobs['routeId1']],
             [$this->jobs['routeId2']],
-        ], static fn (JobInterface $job) => $job, true);
+        ], null, true);
 
         $this->temporaryQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->persistentQueueProcessor
             ->expects($this->once())
@@ -317,14 +316,14 @@ class DistributorTest extends TestCase
             [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED],
         ], array_values($this->jobs), true);
 
-        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'add', [
             [$this->jobs['routeId1']],
             [$this->jobs['routeId2']],
-        ], static fn (JobInterface $job) => $job, true);
+        ], null, true);
 
         $this->temporaryQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->persistentQueueProcessor
             ->expects($this->never())
@@ -357,14 +356,14 @@ class DistributorTest extends TestCase
             [$this->submission, 'generic', 'routeId2', QueueInterface::STATUS_QUEUED],
         ], array_values($this->jobs), true);
 
-        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'add', [
             [$this->jobs['routeId1']],
             [$this->jobs['routeId2']],
-        ], static fn (JobInterface $job) => $job, true);
+        ], null, true);
 
         $this->temporaryQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->persistentQueueProcessor
             ->expects($this->once())
@@ -399,11 +398,11 @@ class DistributorTest extends TestCase
 
         $this->persistentQueue
             ->expects($this->never())
-            ->method('addJob');
+            ->method('add');
 
         $this->temporaryQueue
             ->expects($this->exactly(1))
-            ->method('addJob')
+            ->method('add')
             ->with($this->jobs['routeId1'])
             ->willReturnCallback(static fn (JobInterface $job) => $job);
 
@@ -451,15 +450,15 @@ class DistributorTest extends TestCase
             [$this->submission, 'generic', 'routeId4', QueueInterface::STATUS_PENDING],
         ], array_values($this->jobs), true);
 
-        $this->withConsecutiveWillReturn($this->persistentQueue, 'addJob', [
+        $this->withConsecutiveWillReturn($this->persistentQueue, 'add', [
             [$this->jobs['routeId1']],
             [$this->jobs['routeId2']],
-        ], static fn (JobInterface $job) => $job, true);
+        ], null, true);
 
-        $this->withConsecutiveWillReturn($this->temporaryQueue, 'addJob', [
+        $this->withConsecutiveWillReturn($this->temporaryQueue, 'add', [
             [$this->jobs['routeId3']],
             [$this->jobs['routeId4']],
-        ], static fn (JobInterface $job) => $job, true);
+        ], null, true);
 
         $this->persistentQueueProcessor
             ->expects($this->once())
@@ -491,8 +490,8 @@ class DistributorTest extends TestCase
         $this->logger->expects($this->never())->method('error');
 
         $this->queueDataFactory->expects($this->never())->method('convertSubmissionToJob');
-        $this->persistentQueue->expects($this->never())->method('addJob');
-        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->persistentQueue->expects($this->never())->method('add');
+        $this->temporaryQueue->expects($this->never())->method('add');
         $this->persistentQueueProcessor->expects($this->never())->method('processJobs');
         $this->temporaryQueueProcessor->expects($this->never())->method('processJobs');
 
@@ -511,8 +510,8 @@ class DistributorTest extends TestCase
         $this->logger->expects($this->never())->method('error');
 
         $this->queueDataFactory->expects($this->never())->method('convertSubmissionToJob');
-        $this->persistentQueue->expects($this->never())->method('addJob');
-        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->persistentQueue->expects($this->never())->method('add');
+        $this->temporaryQueue->expects($this->never())->method('add');
         $this->persistentQueueProcessor->expects($this->never())->method('processJobs');
         $this->temporaryQueueProcessor->expects($this->never())->method('processJobs');
 
@@ -531,8 +530,8 @@ class DistributorTest extends TestCase
         $this->logger->expects($this->never())->method('error');
 
         $this->queueDataFactory->expects($this->never())->method('convertSubmissionToJob');
-        $this->persistentQueue->expects($this->never())->method('addJob');
-        $this->temporaryQueue->expects($this->never())->method('addJob');
+        $this->persistentQueue->expects($this->never())->method('add');
+        $this->temporaryQueue->expects($this->never())->method('add');
         $this->persistentQueueProcessor->expects($this->never())->method('processJobs');
         $this->temporaryQueueProcessor->expects($this->never())->method('processJobs');
 

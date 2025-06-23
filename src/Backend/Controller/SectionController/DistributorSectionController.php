@@ -4,11 +4,17 @@ namespace DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionC
 
 use DateTime;
 use DigitalMarketingFramework\Core\Backend\Controller\SectionController\ListSectionController;
+use DigitalMarketingFramework\Core\Model\ItemInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Queue\GlobalConfiguration\Settings\QueueSettings;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface as DistributorRegistryInterface;
 
+/**
+ * @template ItemClass of ItemInterface
+ *
+ * @extends ListSectionController<ItemClass>
+ */
 abstract class DistributorSectionController extends ListSectionController
 {
     protected DistributorRegistryInterface $distributorRegistry;
@@ -37,16 +43,15 @@ abstract class DistributorSectionController extends ListSectionController
     }
 
     /**
-     * @param array{search?:string,advancedSearch?:bool,searchExactMatch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
+     * @param array{search?:string,advancedSearch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
      *
-     * @return array{search:string,advancedSearch:bool,searchExactMatch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool}
+     * @return array{search:string,advancedSearch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool}
      */
     protected function transformInputFilters(array $filters): array
     {
         $result = [
             'search' => $filters['search'] ?? '',
             'advancedSearch' => $filters['advancedSearch'] ?? false,
-            'searchExactMatch' => $filters['searchExactMatch'] ?? false,
             'minCreated' => isset($filters['minCreated']) && $filters['minCreated'] !== '' ? new DateTime($filters['minCreated']) : null,
             'maxCreated' => isset($filters['maxCreated']) && $filters['maxCreated'] !== '' ? new DateTime($filters['maxCreated']) : null,
             'minChanged' => isset($filters['minChanged']) && $filters['minChanged'] !== '' ? new DateTime($filters['minChanged']) : null,

@@ -26,6 +26,11 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
     /** @var array<string,mixed> */
     protected array $submissionContext = [];
 
+    protected string $dataSourceId = 'datasource1';
+
+    /** @var array<string,mixed> */
+    protected array $dataSourceContext = ['dsContextA' => 'A'];
+
     /**
      * @return array<string,mixed>
      */
@@ -48,11 +53,13 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
         $this->submissionData = [];
         $this->submissionConfiguration = [$this->baseConfiguration()];
         $this->submissionContext = [];
+        $this->dataSourceId = 'datasource1';
+        $this->dataSourceContext = ['dsContextA' => 'A'];
     }
 
     protected function getSubmission(): SubmissionDataSetInterface
     {
-        return new SubmissionDataSet($this->submissionData, $this->submissionConfiguration, $this->submissionContext);
+        return new SubmissionDataSet($this->dataSourceId, $this->dataSourceContext, $this->submissionData, $this->submissionConfiguration, $this->submissionContext);
     }
 
     /**

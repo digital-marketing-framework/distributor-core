@@ -30,24 +30,24 @@
 
         {% block tableRow %}
             <td>
-                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1},search:item.message,searchExactMatch:1})}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1}, search:item.message})}) }}">
                     {{ item.message }}
                 </a>
             </td>
             <td>{{ item.count }}</td>
             <td>
-                <a href="{{ uri('page.distributor.edit', {id:error.firstSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ item.firstSeen.label }}">
-                    {{ item.firstSeen.changed|date('Y-m-d H:i:s') }}
+                <a href="{{ uri('page.distributor.edit', {id:item.firstSeen.id, returnUrl:permanentUri}) }}" title="{{ item.firstSeen.label }}">
+                    {{ item.firstSeenTime|date('Y-m-d H:i:s') }}
                 </a>
             </td>
             <td>
-                <a href="{{ uri('page.distributor.edit', {id:error.lastSeen.id,returnUrl:uri('page.distributor.' ~ current, {filters,navigation})}) }}" title="{{ item.lastSeen.label }}">
-                    {{ item.lastSeen.changed|date('Y-m-d H:i:s') }}
+                <a href="{{ uri('page.distributor.edit', {id:item.lastSeen.id, returnUrl:permanentUri}) }}" title="{{ item.lastSeen.label }}">
+                    {{ item.lastSeenTime|date('Y-m-d H:i:s') }}
                 </a>
             </td>
             <td>
                 {% for type,countPerType in item.types %}
-                    <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1},status:{failed:1},search:item.message,searchExactMatch:1})}) }}">
+                    <a href="{{ uri('page.distributor.list', {filters:filters|merge({type:{(type):1}, status:{failed:1}, search:item.message})}) }}">
                         {{ type }} ({{ countPerType }})
                         {% if not loop.last %}<br/>{% endif %}
                     </a>

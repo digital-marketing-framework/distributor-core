@@ -3,8 +3,12 @@
 namespace DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController;
 
 use DigitalMarketingFramework\Core\Backend\Response\Response;
+use DigitalMarketingFramework\Core\Model\Queue\Error;
 use DigitalMarketingFramework\Core\Registry\RegistryInterface;
 
+/**
+ * @extends DistributorSectionController<Error>
+ */
 class DistributorErrorMonitorSectionController extends DistributorSectionController
 {
     public function __construct(
@@ -30,7 +34,7 @@ class DistributorErrorMonitorSectionController extends DistributorSectionControl
 
     protected function showErrorsAction(): Response
     {
-        $this->setUpListView('show-errors', ['count' => 'DESC', 'lastSeen' => 'DESC', 'firstSeen' => '']);
+        $this->setUpListView(['count' => 'DESC', 'lastSeen' => 'DESC', 'firstSeen' => '']);
 
         return $this->render();
     }

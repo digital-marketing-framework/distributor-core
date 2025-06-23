@@ -1,4 +1,4 @@
-{% set statusLabelMap = {
+{% set labelMap = {
     doneNotSkipped: 'Done (processed)',
     doneSkipped: 'Done (skipped)',
     failed: 'Failed',
@@ -6,24 +6,4 @@
     pending: 'Pending',
     running: 'Running'
 } %}
-{% if filterBounds.statusCountNotEmpty > 1 or filterBounds.statusSelected %}
-    <div class="form-row justify-content-between">
-        <div class="form-group">
-            <div class="input-group">
-                <span class="btn btn-default disabled" style="min-width: 8rem">status</span>
-
-                {% for option,count in filterBounds.status %}
-                    {% if count > 0 or filters.status[option] %}
-                        <label class="form-control btn btn-default" style="width:auto">
-                            <span class="form-check form-check-type-toggle">
-                                <input type="checkbox" name="filters[status][{{ option }}]" value="1" {% if filters.status[option] %}checked="checked"{% endif %} class="form-check-input" />
-                            </span>
-                            {{ statusLabelMap[option] ?? option }}
-                            ({{ count }})
-                        </label>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-{% endif %}
+{{ include('list/filters/checkboxes.html.twig', {name:'status',filters,filterBounds,labelMap:labelMap}) }}
