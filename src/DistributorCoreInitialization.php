@@ -5,6 +5,7 @@ namespace DigitalMarketingFramework\Distributor\Core;
 use DigitalMarketingFramework\Core\Alert\AlertHandlerInterface;
 use DigitalMarketingFramework\Core\Backend\Controller\SectionController\SectionControllerInterface;
 use DigitalMarketingFramework\Core\Backend\Section\Section;
+use DigitalMarketingFramework\Core\Cleanup\CleanupTaskInterface;
 use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterface;
 use DigitalMarketingFramework\Core\GlobalConfiguration\Schema\GlobalConfigurationSchemaInterface;
 use DigitalMarketingFramework\Core\Initialization;
@@ -14,6 +15,7 @@ use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorErrorMonitorSectionController;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorListSectionController;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorStatisticsSectionController;
+use DigitalMarketingFramework\Distributor\Core\Cleanup\DistributorQueueCleanupTask;
 use DigitalMarketingFramework\Distributor\Core\DataProcessor\ValueSource\DiscreteMultiValueValueSource;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\CookieDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataPrivacyDataProvider;
@@ -46,6 +48,9 @@ class DistributorCoreInitialization extends Initialization
                 DistributorStatisticsSectionController::class,
                 DistributorListSectionController::class,
                 DistributorErrorMonitorSectionController::class,
+            ],
+            CleanupTaskInterface::class => [
+                DistributorQueueCleanupTask::class,
             ],
         ],
         RegistryDomain::DISTRIBUTOR => [

@@ -22,8 +22,8 @@
     "homepage": "https://www.mediatis.de",
     "require": {
         "php": "^8.2",
-        "digital-marketing-framework/core": "^3.1",
-        "digital-marketing-framework/template-engine-twig": "^3.0"
+        "digital-marketing-framework/core": "dev-feature/cleanup-tasks",
+        "digital-marketing-framework/template-engine-twig": "dev-feature/develop"
     },
     "require-dev": {
         "mediatis/coding-standards": "^2.0"
