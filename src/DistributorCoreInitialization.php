@@ -29,7 +29,6 @@ use DigitalMarketingFramework\Distributor\Core\DataProvider\UriDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataSource\ApiEndPointDistributorDataSourceStorage;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceStorageInterface;
 use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\DistributorCoreGlobalConfigurationSchema;
-use DigitalMarketingFramework\Distributor\Core\TestCase\DistributorTestCaseProcessor;
 
 class DistributorCoreInitialization extends Initialization
 {
@@ -40,9 +39,6 @@ class DistributorCoreInitialization extends Initialization
             ],
             AlertHandlerInterface::class => [
                 JobWatchAlertHandler::class,
-            ],
-            TestCaseProcessorInterface::class => [
-                DistributorTestCaseProcessor::class,
             ],
             SectionControllerInterface::class => [
                 DistributorStatisticsSectionController::class,
