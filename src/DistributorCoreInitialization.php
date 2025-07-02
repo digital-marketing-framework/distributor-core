@@ -10,7 +10,6 @@ use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterfac
 use DigitalMarketingFramework\Core\GlobalConfiguration\Schema\GlobalConfigurationSchemaInterface;
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
-use DigitalMarketingFramework\Core\TestCase\TestCaseProcessorInterface;
 use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorErrorMonitorSectionController;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorListSectionController;
@@ -29,7 +28,6 @@ use DigitalMarketingFramework\Distributor\Core\DataProvider\UriDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataSource\ApiEndPointDistributorDataSourceStorage;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceStorageInterface;
 use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\DistributorCoreGlobalConfigurationSchema;
-use DigitalMarketingFramework\Distributor\Core\TestCase\DistributorTestCaseProcessor;
 
 class DistributorCoreInitialization extends Initialization
 {
@@ -40,9 +38,6 @@ class DistributorCoreInitialization extends Initialization
             ],
             AlertHandlerInterface::class => [
                 JobWatchAlertHandler::class,
-            ],
-            TestCaseProcessorInterface::class => [
-                DistributorTestCaseProcessor::class,
             ],
             SectionControllerInterface::class => [
                 DistributorStatisticsSectionController::class,
