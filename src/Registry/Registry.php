@@ -7,6 +7,7 @@ use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
+use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefinition;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
@@ -65,6 +66,12 @@ class Registry extends CoreRegistry implements RegistryInterface
         // distributor API endpoints
         foreach ($this->getEndPointStorage()->fetchAll() as $endpoint) {
             $schemaDocument->addValueToValueSet('distributorEndPoints/all', $endpoint->getName());
+        }
+
+        // distributor data source field list definitions
+        foreach ($this->getDistributorDataSourceManager()->getAllDataSources() as $dataSource) {
+            $fieldList = $dataSource->getFieldListDefinition();
+            $schemaDocument->addFieldContext($fieldList->getName(), $fieldList);
         }
 
         // general outbound settings
