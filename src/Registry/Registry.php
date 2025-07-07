@@ -7,7 +7,6 @@ use DigitalMarketingFramework\Core\Queue\QueueProcessor;
 use DigitalMarketingFramework\Core\Queue\QueueProcessorInterface;
 use DigitalMarketingFramework\Core\Queue\WorkerInterface;
 use DigitalMarketingFramework\Core\Registry\Registry as CoreRegistry;
-use DigitalMarketingFramework\Core\SchemaDocument\FieldDefinition\FieldListDefinition;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\BooleanSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
