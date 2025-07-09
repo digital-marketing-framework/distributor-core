@@ -67,6 +67,12 @@ class Registry extends CoreRegistry implements RegistryInterface
             $schemaDocument->addValueToValueSet('distributorEndPoints/all', $endpoint->getName());
         }
 
+        // distributor data source field list definitions
+        foreach ($this->getDistributorDataSourceManager()->getAllDataSources() as $dataSource) {
+            $fieldList = $dataSource->getFieldListDefinition();
+            $schemaDocument->addFieldContext($fieldList->getName(), $fieldList);
+        }
+
         // general outbound settings
         $generalOutboundConfiguration = new ContainerSchema();
         $generalOutboundConfiguration->getRenderingDefinition()->setIcon(Icon::OUTBOUND_ROUTES);
