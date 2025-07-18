@@ -11,7 +11,7 @@
 {% macro tableRow(row, filters, type=null) %}
     <tr>
         <td class="col-title">
-            <a href="{{ uri('page.distributo.list', {filters,type:[type]}) }}">
+            <a href="{{ uri('page.distributor.list', {filters,type:[type]}) }}">
                 {% if type %}{{ type }}{% else %}All{% endif %}
             </a>
         </td>
