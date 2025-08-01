@@ -52,6 +52,9 @@ class OutboundRouteSchema extends SwitchSchema
             strict: true
         );
 
+        $passSchema->getRenderingDefinition()->setLabel('Route Pass Name');
+        $passSchema->getRenderingDefinition()->setHint('If you have multiple routes of the same type, the pass name helps you to tell them apart.');
+
         $this->addProperty(static::KEY_PASS, $passSchema)->setWeight(1);
     }
 

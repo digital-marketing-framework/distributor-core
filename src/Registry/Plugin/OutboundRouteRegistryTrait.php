@@ -42,6 +42,8 @@ trait OutboundRouteRegistryTrait
             }
         }
 
+        $this->sortPlugins($routes);
+
         return $routes;
     }
 

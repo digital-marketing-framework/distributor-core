@@ -4,11 +4,11 @@ namespace DigitalMarketingFramework\Distributor\Core\Factory;
 
 use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerAwareInterface;
 use DigitalMarketingFramework\Core\ConfigurationDocument\ConfigurationDocumentManagerAwareTrait;
+use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareInterface;
 use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareTrait;
 use DigitalMarketingFramework\Core\Model\Data\Data;
-use DigitalMarketingFramework\Core\Model\Queue\Job;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
@@ -17,6 +17,7 @@ use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceM
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSourceInterface;
+use DigitalMarketingFramework\Distributor\Core\Model\Queue\Job;
 
 class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocumentManagerAwareInterface, DistributorDataSourceManagerAwareInterface, GlobalConfigurationAwareInterface
 {
@@ -31,11 +32,6 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     public const KEY_SUBMISSION = 'submission';
 
     public const DEFAULT_LABEL = 'undefined';
-
-    protected function createJob(): JobInterface
-    {
-        return new Job();
-    }
 
     /**
      * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<sting,mixed>,context:array<string,mixed>} $submissionData
@@ -133,7 +129,8 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
         int $status = QueueInterface::STATUS_QUEUED,
     ): JobInterface {
         $submissionData = $this->pack($submission);
-        $job = $this->createJob();
+        $job = new Job();
+        $job->setSynchronousContext($submission->getContext());
         $job->setStatus($status);
         $job->setData([
             static::KEY_INTEGRATION_NAME => $integrationName,
@@ -148,7 +145,12 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
 
     public function convertJobToSubmission(JobInterface $job): SubmissionDataSetInterface
     {
-        return $this->unpack($this->getJobSubmissionData($job));
+        $synchronousContext = null;
+        if ($job instanceof Job) {
+            $synchronousContext = $job->getSynchronousContext();
+        }
+
+        return $this->unpack($this->getJobSubmissionData($job), $synchronousContext);
     }
 
     /**
@@ -214,19 +216,25 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     /**
      * @param array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<string,mixed>,context:array<string,mixed>}|array{data:array<string,array{type:string,value:mixed}>,configuration:array<string,mixed>,context:array<string,mixed>} $data
      */
-    protected function unpack(array $data): SubmissionDataSetInterface
+    protected function unpack(array $data, ?WriteableContextInterface $synchronousContext = null): SubmissionDataSetInterface
     {
         $this->validatePackage($data);
 
         $submissionData = Data::unpack($data['data']);
         $submissionConfiguration = $this->unpackConfiguration($data);
 
-        return new SubmissionDataSet(
+        $submission = new SubmissionDataSet(
             $data['dataSourceId'] ?? '',
             $data['dataSourceContext'] ?? [],
             $submissionData->toArray(),
             $submissionConfiguration,
-            $data['context']
+            $synchronousContext ?? $data['context']
         );
+
+        if (!$synchronousContext instanceof WriteableContextInterface) {
+            $submission->getContext()->setResponsive(false);
+        }
+
+        return $submission;
     }
 }

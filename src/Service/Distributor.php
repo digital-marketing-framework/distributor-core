@@ -86,7 +86,6 @@ class Distributor implements DistributorInterface, LoggerAwareInterface, Context
         $contextPushed = false;
         try {
             $submission = $this->queueDataFactory->convertJobToSubmission($job);
-            $submission->getContext()->setResponsive(false);
 
             $this->registry->pushContext($submission->getContext());
             $contextPushed = true;
