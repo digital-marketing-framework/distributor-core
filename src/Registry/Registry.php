@@ -58,6 +58,15 @@ class Registry extends CoreRegistry implements RegistryInterface
         return $this->createObject(Distributor::class, [$this]);
     }
 
+    public function addConfigurationSchemaDocumentEditorContext(SchemaDocument $schemaDocument): void
+    {
+        // distributor data source field list definitions
+        foreach ($this->getDistributorDataSourceManager()->getAllDataSources() as $dataSource) {
+            $fieldList = $dataSource->getFieldListDefinition();
+            $schemaDocument->addFieldContext($fieldList->getName(), $fieldList);
+        }
+    }
+
     public function addConfigurationSchemaDocument(SchemaDocument $schemaDocument): void
     {
         parent::addConfigurationSchemaDocument($schemaDocument);
@@ -65,12 +74,6 @@ class Registry extends CoreRegistry implements RegistryInterface
         // distributor API endpoints
         foreach ($this->getEndPointStorage()->fetchAll() as $endpoint) {
             $schemaDocument->addValueToValueSet('distributorEndPoints/all', $endpoint->getName());
-        }
-
-        // distributor data source field list definitions
-        foreach ($this->getDistributorDataSourceManager()->getAllDataSources() as $dataSource) {
-            $fieldList = $dataSource->getFieldListDefinition();
-            $schemaDocument->addFieldContext($fieldList->getName(), $fieldList);
         }
 
         // general outbound settings
