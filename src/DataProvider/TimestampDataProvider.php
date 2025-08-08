@@ -2,7 +2,9 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
+use DateTime;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\Model\Data\Value\DateTimeValue;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
@@ -39,7 +41,7 @@ class TimestampDataProvider extends DataProvider
         $timestamp = $this->context->getTimestamp();
         if ($timestamp !== null) {
             $format = $this->getConfig(static::KEY_FORMAT);
-            $value = date($format, $timestamp);
+            $value = new DateTimeValue($timestamp, $format);
             $this->setField($this->getConfig(static::KEY_FIELD), $value);
         }
     }
