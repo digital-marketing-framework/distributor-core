@@ -1,8 +1,9 @@
-{% macro tableCell(filters, type, count, status=[]) %}
+{% macro tableCell(filters, type, count, status={}) %}
     {% if count == 0 %}
         0
     {% else %}
-        <a href="{{ uri('page.distributor.list', {filters,status,type:[type]}) }}">
+        {% set mergedFilters = type ? {status:status, type:{(type):1}} : {status:status} %}
+        <a href="{{ uri('page.distributor.list', {filters:filters|merge(mergedFilters)}) }}">
             {{ count }}
         </a>
     {% endif %}
@@ -11,7 +12,8 @@
 {% macro tableRow(row, filters, type=null) %}
     <tr>
         <td class="col-title">
-            <a href="{{ uri('page.distributor.list', {filters,type:[type]}) }}">
+            {% set mergedFilters = type ? {type:{(type):1}} : {} %}
+            <a href="{{ uri('page.distributor.list', {filters:filters|merge(mergedFilters)}) }}">
                 {% if type %}{{ type }}{% else %}All{% endif %}
             </a>
         </td>
@@ -19,25 +21,25 @@
             {{ _self.tableCell(filters, type, row.all) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.queued, ['queued']) }}
+            {{ _self.tableCell(filters, type, row.queued, {queued:1}) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.pending, ['pending']) }}
+            {{ _self.tableCell(filters, type, row.pending, {pending:1}) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.running, ['running']) }}
+            {{ _self.tableCell(filters, type, row.running, {running:1}) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.done, ['doneNotSkipped','doneSkipped']) }}
+            {{ _self.tableCell(filters, type, row.done, {doneNotSkipped:1, doneSkipped:1}) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.doneNotSkipped, ['doneNotSkipped']) }}
+            {{ _self.tableCell(filters, type, row.doneNotSkipped, {doneNotSkipped:1}) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.doneSkipped, ['doneSkipped']) }}
+            {{ _self.tableCell(filters, type, row.doneSkipped, {doneSkipped:1}) }}
         </td>
         <td>
-            {{ _self.tableCell(filters, type, row.failed, ['failed']) }}
+            {{ _self.tableCell(filters, type, row.failed, {failed:1}) }}
         </td>
     </tr>
 {% endmacro %}
@@ -55,43 +57,43 @@
                 <div class="progress">&nbsp;</div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:{0:'queued'}}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{queued:1}})}) }}">
                     Queued
                 </a>
                 <div class="progress"><div class="progress-bar bg-info" style="width:100%"></div></div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:{0:'pending'}}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{pending:1}})}) }}">
                     Pending
                 </a>
                 <div class="progress"><div class="progress-bar" style="width:100%"></div></div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:['running']}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{running:1}})}) }}">
                     Running
                 </a>
                 <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div></div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:['doneNotSkipped','doneSkipped']}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{doneNotSkipped:1, doneSkipped:1}})}) }}">
                     Done
                 </a>
                 <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:['doneNotSkipped']}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{doneNotSkipped:1}})}) }}">
                     Processed
                 </a>
                 <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:['doneSkipped']}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{doneSkipped:1}})}) }}">
                     Skipped
                 </a>
                 <div class="progress"><div class="progress-bar bg-success" style="width:100%"></div></div>
             </th>
             <th style="min-width:6rem">
-                <a href="{{ uri('page.distributor.list', {filters,status:['failed']}) }}">
+                <a href="{{ uri('page.distributor.list', {filters:filters|merge({status:{failed:1}})}) }}">
                     Failed
                 </a>
                 <div class="progress"><div class="progress-bar bg-danger" style="width:100%"></div></div>
