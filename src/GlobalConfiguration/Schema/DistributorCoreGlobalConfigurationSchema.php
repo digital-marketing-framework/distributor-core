@@ -34,18 +34,14 @@ class DistributorCoreGlobalConfigurationSchema extends GlobalConfigurationSchema
 
     public const DEFAULT_DEBUG_FILE = 'ditigal-marketing-framework-distributor-submission.log';
 
-    protected ContainerSchema $queueSchema;
-
     protected ContainerSchema $fileUploadSchema;
 
     protected ContainerSchema $debugSchema;
 
-    public function __construct(?QueueSchema $queueSchema = null)
+    public function __construct(protected ?QueueSchema $queueSchema = new QueueSchema())
     {
         parent::__construct();
         $this->getRenderingDefinition()->setLabel('Distributor');
-
-        $this->queueSchema = $queueSchema ?? new QueueSchema();
         $this->addProperty(QueueSchema::KEY_QUEUE, $this->queueSchema);
 
         $this->fileUploadSchema = $this->getFileUploadSchema();

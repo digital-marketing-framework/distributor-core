@@ -79,7 +79,7 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     {
         $data = $this->submission->getData();
         if (
-            $this->getConfig(static::KEY_MUST_EXIST)
+            $this->getBoolConfig(static::KEY_MUST_EXIST)
             && !$data->fieldExists($key)
         ) {
             return false;
@@ -98,14 +98,14 @@ abstract class DataProvider extends ConfigurablePlugin implements DataProviderIn
     {
         $data = $this->submission->getData();
         if (
-            $this->getConfig(static::KEY_MUST_EXIST)
+            $this->getBoolConfig(static::KEY_MUST_EXIST)
             && !$data->fieldExists($key)
         ) {
             return false;
         }
 
         if (
-            $this->getConfig(static::KEY_MUST_BE_EMPTY)
+            $this->getBoolConfig(static::KEY_MUST_BE_EMPTY)
             && $data->fieldExists($key)
             && !$data->fieldEmpty($key)
         ) {

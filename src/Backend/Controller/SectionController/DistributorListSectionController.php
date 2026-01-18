@@ -113,8 +113,6 @@ class DistributorListSectionController extends DistributorSectionController
     }
 
     /**
-     * @param array{search:string,advancedSearch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool} $filters
-     *
      * @return array{type:array<string,int>,status:array<string,int>,countNotEmpty:array{type:int,status:int},selected:array{type:bool,status:bool}}
      */
     protected function getFilterBounds(array $filters): array
@@ -122,11 +120,14 @@ class DistributorListSectionController extends DistributorSectionController
         $types = $this->getTypeFilterBounds($filters);
         $status = $this->getStatusFilterBounds($filters);
 
+        $typeFilter = (array)($filters['type'] ?? []);
+        $statusFilter = (array)($filters['status'] ?? []);
+
         $typeCountNotEmpty = count(array_filter($types, static fn (int $count) => $count > 0));
-        $typeSelected = $filters['type'] !== [];
+        $typeSelected = $typeFilter !== [];
 
         $statusCountNotEmpty = count(array_filter($status, static fn (int $count) => $count > 0));
-        $statusSelected = $filters['status'] !== [];
+        $statusSelected = $statusFilter !== [];
 
         return [
             'type' => $types,
