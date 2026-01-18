@@ -14,6 +14,23 @@ class TimestampDataProviderTest extends DataProviderTestBase
         TimestampDataProvider::KEY_FORMAT => TimestampDataProvider::DEFAULT_FORMAT,
     ];
 
+    private string $originalTimezone;
+
+    protected function setUp(): void
+    {
+        // Save original timezone and set to UTC for consistent test results
+        $this->originalTimezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        // Restore original timezone
+        date_default_timezone_set($this->originalTimezone);
+        parent::tearDown();
+    }
+
     #[Test]
     public function addsContextEvenIfDisabled(): void
     {
