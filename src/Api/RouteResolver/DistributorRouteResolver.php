@@ -31,7 +31,7 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
     {
         $data = $request->getPayload();
         $context = $request->getContext();
-        $endPoint = $request->getEndpoint();
+        $endPoint = $request->getEndPoint();
         $this->distributorSubmissionHandler->submitToEndPoint($endPoint, $data, $context);
 
         return new ApiResponse(['success' => true], 200);

@@ -22,7 +22,7 @@
     "homepage": "https://www.mediatis.de",
     "require": {
         "php": "^8.2",
-        "digital-marketing-framework/core": "^3.5",
+        "digital-marketing-framework/core": "^3.5.5",
         "digital-marketing-framework/template-engine-twig": "^3.0"
     },
     "require-dev": {
@@ -42,9 +42,15 @@
     },
     "config": {
         "allow-plugins": {
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "phpstan/extension-installer": true
         },
         "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "3.x-dev"
+        }
     },
     "scripts": {
         "ci": [
