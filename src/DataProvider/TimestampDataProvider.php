@@ -2,15 +2,19 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataProvider;
 
-use DateTime;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareTrait;
+use DigitalMarketingFramework\Core\GlobalConfiguration\Settings\CoreSettings;
 use DigitalMarketingFramework\Core\Model\Data\Value\DateTimeValue;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\ContainerSchema;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\SchemaInterface;
 use DigitalMarketingFramework\Core\SchemaDocument\Schema\StringSchema;
 
-class TimestampDataProvider extends DataProvider
+class TimestampDataProvider extends DataProvider implements GlobalConfigurationAwareInterface
 {
+    use GlobalConfigurationAwareTrait;
+
     public const KEY_FIELD = 'field';
 
     public const DEFAULT_FIELD = 'timestamp';
@@ -18,6 +22,11 @@ class TimestampDataProvider extends DataProvider
     public const KEY_FORMAT = 'format';
 
     public const DEFAULT_FORMAT = 'c';
+
+    protected function getDefaultTimezone(): string
+    {
+        return $this->globalConfiguration->getGlobalSettings(CoreSettings::class)->getDefaultTimezone();
+    }
 
     protected function processContext(WriteableContextInterface $context): void
     {
@@ -41,7 +50,7 @@ class TimestampDataProvider extends DataProvider
         $timestamp = $this->context->getTimestamp();
         if ($timestamp !== null) {
             $format = $this->getConfig(static::KEY_FORMAT);
-            $value = new DateTimeValue($timestamp, $format);
+            $value = new DateTimeValue((string)$timestamp, $format, $this->getDefaultTimezone());
             $this->setField($this->getConfig(static::KEY_FIELD), $value);
         }
     }

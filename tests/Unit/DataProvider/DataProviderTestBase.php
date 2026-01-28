@@ -7,8 +7,12 @@ use DigitalMarketingFramework\Core\Context\ContextStackInterface;
 use DigitalMarketingFramework\Core\Context\WriteableContext;
 use DigitalMarketingFramework\Core\Context\WriteableContextInterface;
 use DigitalMarketingFramework\Core\DataPrivacy\DataPrivacyManagerInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationInterface;
+use DigitalMarketingFramework\Core\GlobalConfiguration\Settings\CoreSettings;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
+use DigitalMarketingFramework\Core\Model\Data\Value\DateTimeValue;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\DataProvider\DataProvider;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
@@ -38,6 +42,10 @@ abstract class DataProviderTestBase extends TestCase
 
     protected DataPrivacyManagerInterface&MockObject $dataPrivacyManager;
 
+    protected GlobalConfigurationInterface&MockObject $globalConfiguration;
+
+    protected CoreSettings&MockObject $coreSettings;
+
     protected DataInterface $submissionData;
 
     protected DistributorConfigurationInterface&MockObject $submissionConfiguration;
@@ -52,6 +60,12 @@ abstract class DataProviderTestBase extends TestCase
         $this->globalContext = $this->createMock(ContextStackInterface::class);
         $this->dataPrivacyManager = $this->createMock(DataPrivacyManagerInterface::class);
         $this->dataPrivacyManager->expects($this->any())->method('getPermission')->willReturnMap([['unregulated:allowed', true], ['unregulated:denied', false]]);
+
+        $this->coreSettings = $this->createMock(CoreSettings::class);
+        $this->coreSettings->method('getDefaultTimezone')->willReturn(DateTimeValue::DEFAULT_TIMEZONE);
+
+        $this->globalConfiguration = $this->createMock(GlobalConfigurationInterface::class);
+        $this->globalConfiguration->method('getGlobalSettings')->with(CoreSettings::class)->willReturn($this->coreSettings);
 
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
@@ -70,6 +84,13 @@ abstract class DataProviderTestBase extends TestCase
         $this->submissionConfiguration->method('getDataProviderConfiguration')->with($keyword)->willReturn($config);
     }
 
+    protected function injectGlobalConfiguration(object $subject): void
+    {
+        if ($subject instanceof GlobalConfigurationAwareInterface) {
+            $subject->setGlobalConfiguration($this->globalConfiguration);
+        }
+    }
+
     /**
      * @param array<mixed> $additionalArguments
      * @param ?array<string,mixed> $defaultConfig
@@ -85,5 +106,6 @@ abstract class DataProviderTestBase extends TestCase
         $this->subject->setDataPrivacyManager($this->dataPrivacyManager);
         $this->subject->setContext($this->globalContext);
         $this->subject->setDefaultConfiguration($defaultConfig);
+        $this->injectGlobalConfiguration($this->subject);
     }
 }
