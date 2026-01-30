@@ -43,26 +43,33 @@ abstract class DistributorSectionController extends ListSectionController
     }
 
     /**
-     * @param array{search?:string,advancedSearch?:bool,minCreated?:string,maxCreated?:string,minChanged?:string,maxChanged?:string,type?:array<string,string>,status?:array<string>} $filters
-     *
      * @return array{search:string,advancedSearch:bool,minCreated:?DateTime,maxCreated:?DateTime,minChanged:?DateTime,maxChanged:?DateTime,type:array<string>,status:array<int>,skipped:?bool}
      */
     protected function transformInputFilters(array $filters): array
     {
+        $search = (string)($filters['search'] ?? '');
+        $advancedSearch = (bool)($filters['advancedSearch'] ?? false);
+        $minCreated = (string)($filters['minCreated'] ?? '');
+        $maxCreated = (string)($filters['maxCreated'] ?? '');
+        $minChanged = (string)($filters['minChanged'] ?? '');
+        $maxChanged = (string)($filters['maxChanged'] ?? '');
+        $typeFilter = (array)($filters['type'] ?? []);
+        $statusFilter = (array)($filters['status'] ?? []);
+
         $result = [
-            'search' => $filters['search'] ?? '',
-            'advancedSearch' => $filters['advancedSearch'] ?? false,
-            'minCreated' => isset($filters['minCreated']) && $filters['minCreated'] !== '' ? new DateTime($filters['minCreated']) : null,
-            'maxCreated' => isset($filters['maxCreated']) && $filters['maxCreated'] !== '' ? new DateTime($filters['maxCreated']) : null,
-            'minChanged' => isset($filters['minChanged']) && $filters['minChanged'] !== '' ? new DateTime($filters['minChanged']) : null,
-            'maxChanged' => isset($filters['maxChanged']) && $filters['maxChanged'] !== '' ? new DateTime($filters['maxChanged']) : null,
-            'type' => isset($filters['type']) ? array_keys(array_filter($filters['type'])) : [],
+            'search' => $search,
+            'advancedSearch' => $advancedSearch,
+            'minCreated' => $minCreated !== '' ? new DateTime($minCreated) : null,
+            'maxCreated' => $maxCreated !== '' ? new DateTime($maxCreated) : null,
+            'minChanged' => $minChanged !== '' ? new DateTime($minChanged) : null,
+            'maxChanged' => $maxChanged !== '' ? new DateTime($maxChanged) : null,
+            'type' => array_keys(array_filter($typeFilter, static fn ($value): bool => (bool)$value)),
         ];
 
         $result['status'] = [];
         $result['skipped'] = null;
 
-        $inputStatus = isset($filters['status']) ? array_keys(array_filter($filters['status'])) : [];
+        $inputStatus = array_keys(array_filter($statusFilter, static fn ($value): bool => (bool)$value));
         $skippedFound = false;
         $notSkippedFound = false;
         foreach ($inputStatus as $status) {

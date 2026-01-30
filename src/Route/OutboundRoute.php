@@ -125,7 +125,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         }
 
         $gate = $this->getConfig(static::KEY_GATE);
-        if (empty($gate)) {
+        if ($gate === null || $gate === []) {
             return true;
         }
 
