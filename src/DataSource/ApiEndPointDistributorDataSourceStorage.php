@@ -62,4 +62,14 @@ class ApiEndPointDistributorDataSourceStorage extends DistributorDataSourceStora
 
         return $result;
     }
+
+    public function getAllDataSourceVariants(): array
+    {
+        $result = [];
+        foreach ($this->endPointStorage->fetchAll() as $endPoint) {
+            $result[] = new ApiEndPointDistributorDataSource($endPoint);
+        }
+
+        return $result;
+    }
 }
