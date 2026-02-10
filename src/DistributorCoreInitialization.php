@@ -10,6 +10,7 @@ use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterfac
 use DigitalMarketingFramework\Core\GlobalConfiguration\Schema\GlobalConfigurationSchemaInterface;
 use DigitalMarketingFramework\Core\Initialization;
 use DigitalMarketingFramework\Core\Registry\RegistryDomain;
+use DigitalMarketingFramework\Core\Registry\RegistryInterface as CoreRegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Alert\JobWatchAlertHandler;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorErrorMonitorSectionController;
 use DigitalMarketingFramework\Distributor\Core\Backend\Controller\SectionController\DistributorListSectionController;
@@ -28,6 +29,7 @@ use DigitalMarketingFramework\Distributor\Core\DataProvider\UriDataProvider;
 use DigitalMarketingFramework\Distributor\Core\DataSource\ApiEndPointDistributorDataSourceStorage;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceStorageInterface;
 use DigitalMarketingFramework\Distributor\Core\GlobalConfiguration\Schema\DistributorCoreGlobalConfigurationSchema;
+use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 
 class DistributorCoreInitialization extends Initialization
 {
@@ -72,6 +74,15 @@ class DistributorCoreInitialization extends Initialization
     ];
 
     protected const SCHEMA_MIGRATIONS = [];
+
+    public function initServices(string $domain, CoreRegistryInterface $registry): void
+    {
+        parent::initServices($domain, $registry);
+
+        if ($registry instanceof RegistryInterface) {
+            $registry->addDataSourceManager($registry->getDistributorDataSourceManager());
+        }
+    }
 
     public function __construct(string $packageAlias = '', ?GlobalConfigurationSchemaInterface $globalConfigurationSchema = null)
     {

@@ -114,7 +114,8 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
         try {
             $configurationDocument = $endPoint->getConfigurationDocument();
-            $configurationStack = $this->configurationDocumentManager->getConfigurationStackFromDocument($configurationDocument);
+            $schemaDocument = $this->registry->getConfigurationSchemaDocument();
+            $configurationStack = $this->configurationDocumentManager->getConfigurationStackFromDocument($configurationDocument, $schemaDocument);
             $configuration = new DistributorConfiguration($configurationStack);
         } catch (DigitalMarketingFrameworkException $e) {
             $this->handleException($e);

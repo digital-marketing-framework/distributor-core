@@ -31,4 +31,9 @@ class ApiEndPointDistributorDataSource extends DistributorDataSource
             $endPoint->getConfigurationDocument()
         );
     }
+
+    public function getEndPoint(): EndPointInterface
+    {
+        return $this->endPoint;
+    }
 }

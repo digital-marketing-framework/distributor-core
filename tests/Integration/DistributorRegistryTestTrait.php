@@ -53,10 +53,8 @@ trait DistributorRegistryTestTrait // extends \PHPUnit\Framework\TestCase
         $this->temporaryQueue = $this->createMock(QueueInterface::class);
         $this->endPointStorage = $this->createMock(EndPointStorageInterface::class);
 
-        // initialize the rest regularly
-        $this->queueDataFactory = new QueueDataFactory();
-        $this->queueDataFactory->setConfigurationDocumentManager($this->configurationDocumentManager);
-        $this->queueDataFactory->setDistributorDataSourceManager($this->registry->getDistributorDataSourceManager());
+        // initialize the rest regularly (createObject handles awareness interfaces including mock configurationDocumentManager)
+        $this->queueDataFactory = $this->registry->createObject(QueueDataFactory::class);
 
         $this->registry->setEndPointStorage($this->endPointStorage);
         $this->registry->setPersistentQueue($this->queue);

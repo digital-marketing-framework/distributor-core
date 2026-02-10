@@ -2,64 +2,38 @@
 
 namespace DigitalMarketingFramework\Distributor\Core\DataSource;
 
-use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageAwareInterface;
-use DigitalMarketingFramework\Core\Api\EndPoint\EndPointStorageAwareTrait;
+use DigitalMarketingFramework\Core\DataSource\AbstractApiEndPointDataSourceStorage;
 use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
+use DigitalMarketingFramework\Core\Model\DataSource\DataSourceInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSource\ApiEndPointDistributorDataSource;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSourceInterface;
 
 /**
- * @extends DistributorDataSourceStorage<ApiEndPointDistributorDataSource>
+ * @extends AbstractApiEndPointDataSourceStorage<ApiEndPointDistributorDataSource>
+ *
+ * @implements DistributorDataSourceStorageInterface<ApiEndPointDistributorDataSource>
  */
-class ApiEndPointDistributorDataSourceStorage extends DistributorDataSourceStorage implements EndPointStorageAwareInterface
+class ApiEndPointDistributorDataSourceStorage extends AbstractApiEndPointDataSourceStorage implements DistributorDataSourceStorageInterface
 {
-    use EndPointStorageAwareTrait;
-
-    public function getType(): string
+    protected function createDataSource(EndPointInterface $endPoint): DataSourceInterface
     {
-        return ApiEndPointDistributorDataSource::TYPE;
+        return new ApiEndPointDistributorDataSource($endPoint);
     }
 
-    protected function updateEndPoint(?EndPointInterface $endPoint): ?EndPointInterface
+    /**
+     * Filter for getAllDataSources() and getDataSourceById().
+     * Distributor: checks both the general enabled flag and the push enabled flag.
+     */
+    protected function filterEndPoint(EndPointInterface $endPoint): bool
     {
-        if (!$endPoint instanceof EndPointInterface) {
-            return null;
-        }
-
-        if (!$endPoint->getEnabled() || !$endPoint->getPushEnabled()) {
-            return null;
-        }
-
-        return $endPoint;
+        return $endPoint->getEnabled() && $endPoint->getPushEnabled();
     }
 
-    public function getDataSourceById(string $id, array $dataSourceContext): ?DistributorDataSourceInterface
+    /**
+     * Filter for getAllDataSourceVariants().
+     * Distributor: checks the push enabled flag.
+     */
+    protected function filterEndPointVariant(EndPointInterface $endPoint): bool
     {
-        if (!$this->matches($id)) {
-            return null;
-        }
-
-        $name = $this->getInnerIdentifier($id);
-        $endPoint = $this->endPointStorage->fetchByName($name);
-        $endPoint = $this->updateEndPoint($endPoint);
-
-        if ($endPoint instanceof EndPointInterface) {
-            return new ApiEndPointDistributorDataSource($endPoint);
-        }
-
-        return null;
-    }
-
-    public function getAllDataSources(): array
-    {
-        $result = [];
-        foreach ($this->endPointStorage->fetchAll() as $endPoint) {
-            $endPoint = $this->updateEndPoint($endPoint);
-            if ($endPoint instanceof EndPointInterface) {
-                $result[] = new ApiEndPointDistributorDataSource($endPoint);
-            }
-        }
-
-        return $result;
+        return $endPoint->getPushEnabled();
     }
 }
