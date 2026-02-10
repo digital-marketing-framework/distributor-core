@@ -8,6 +8,8 @@ use DigitalMarketingFramework\Core\Model\Data\Value\FileValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\MultiValue;
 use DigitalMarketingFramework\Core\Model\Data\Value\ValueInterface;
 use DigitalMarketingFramework\Core\Model\Queue\Job;
+use DigitalMarketingFramework\Core\Registry\Service\ConfigurationSchemaRegistryInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\SchemaDocument;
 use DigitalMarketingFramework\Core\Tests\ListMapTestTrait;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerInterface;
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
@@ -30,6 +32,8 @@ class QueueDataFactoryTest extends TestCase
 
     protected DistributorDataSourceManagerInterface&MockObject $distributorDataSourceManager;
 
+    protected ConfigurationSchemaRegistryInterface&MockObject $configurationSchemaProvider;
+
     protected QueueDataFactory $subject;
 
     protected function setUp(): void
@@ -40,9 +44,14 @@ class QueueDataFactoryTest extends TestCase
 
         $this->distributorDataSourceManager = $this->createMock(DistributorDataSourceManagerInterface::class);
 
+        $schemaDocument = $this->createMock(SchemaDocument::class);
+        $this->configurationSchemaProvider = $this->createMock(ConfigurationSchemaRegistryInterface::class);
+        $this->configurationSchemaProvider->method('getConfigurationSchemaDocument')->willReturn($schemaDocument);
+
         $this->subject = new QueueDataFactory();
         $this->subject->setConfigurationDocumentManager($this->configurationDocumentManager);
         $this->subject->setDistributorDataSourceManager($this->distributorDataSourceManager);
+        $this->subject->setConfigurationSchemaProvider($this->configurationSchemaProvider);
     }
 
     /**

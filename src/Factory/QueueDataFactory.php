@@ -11,6 +11,8 @@ use DigitalMarketingFramework\Core\GlobalConfiguration\GlobalConfigurationAwareT
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Queue\JobInterface;
 use DigitalMarketingFramework\Core\Queue\QueueInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\ConfigurationSchemaAwareInterface;
+use DigitalMarketingFramework\Core\SchemaDocument\ConfigurationSchemaAwareTrait;
 use DigitalMarketingFramework\Core\Utility\GeneralUtility;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareInterface;
 use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceManagerAwareTrait;
@@ -19,11 +21,12 @@ use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetIn
 use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSourceInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Queue\Job;
 
-class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocumentManagerAwareInterface, DistributorDataSourceManagerAwareInterface, GlobalConfigurationAwareInterface
+class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocumentManagerAwareInterface, DistributorDataSourceManagerAwareInterface, GlobalConfigurationAwareInterface, ConfigurationSchemaAwareInterface
 {
     use ConfigurationDocumentManagerAwareTrait;
     use DistributorDataSourceManagerAwareTrait;
     use GlobalConfigurationAwareTrait;
+    use ConfigurationSchemaAwareTrait;
 
     public const KEY_INTEGRATION_NAME = 'integration';
 
@@ -206,11 +209,11 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
                 throw new DigitalMarketingFrameworkException(sprintf('Distributor data source with ID "%s" not found', $data['dataSourceId']));
             }
 
-            return $this->configurationDocumentManager->getConfigurationStackFromDocument($dataSource->getConfigurationDocument());
+            return $this->configurationDocumentManager->getConfigurationStackFromDocument($dataSource->getConfigurationDocument(), $this->getConfigurationSchemaDocument());
         }
 
         // TODO legacy job support, remove in future
-        return $this->configurationDocumentManager->getConfigurationStackFromConfiguration($data['configuration']);
+        return $this->configurationDocumentManager->getConfigurationStackFromConfiguration($data['configuration'], $this->getConfigurationSchemaDocument());
     }
 
     /**

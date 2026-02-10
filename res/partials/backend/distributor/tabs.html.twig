@@ -1,28 +1,8 @@
-<div class="my-4">
-    <a class="btn btn-default{% if current == 'show-statistics' %} active{% endif %}" href="{{ uri('page.distributor.show-statistics') }}">
-        Statistics
-    </a>
-
-    <a class="btn btn-default{% if current == 'show-errors' %} active{% endif %}" href="{{ uri('page.distributor.show-errors') }}">
-        Errors
-    </a>
-
-    <a class="btn btn-default{% if current == 'list' %} active{% endif %}" href="{{ uri('page.distributor.list') }}">
-        List
-    </a>
-
-    <a class="btn btn-default{% if current == 'list-failed' %} active{% endif %}" href="{{ uri('page.distributor.list-failed') }}">
-        {{ include('t3-icon.html.twig', {name:'link'}) }}
-        List failed
-    </a>
-
-    <a class="btn btn-default{% if current == 'list-stuck' %} active{% endif %}" href="{{ uri('page.distributor.list-stuck') }}">
-        {{ include('t3-icon.html.twig', {name:'link'}) }}
-        List stuck
-    </a>
-
-    <a class="btn btn-default{% if current == 'list-expired' %} active{% endif %}" href="{{ uri('page.distributor.list-expired') }}">
-        {{ include('t3-icon.html.twig', {name:'link'}) }}
-        List expired
-    </a>
-</div>
+{{ include('section/tabs.html.twig', {current, tabs: [
+    {action: 'show-statistics', label: 'Statistics', url: uri('page.distributor.show-statistics')},
+    {action: 'show-errors', label: 'Errors', url: uri('page.distributor.show-errors')},
+    {action: 'list', label: 'List', url: uri('page.distributor.list')},
+    {action: 'list-failed', label: 'List failed', icon: 'link', url: uri('page.distributor.list-failed')},
+    {action: 'list-stuck', label: 'List stuck', icon: 'link', url: uri('page.distributor.list-stuck')},
+    {action: 'list-expired', label: 'List expired', icon: 'link', url: uri('page.distributor.list-expired')}
+]}) }}

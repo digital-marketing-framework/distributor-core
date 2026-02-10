@@ -27,7 +27,7 @@ class DistributorListSectionController extends DistributorSectionController
         RegistryInterface $registry,
         array $routes = [],
     ) {
-        parent::__construct($keyword, $registry, ['list', 'list-expired', 'list-stuck', 'list-failed', 'preview', 'queue', 'run', 'delete', 'edit', 'save', ...$routes]);
+        parent::__construct($keyword, $registry, ['list', 'list-expired', 'list-stuck', 'list-failed', 'queue', 'run', 'delete', 'edit', 'save', ...$routes]);
     }
 
     protected function getExpirationDate(): DateTime
@@ -198,27 +198,6 @@ class DistributorListSectionController extends DistributorSectionController
     protected function saveAction(): never
     {
         throw new BadMethodCallException('Distributor save action not implemented in core package');
-    }
-
-    protected function previewAction(): Response
-    {
-        $list = $this->getSelectedItems();
-        $records = [];
-        if ($list !== []) {
-            $jobs = $this->queue->fetchByIdList($list);
-            $distributor = $this->distributorRegistry->getDistributor();
-            foreach ($jobs as $job) {
-                $records[] = [
-                    'job' => $job,
-                    'preview' => $distributor->getPreviewData($job),
-                ];
-            }
-        }
-
-        $this->assignCurrentRouteData();
-        $this->viewData['records'] = $records;
-
-        return $this->render();
     }
 
     protected function deleteAction(): Response
