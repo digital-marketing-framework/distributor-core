@@ -186,7 +186,6 @@ class QueueDataFactoryTest extends TestCase
     /**
      * @return array<array{
      *   string,
-     *   array<string,mixed>,
      *   string,
      *   array<string,string|ValueInterface>,
      *   array<int,array<string,mixed>>,
@@ -199,7 +198,6 @@ class QueueDataFactoryTest extends TestCase
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       dataSourceId:string,
-     *       dataSourceContext:array<string,mixed>,
      *       context:array<string,mixed>
      *     }
      *   }
@@ -214,7 +212,6 @@ class QueueDataFactoryTest extends TestCase
                     foreach (static::routeIdProvider() as $routeId) {
                         $result[] = [
                             'datasource1',
-                            ['dsContextA' => 'A'],
                             'configurationDocument1',
                             $data,
                             [$configuration],
@@ -227,7 +224,6 @@ class QueueDataFactoryTest extends TestCase
                                 'submission' => [
                                     'data' => $packedData,
                                     'dataSourceId' => 'datasource1',
-                                    'dataSourceContext' => ['dsContextA' => 'A'],
                                     'context' => $packedContext,
                                 ],
                             ],
@@ -241,7 +237,6 @@ class QueueDataFactoryTest extends TestCase
     }
 
     /**
-     * @param array<string,mixed> $dataSourceContext
      * @param array<string,string|ValueInterface> $data
      * @param array<int,array<string,mixed>> $configuration
      * @param array<string,mixed> $context
@@ -251,22 +246,20 @@ class QueueDataFactoryTest extends TestCase
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       dataSourceId: string,
-     *       dataSourceContext: array<string,mixed>,
      *       context:array<string,mixed>
      *     }
      *   } $jobData
      */
     #[Test]
     #[DataProvider('packProvider')]
-    public function pack(string $dataSourceId, array $dataSourceContext, string $configurationDocument, array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
+    public function pack(string $dataSourceId, string $configurationDocument, array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
-        $submission = new SubmissionDataSet($dataSourceId, $dataSourceContext, $data, $configuration, $context);
+        $submission = new SubmissionDataSet($dataSourceId, $data, $configuration, $context);
         $job = $this->subject->convertSubmissionToJob($submission, $integration, $routeId);
         $this->assertEquals($jobData, $job->getData());
     }
 
     /**
-     * @param array<string,mixed> $dataSourceContext
      * @param array<string,string|ValueInterface> $data
      * @param array<int,array<string,mixed>> $configuration
      * @param array<string,mixed> $context
@@ -276,7 +269,6 @@ class QueueDataFactoryTest extends TestCase
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       dataSourceId: string,
-     *       dataSourceContext: array<string,mixed>,
      *       context:array<string,mixed>
      *     }
      *   } $jobData
@@ -285,7 +277,7 @@ class QueueDataFactoryTest extends TestCase
      */
     #[Test]
     #[DataProvider('packProvider')]
-    public function unpack(string $dataSourceId, array $dataSourceContext, string $configurationDocument, array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
+    public function unpack(string $dataSourceId, string $configurationDocument, array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $job = new Job();
         $job->setData($jobData);
@@ -293,8 +285,8 @@ class QueueDataFactoryTest extends TestCase
         $dataSource = $this->createMock(DistributorDataSourceInterface::class);
         $dataSource->method('getConfigurationDocument')->willReturn($configurationDocument);
 
-        $this->distributorDataSourceManager->method('getDataSourceById')
-            ->with($dataSourceId, $dataSourceContext)
+        $this->distributorDataSourceManager->method('getDataSourceVariantByIdentifier')
+            ->with($dataSourceId)
             ->willReturn($dataSource);
 
         $this->configurationDocumentManager->method('getConfigurationStackFromDocument')
@@ -309,7 +301,6 @@ class QueueDataFactoryTest extends TestCase
     }
 
     /**
-     * @param array<string,mixed> $dataSourceContext
      * @param array<string,string|ValueInterface> $data
      * @param array<int,array<string,mixed>> $configuration
      * @param array<string,mixed> $context
@@ -319,7 +310,6 @@ class QueueDataFactoryTest extends TestCase
      *     submission:array{
      *       data:array<string,array{type:string,value:mixed}>,
      *       dataSourceId: string,
-     *       dataSourceContext: array<string,mixed>,
      *       context:array<string,mixed>
      *     }
      *   } $jobData
@@ -328,20 +318,20 @@ class QueueDataFactoryTest extends TestCase
      */
     #[Test]
     #[DataProvider('packProvider')]
-    public function packUnpack(string $dataSourceId, array $dataSourceContext, string $configurationDocument, array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
+    public function packUnpack(string $dataSourceId, string $configurationDocument, array $data, array $configuration, array $context, string $routeId, string $integration, array $jobData): void
     {
         $dataSource = $this->createMock(DistributorDataSourceInterface::class);
         $dataSource->method('getConfigurationDocument')->willReturn($configurationDocument);
 
-        $this->distributorDataSourceManager->method('getDataSourceById')
-            ->with($dataSourceId, $dataSourceContext)
+        $this->distributorDataSourceManager->method('getDataSourceVariantByIdentifier')
+            ->with($dataSourceId)
             ->willReturn($dataSource);
 
         $this->configurationDocumentManager->method('getConfigurationStackFromDocument')
             ->with($configurationDocument)
             ->willReturn($configuration);
 
-        $submission = new SubmissionDataSet($dataSourceId, $dataSourceContext, $data, $configuration, $context);
+        $submission = new SubmissionDataSet($dataSourceId, $data, $configuration, $context);
         $job = $this->subject->convertSubmissionToJob($submission, $integration, $routeId);
         $this->assertEquals($jobData, $job->getData());
 

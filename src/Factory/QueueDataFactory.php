@@ -93,7 +93,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
-     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,dataSourceContext?:array<string,mixed>,context:array<string,mixed>}
+     * @return array{data:array<string,array{type:string,value:mixed}>,dataSourceId:string,context:array<string,mixed>}
      */
     protected function getJobSubmissionData(JobInterface $job): array
     {
@@ -163,8 +163,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     {
         return [
             'data' => $submission->getData()->pack(),
-            'dataSourceId' => $submission->getDataSourceId(),
-            'dataSourceContext' => $submission->getDataSourceContext(),
+            'dataSourceId' => $submission->getDataSourceIdentifier(),
             'context' => $submission->getContext()->toArray(),
         ];
     }
@@ -186,7 +185,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
 
         if (
             (!isset($data['dataSourceId']) || !is_string($data['dataSourceId']))
-            && (!isset($data['configuration']) || !is_array($data['configuration'])) // TODO legacy job support, remove in future
+            && (!isset($data['configuration']) || !is_array($data['configuration'])) // legacy job support
         ) {
             throw new DigitalMarketingFrameworkException('job has no valid submission data source ID');
         }
@@ -197,6 +196,30 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     }
 
     /**
+     * Builds the full data source variant identifier from packed job submission data.
+     *
+     * Handles three job formats:
+     * - Format 1 (legacy): No dataSourceId key, configuration embedded in job. Returns ''.
+     * - Format 2 (legacy): dataSourceId + dataSourceContext with pluginId. Appends pluginId.
+     * - Format 3 (current): dataSourceId contains the full identifier.
+     *
+     * @param array<string,mixed> $data The 'submission' part of the job data
+     */
+    public static function buildDataSourceIdentifier(array $data): string
+    {
+        if (!isset($data['dataSourceId']) || !is_string($data['dataSourceId'])) {
+            return '';
+        }
+
+        $identifier = $data['dataSourceId'];
+        if (isset($data['dataSourceContext']['pluginId'])) {
+            $identifier .= ':' . $data['dataSourceContext']['pluginId'];
+        }
+
+        return $identifier;
+    }
+
+    /**
      * @param array{dataSourceId:string,dataSourceContext?:array<string,mixed>}|array{configuration:array<string,mixed>} $data
      *
      * @return array<array<string,mixed>>
@@ -204,15 +227,16 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
     protected function unpackConfiguration(array $data): array
     {
         if (isset($data['dataSourceId'])) {
-            $dataSource = $this->distributorDataSourceManager->getDataSourceById($data['dataSourceId'], $data['dataSourceContext'] ?? []);
+            $identifier = static::buildDataSourceIdentifier($data);
+            $dataSource = $this->distributorDataSourceManager->getDataSourceVariantByIdentifier($identifier);
             if (!$dataSource instanceof DistributorDataSourceInterface) {
-                throw new DigitalMarketingFrameworkException(sprintf('Distributor data source with ID "%s" not found', $data['dataSourceId']));
+                throw new DigitalMarketingFrameworkException(sprintf('Distributor data source with identifier "%s" not found', $identifier));
             }
 
             return $this->configurationDocumentManager->getConfigurationStackFromDocument($dataSource->getConfigurationDocument(), $this->getConfigurationSchemaDocument());
         }
 
-        // TODO legacy job support, remove in future
+        // legacy job support
         return $this->configurationDocumentManager->getConfigurationStackFromConfiguration($data['configuration'], $this->getConfigurationSchemaDocument());
     }
 
@@ -227,8 +251,7 @@ class QueueDataFactory implements QueueDataFactoryInterface, ConfigurationDocume
         $submissionConfiguration = $this->unpackConfiguration($data);
 
         $submission = new SubmissionDataSet(
-            $data['dataSourceId'] ?? '',
-            $data['dataSourceContext'] ?? [],
+            static::buildDataSourceIdentifier($data),
             $submissionData->toArray(),
             $submissionConfiguration,
             $synchronousContext ?? $data['context']

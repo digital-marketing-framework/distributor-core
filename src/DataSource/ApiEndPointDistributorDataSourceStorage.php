@@ -20,7 +20,7 @@ class ApiEndPointDistributorDataSourceStorage extends AbstractApiEndPointDataSou
     }
 
     /**
-     * Filter for getAllDataSources() and getDataSourceById().
+     * Filter for getAllDataSources() and getDataSourceByIdentifier().
      * Distributor: checks both the general enabled flag and the push enabled flag.
      */
     protected function filterEndPoint(EndPointInterface $endPoint): bool

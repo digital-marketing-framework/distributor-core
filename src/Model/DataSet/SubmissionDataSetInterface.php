@@ -9,10 +9,5 @@ interface SubmissionDataSetInterface extends DataSetInterface
 {
     public function getConfiguration(): DistributorConfigurationInterface;
 
-    public function getDataSourceId(): string;
-
-    /**
-     * @return array<string,mixed>
-     */
-    public function getDataSourceContext(): array;
+    public function getDataSourceIdentifier(): string;
 }
