@@ -52,7 +52,6 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
     public function submit(
         string $dataSourceId,
-        array $dataSourceContext,
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
@@ -67,7 +66,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
                 $this->registry->pushContext($context);
             }
 
-            $submission = new SubmissionDataSet($dataSourceId, $dataSourceContext, $data, $configuration);
+            $submission = new SubmissionDataSet($dataSourceId, $data, $configuration);
             $submission->getContext()->setResponsive($responsive);
             $jobs = $this->distributor->process($submission);
             foreach ($jobs as $job) {
@@ -125,7 +124,6 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
         $this->submit(
             $dataSource->getIdentifier(),
-            [],
             $configuration,
             $data,
             $context,

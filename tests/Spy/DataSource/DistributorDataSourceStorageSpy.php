@@ -24,11 +24,8 @@ class DistributorDataSourceStorageSpy
         return isset($this->dataSources[$id]);
     }
 
-    /**
-     * @param array<string,mixed> $dataSourceContext
-     */
-    public function getDataSourceById(string $id, array $dataSourceContext): ?DistributorDataSourceInterface
+    public function getDataSourceVariantByIdentifier(string $identifier): ?DistributorDataSourceInterface
     {
-        return $this->dataSources[$id] ?? null;
+        return $this->dataSources[$identifier] ?? null;
     }
 }

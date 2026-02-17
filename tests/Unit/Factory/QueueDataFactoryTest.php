@@ -60,14 +60,14 @@ class QueueDataFactoryTest extends TestCase
         $this->configurationDocumentManager->method('getConfigurationStackFromDocument')->willReturnCallback(fn (string $document) => $this->configurationDocuments[$document] ?? '');
 
         $this->distributorDataSourceManager = $this->createMock(DistributorDataSourceManagerInterface::class);
-        $this->distributorDataSourceManager->method('getDataSourceById')->willReturnCallback(
-            function (string $dataSourceId) {
-                if (!isset($this->dataSources[$dataSourceId])) {
+        $this->distributorDataSourceManager->method('getDataSourceVariantByIdentifier')->willReturnCallback(
+            function (string $identifier) {
+                if (!isset($this->dataSources[$identifier])) {
                     return null;
                 }
 
                 $dataSource = $this->createMock(DistributorDataSourceInterface::class);
-                $dataSource->method('getConfigurationDocument')->willReturn($this->dataSources[$dataSourceId]);
+                $dataSource->method('getConfigurationDocument')->willReturn($this->dataSources[$identifier]);
 
                 return $dataSource;
             }
@@ -128,7 +128,7 @@ class QueueDataFactoryTest extends TestCase
             'field1' => 'value1',
         ];
         $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => [], 'routeId2' => []]);
-        $submission = new SubmissionDataSet('datasource1', ['dsContextA' => 'A'], $data, $configuration, ['timestamp' => 1716482226]);
+        $submission = new SubmissionDataSet('datasource1', $data, $configuration, ['timestamp' => 1716482226]);
         $job = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
         $this->assertEquals([
             'integration' => 'integration1',
@@ -138,12 +138,11 @@ class QueueDataFactoryTest extends TestCase
                     'field1' => ['type' => 'string', 'value' => 'value1'],
                 ],
                 'dataSourceId' => 'datasource1',
-                'dataSourceContext' => ['dsContextA' => 'A'],
                 'context' => ['timestamp' => 1716482226],
             ],
         ], $job->getData());
-        $this->assertEquals('440BE46ADDF60B1D17EB6E44DC56C744', $job->getHash());
-        $this->assertEquals('440BE#route1#2', $job->getLabel());
+        $this->assertEquals('8A449669AB524A1336B98113D85E1CC6', $job->getHash());
+        $this->assertEquals('8A449#route1#2', $job->getLabel());
     }
 
     #[Test]
@@ -153,7 +152,7 @@ class QueueDataFactoryTest extends TestCase
             'field1' => new StringValue('value1'),
         ];
         $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => [], 'routeId2' => []]);
-        $submission = new SubmissionDataSet('datasource1', ['dsContextA' => 'A'], $data, $configuration, ['timestamp' => 1716482226]);
+        $submission = new SubmissionDataSet('datasource1', $data, $configuration, ['timestamp' => 1716482226]);
         $job = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
         $this->assertEquals([
             'integration' => 'integration1',
@@ -163,12 +162,11 @@ class QueueDataFactoryTest extends TestCase
                     'field1' => ['type' => StringValue::class, 'value' => ['value' => 'value1']],
                 ],
                 'dataSourceId' => 'datasource1',
-                'dataSourceContext' => ['dsContextA' => 'A'],
                 'context' => ['timestamp' => 1716482226],
             ],
         ], $job->getData());
-        $this->assertEquals('301342137702037436653AF526B32927', $job->getHash());
-        $this->assertEquals('30134#route1#2', $job->getLabel());
+        $this->assertEquals('8E3D7CF50B5AF12DD51E924D742A2D57', $job->getHash());
+        $this->assertEquals('8E3D7#route1#2', $job->getLabel());
     }
 
     #[Test]
@@ -178,7 +176,7 @@ class QueueDataFactoryTest extends TestCase
             'field1' => new InvalidValue(),
         ];
         $configuration = $this->createRouteConfig('integration1', 'route1', ['routeId1' => [], 'routeId2' => []]);
-        $submission = new SubmissionDataSet('datasource1', ['dsContextA' => 'A'], $data, $configuration, ['timestamp' => 1716482226]); // @phpstan-ignore-line this test case specifically checks how the system handles invalid data
+        $submission = new SubmissionDataSet('datasource1', $data, $configuration, ['timestamp' => 1716482226]); // @phpstan-ignore-line this test case specifically checks how the system handles invalid data
 
         $this->expectException(InvalidArgumentException::class);
         $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId2');
@@ -206,7 +204,7 @@ class QueueDataFactoryTest extends TestCase
                 'contextKey2.2' => 'contextValue2.2',
             ],
         ];
-        $submission = new SubmissionDataSet('datasource1', ['dsContextA' => 'A'], $data, $configuration, $context);
+        $submission = new SubmissionDataSet('datasource1', $data, $configuration, $context);
 
         $job = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId1');
         $this->assertEquals([
@@ -217,19 +215,17 @@ class QueueDataFactoryTest extends TestCase
                     'field1' => ['type' => 'string', 'value' => 'value1'],
                 ],
                 'dataSourceId' => 'datasource1',
-                'dataSourceContext' => ['dsContextA' => 'A'],
                 'context' => $context,
             ],
         ], $job->getData());
-        $this->assertEquals('0B322C02720E7332637595661B980209', $job->getHash());
-        $this->assertEquals('0B322#route1', $job->getLabel());
+        $this->assertEquals('73FADCEF4D6C7F856A228C47216502F2', $job->getHash());
+        $this->assertEquals('73FAD#route1', $job->getLabel());
     }
 
     /**
      * @param array{
      *   data:array<string,array{type:string,value:mixed}>,
      *   dataSourceId:string,
-     *   dataSourceContext:array<string,mixed>,
      *   context:array<string,mixed>
      * } $submissionData
      */
@@ -255,7 +251,6 @@ class QueueDataFactoryTest extends TestCase
                 'field1' => ['type' => 'string', 'value' => 'value1'],
             ],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $submission = $this->subject->convertJobToSubmission($job);
@@ -272,7 +267,6 @@ class QueueDataFactoryTest extends TestCase
                 'field1' => ['type' => StringValue::class, 'value' => ['value' => 'value1']],
             ],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $submission = $this->subject->convertJobToSubmission($job);
@@ -291,7 +285,6 @@ class QueueDataFactoryTest extends TestCase
                 'field1' => ['type' => InvalidValue::class, 'value' => ['value' => 'value1']],
             ],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $this->expectException(DigitalMarketingFrameworkException::class);
@@ -307,7 +300,6 @@ class QueueDataFactoryTest extends TestCase
                 'field1' => ['type' => 'DigitalMarketingFramework\Distributor\Core\Model\Data\Value\ValueClassThatDoesNotExist', 'value' => ['value1']],
             ],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $this->expectException(DigitalMarketingFrameworkException::class);
@@ -325,7 +317,6 @@ class QueueDataFactoryTest extends TestCase
             [
                 new SubmissionDataSet(
                     'datasource1',
-                    ['dsContextA' => 'A'],
                     ['field1' => 'value1'],
                     $config,
                     ['timestamp' => 1716482226, 'context1' => 'contextValue1']
@@ -334,12 +325,11 @@ class QueueDataFactoryTest extends TestCase
                     [
                         'data' => ['field1' => ['type' => 'string', 'value' => 'value1']],
                         'dataSourceId' => 'datasource1',
-                        'dataSourceContext' => ['dsContextA' => 'A'],
                         'context' => ['timestamp' => 1716482226, 'context1' => 'contextValue1'],
                     ],
                     'integration1', 'routeId1'
                 ),
-                '0F9FD178F360D35BDB6662752B110075',
+                'D279DC4B11433190865189B76A7CF4CD',
                 'configurationDocument1Content',
             ],
         ];
@@ -365,7 +355,7 @@ class QueueDataFactoryTest extends TestCase
     #[DataProvider('hashDataProvider')]
     public function getSubmissionAndConvertedJobHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash, string $configurationDocument): void
     {
-        $this->addDataSource($submission->getDataSourceId(), $configurationDocument, $submission->getConfiguration()->getRootConfiguration());
+        $this->addDataSource($submission->getDataSourceIdentifier(), $configurationDocument, $submission->getConfiguration()->getRootConfiguration());
 
         $submissionHash = $this->subject->getSubmissionHash($submission);
         $convertedJob = $this->subject->convertSubmissionToJob($submission, 'integration1', 'routeId1');
@@ -384,7 +374,7 @@ class QueueDataFactoryTest extends TestCase
     #[DataProvider('hashDataProvider')]
     public function getJobAndConvertedSubmissionHash(SubmissionDataSetInterface $submission, JobInterface $job, string $expectedHash, string $configurationDocument): void
     {
-        $this->addDataSource($submission->getDataSourceId(), $configurationDocument, $submission->getConfiguration()->getRootConfiguration());
+        $this->addDataSource($submission->getDataSourceIdentifier(), $configurationDocument, $submission->getConfiguration()->getRootConfiguration());
 
         $jobHash = $this->subject->getJobHash($job);
         $convertedSubmission = $this->subject->convertJobToSubmission($job);
@@ -401,7 +391,6 @@ class QueueDataFactoryTest extends TestCase
     {
         $submission = new SubmissionDataSet(
             'datasource1',
-            ['dsContextA' => 'A'],
             [],
             [
                 [
@@ -422,7 +411,7 @@ class QueueDataFactoryTest extends TestCase
             ['timestamp' => 1716482226]
         );
         $label = $this->subject->getSubmissionLabel($submission, 'integration1', 'routeId1');
-        $this->assertEquals('C306F#route1', $label);
+        $this->assertEquals('4425C#route1', $label);
     }
 
     #[Test]
@@ -446,7 +435,6 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1', 'ABCDEFGHIJKLMNO');
         $label = $this->subject->getJobLabel($job);
@@ -474,11 +462,10 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $label = $this->subject->getJobLabel($job);
-        $this->assertEquals('C306F#route1', $label);
+        $this->assertEquals('4425C#route1', $label);
     }
 
     #[Test]
@@ -502,7 +489,6 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $route = $this->subject->getJobRouteId($job);
@@ -530,7 +516,6 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->createJob([
             'data' => [],
             'dataSourceId' => 'datasource1',
-            'dataSourceContext' => ['dsContextA' => 'A'],
             'context' => ['timestamp' => 1716482226],
         ], 'integration1', 'routeId1');
         $integration = $this->subject->getJobRouteIntegrationName($job);

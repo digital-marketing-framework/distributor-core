@@ -35,8 +35,13 @@ class SpiedOnDistributorDataSourceStorage extends DistributorDataSourceStorage
         return $this->spy->matches($id);
     }
 
-    public function getDataSourceById(string $id, array $dataSourceContext): ?DataSourceInterface
+    public function getDataSourceByIdentifier(string $identifier): ?DataSourceInterface
     {
-        return $this->spy->getDataSourceById($id, $dataSourceContext);
+        return null;
+    }
+
+    public function getDataSourceVariantByIdentifier(string $identifier, bool $maintenanceMode = false): ?DataSourceInterface
+    {
+        return $this->spy->getDataSourceVariantByIdentifier($identifier);
     }
 }
