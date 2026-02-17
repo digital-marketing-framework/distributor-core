@@ -3,8 +3,9 @@
 namespace DigitalMarketingFramework\Distributor\Core\Model\DataSource;
 
 use DigitalMarketingFramework\Core\Model\Api\EndPointInterface;
+use DigitalMarketingFramework\Core\Model\DataSource\ApiEndPointDataSourceInterface;
 
-class ApiEndPointDistributorDataSource extends DistributorDataSource
+class ApiEndPointDistributorDataSource extends DistributorDataSource implements ApiEndPointDataSourceInterface
 {
     public const TYPE = 'api';
 
