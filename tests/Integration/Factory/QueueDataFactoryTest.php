@@ -15,7 +15,6 @@ use DigitalMarketingFramework\Distributor\Core\DataSource\DistributorDataSourceM
 use DigitalMarketingFramework\Distributor\Core\Factory\QueueDataFactory;
 use DigitalMarketingFramework\Distributor\Core\Model\Data\Value\DiscreteMultiValue;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSet;
-use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSource\DistributorDataSourceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -335,7 +334,6 @@ class QueueDataFactoryTest extends TestCase
         $job = $this->subject->convertSubmissionToJob($submission, $integration, $routeId);
         $this->assertEquals($jobData, $job->getData());
 
-        /** @var SubmissionDataSetInterface */
         $result = $this->subject->convertJobToSubmission($job);
         $this->assertEquals($data, $result->getData()->toArray());
         $this->assertEquals($configuration, $result->getConfiguration()->toArray());
