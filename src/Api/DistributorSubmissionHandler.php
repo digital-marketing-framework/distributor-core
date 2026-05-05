@@ -56,7 +56,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
         bool $responsive = false,
-    ): void {
+    ): ContextInterface {
         if (is_array($context)) {
             $context = new WriteableContext($context);
         }
@@ -82,6 +82,8 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
             if ($context instanceof ContextInterface) {
                 $this->registry->popContext();
             }
+
+            return $submission->getContext();
         } catch (DigitalMarketingFrameworkException $e) {
             if ($context instanceof ContextInterface) {
                 $this->registry->popContext();
@@ -95,7 +97,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
         EndPointInterface $endPoint,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
-    ): void {
+    ): ContextInterface {
         if (!$endPoint->getEnabled()) {
             $this->handleException('End point not found or disabled', 404);
         }
@@ -122,7 +124,7 @@ class DistributorSubmissionHandler implements DistributorSubmissionHandlerInterf
 
         $dataSource = new ApiEndPointDistributorDataSource($endPoint);
 
-        $this->submit(
+        return $this->submit(
             $dataSource->getIdentifier(),
             $configuration,
             $data,

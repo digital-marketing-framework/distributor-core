@@ -20,6 +20,7 @@ class ApiEndPointDistributorDataSource extends DistributorDataSource implements 
             'disableContext' => $this->endPoint->getDisableContext(),
             'allowContextOverride' => $this->endPoint->getAllowContextOverride(),
             'exposeToFrondEnd' => $this->endPoint->getExposeToFrontend(),
+            'httpRedirect' => $this->endPoint->getHttpRedirect(),
             'configurationDocument' => $this->endPoint->getConfigurationDocument(),
         ];
         $hash = md5(json_encode($hashData));
