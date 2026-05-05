@@ -32,9 +32,20 @@ class DistributorRouteResolver implements DistributorRouteResolverInterface
         $data = $request->getPayload();
         $context = $request->getContext();
         $endPoint = $request->getEndPoint();
-        $this->distributorSubmissionHandler->submitToEndPoint($endPoint, $data, $context);
+        $submissionContext = $this->distributorSubmissionHandler->submitToEndPoint($endPoint, $data, $context);
 
-        return new ApiResponse(['success' => true], 200);
+        $redirectUrl = $submissionContext->getResponseRedirect();
+
+        if ($redirectUrl !== null && $redirectUrl !== '' && $endPoint->getHttpRedirect()) {
+            return new ApiResponse(null, 303, redirectUrl: $redirectUrl);
+        }
+
+        $payload = ['success' => true];
+        if ($redirectUrl !== null && $redirectUrl !== '') {
+            $payload['redirect'] = $redirectUrl;
+        }
+
+        return new ApiResponse($payload, 200);
     }
 
     public function getEndPointRoute(): TemplateRouteInterface

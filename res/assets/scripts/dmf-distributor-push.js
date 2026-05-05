@@ -3,6 +3,7 @@
   const EVENT_FORM_SUBMIT_SUCCESS = 'dmf-form-submit-success'
   const EVENT_FORM_SUBMIT_ERROR = 'dmf-form-submit-error'
   const EVENT_FORM_SUBMIT_RESET = 'dmf-form-reset'
+  const EVENT_FORM_REDIRECT = 'dmf-form-redirect'
 
   const CLASS_SUBMITTING = 'submitting-form'
 
@@ -33,13 +34,11 @@
 
     function handleReset(event) {
       event.preventDefault()
-      plugin.hide('reset')
-      plugin.hide('success')
-      plugin.hide('error')
+      plugin.markAsCleared()
       plugin.show()
     }
 
-    plugin.on('click', handleReset, 'reset')
+    plugin.on('click', handleReset, plugin.settings.snippets.RESET)
 
     async function handleSubmit(event) {
       event.preventDefault()
@@ -73,17 +72,33 @@
 
       if (behaviour === 'hide') {
         plugin.hide()
-        plugin.show('reset')
+        plugin.show(plugin.settings.snippets.RESET)
       }
 
       if (response.status.code === 200) {
         DMF.trigger(form, EVENT_FORM_SUBMIT_SUCCESS, data)
-        plugin.show('success')
-        plugin.hide('error')
+        plugin.markAsSucceeded()
+
+        const redirectUrl = response.response && response.response.redirect
+        if (redirectUrl) {
+          const redirectEvent = new CustomEvent(EVENT_FORM_REDIRECT, {
+            detail: { redirect: redirectUrl, data: data },
+            cancelable: true,
+          })
+          form.dispatchEvent(redirectEvent)
+          if (!redirectEvent.defaultPrevented) {
+            window.location.href = redirectUrl
+            return
+          }
+        }
       } else {
+        const code = response.status.code
+        const isExpectedError = code >= 400 && code < 500
+        if (!isExpectedError) {
+          console.error('Push failed:', response)
+        }
         DMF.trigger(form, EVENT_FORM_SUBMIT_ERROR, data)
-        plugin.hide('success')
-        plugin.show('error')
+        plugin.markAsFailed(response.status.message)
       }
 
       DMF.refresh()

@@ -20,7 +20,7 @@ interface DistributorSubmissionHandlerInterface
         array|DistributorConfigurationInterface $configuration,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
-    ): void;
+    ): ContextInterface;
 
     /**
      * @param array<string,string|ValueInterface>|DataInterface $data
@@ -30,7 +30,7 @@ interface DistributorSubmissionHandlerInterface
         EndPointInterface $endPoint,
         array|DataInterface $data,
         array|ContextInterface|null $context = null,
-    ): void;
+    ): ContextInterface;
 
     /**
      * @return array<string>
