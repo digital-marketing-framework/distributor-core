@@ -15,9 +15,7 @@ trait DistributorDataSourceRegistryTrait
 
     public function getDistributorDataSourceManager(): DistributorDataSourceManagerInterface
     {
-        if ($this->distributorDataSourceManager === null) {
-            $this->distributorDataSourceManager = $this->createObject(DistributorDataSourceManager::class, [$this]);
-        }
+        $this->distributorDataSourceManager ??= $this->createObject(DistributorDataSourceManager::class, [$this]);
 
         return $this->distributorDataSourceManager;
     }

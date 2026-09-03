@@ -16,9 +16,7 @@ trait ApiRegistryTrait
 
     public function getDistributorApiRouteResolver(): DistributorRouteResolverInterface
     {
-        if (!isset($this->distributorRouteResolver)) {
-            $this->distributorRouteResolver = $this->createObject(DistributorRouteResolver::class, [$this]);
-        }
+        $this->distributorRouteResolver ??= $this->createObject(DistributorRouteResolver::class, [$this]);
 
         return $this->distributorRouteResolver;
     }
@@ -32,9 +30,7 @@ trait ApiRegistryTrait
 
     public function getDistributorSubmissionHandler(): DistributorSubmissionHandlerInterface
     {
-        if (!isset($this->distributorSubmissionHandler)) {
-            $this->distributorSubmissionHandler = $this->createObject(DistributorSubmissionHandler::class, [$this]);
-        }
+        $this->distributorSubmissionHandler ??= $this->createObject(DistributorSubmissionHandler::class, [$this]);
 
         return $this->distributorSubmissionHandler;
     }
