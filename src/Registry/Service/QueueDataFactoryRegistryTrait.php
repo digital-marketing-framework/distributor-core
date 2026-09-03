@@ -14,9 +14,7 @@ trait QueueDataFactoryRegistryTrait
 
     public function getQueueDataFactory(): QueueDataFactoryInterface
     {
-        if (!isset($this->queueDataFactory)) {
-            $this->queueDataFactory = $this->createObject(QueueDataFactory::class);
-        }
+        $this->queueDataFactory ??= $this->createObject(QueueDataFactory::class);
 
         return $this->queueDataFactory;
     }

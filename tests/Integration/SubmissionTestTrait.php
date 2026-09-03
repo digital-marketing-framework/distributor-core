@@ -118,23 +118,19 @@ trait SubmissionTestTrait // extends \PHPUnit\Framework\TestCase
      */
     protected function updateRouteConfiguration(array &$configuration): void
     {
-        if (!isset($configuration[OutboundRoute::KEY_ENABLE_DATA_PROVIDERS])) {
-            $configuration[OutboundRoute::KEY_ENABLE_DATA_PROVIDERS] = [
-                SwitchSchema::KEY_TYPE => RestrictedTermsSchema::KEY_ALL,
-                SwitchSchema::KEY_CONFIG => [
-                    RestrictedTermsSchema::KEY_ALL => [],
-                ],
-            ];
-        }
+        $configuration[OutboundRoute::KEY_ENABLE_DATA_PROVIDERS] ??= [
+            SwitchSchema::KEY_TYPE => RestrictedTermsSchema::KEY_ALL,
+            SwitchSchema::KEY_CONFIG => [
+                RestrictedTermsSchema::KEY_ALL => [],
+            ],
+        ];
 
-        if (!isset($configuration[OutboundRouteInterface::KEY_GATE])) {
-            $configuration[OutboundRouteInterface::KEY_GATE] = [
-                SwitchSchema::KEY_TYPE => 'true',
-                SwitchSchema::KEY_CONFIG => [
-                    'true' => [],
-                ],
-            ];
-        }
+        $configuration[OutboundRouteInterface::KEY_GATE] ??= [
+            SwitchSchema::KEY_TYPE => 'true',
+            SwitchSchema::KEY_CONFIG => [
+                'true' => [],
+            ],
+        ];
     }
 
     /**

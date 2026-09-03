@@ -97,9 +97,7 @@ abstract class DataProviderTestBase extends TestCase
      */
     protected function createDataProvider(string $keyword = 'myCustomKeyword', array $additionalArguments = [], ?array $defaultConfig = null): void
     {
-        if ($defaultConfig === null) {
-            $defaultConfig = static::DEFAULT_CONFIG;
-        }
+        $defaultConfig ??= static::DEFAULT_CONFIG;
 
         $class = static::DATA_PROVIDER_CLASS;
         $this->subject = new $class($keyword, $this->registry, $this->submission, ...$additionalArguments);

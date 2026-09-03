@@ -23,9 +23,7 @@ class DistributorDataSourceManager extends DataSourceManager implements Distribu
 
     protected function getDataSourceStorages(): array
     {
-        if ($this->sourceStorages === null) {
-            $this->sourceStorages = $this->registry->getAllDistributorSourceStorages();
-        }
+        $this->sourceStorages ??= $this->registry->getAllDistributorSourceStorages();
 
         return $this->sourceStorages;
     }

@@ -28,9 +28,7 @@ trait QueueRegistryTrait
 
     public function getNonPersistentQueue(): QueueInterface
     {
-        if (!isset($this->nonPersistentQueue)) {
-            $this->nonPersistentQueue = $this->createObject(NonPersistentQueue::class);
-        }
+        $this->nonPersistentQueue ??= $this->createObject(NonPersistentQueue::class);
 
         return $this->nonPersistentQueue;
     }
