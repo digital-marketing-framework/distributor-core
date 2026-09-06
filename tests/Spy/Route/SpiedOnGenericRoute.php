@@ -8,6 +8,7 @@ use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInte
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\SpiedOnDataDispatcher;
 
 class SpiedOnGenericRoute extends OutboundRoute
 {
@@ -33,6 +34,6 @@ class SpiedOnGenericRoute extends OutboundRoute
 
     protected function getDispatcher(): DataDispatcherInterface
     {
-        return $this->routeSpy;
+        return new SpiedOnDataDispatcher('routeSpy', $this->registry, $this->routeSpy);
     }
 }
