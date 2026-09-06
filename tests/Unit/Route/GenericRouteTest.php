@@ -10,12 +10,13 @@ use DigitalMarketingFramework\Core\Exception\DigitalMarketingFrameworkException;
 use DigitalMarketingFramework\Core\Log\LoggerInterface;
 use DigitalMarketingFramework\Core\Model\Data\Data;
 use DigitalMarketingFramework\Core\Model\Data\DataInterface;
-use DigitalMarketingFramework\Distributor\Core\DataDispatcher\DataDispatcherInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\Configuration\DistributorConfigurationInterface;
 use DigitalMarketingFramework\Distributor\Core\Model\DataSet\SubmissionDataSetInterface;
 use DigitalMarketingFramework\Distributor\Core\Registry\RegistryInterface;
 use DigitalMarketingFramework\Distributor\Core\Route\OutboundRoute;
 use DigitalMarketingFramework\Distributor\Core\Tests\Route\GenericRoute;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\DataDispatcherSpyInterface;
+use DigitalMarketingFramework\Distributor\Core\Tests\Spy\DataDispatcher\SpiedOnDataDispatcher;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +37,7 @@ class GenericRouteTest extends TestCase
 
     protected LoggerInterface&MockObject $logger;
 
-    protected DataDispatcherInterface&MockObject $dataDispatcher;
+    protected DataDispatcherSpyInterface&MockObject $dataDispatcher;
 
     protected SubmissionDataSetInterface&MockObject $submission;
 
@@ -59,7 +60,7 @@ class GenericRouteTest extends TestCase
 
         $this->dataProcessor = $this->createMock(DataProcessorInterface::class);
 
-        $this->dataDispatcher = $this->createMock(DataDispatcherInterface::class);
+        $this->dataDispatcher = $this->createMock(DataDispatcherSpyInterface::class);
 
         $this->submissionData = new Data();
         $this->submissionConfiguration = $this->createMock(DistributorConfigurationInterface::class);
@@ -77,7 +78,7 @@ class GenericRouteTest extends TestCase
             $this->registry,
             $submission ?? $this->submission,
             $routeId,
-            $useDispatcher ? $this->dataDispatcher : null
+            $useDispatcher ? new SpiedOnDataDispatcher('spy', $this->registry, $this->dataDispatcher) : null
         );
         $this->subject->setLogger($this->logger);
         $this->subject->setDataProcessor($this->dataProcessor);

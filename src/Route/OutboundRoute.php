@@ -194,7 +194,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
      */
     protected function processData(DataInterface $data): bool
     {
-        $this->getDispatcher()->send($data->toArray());
+        $this->getDispatcher()->dispatch($data);
 
         return true;
     }
@@ -245,7 +245,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
      */
     protected function previewData(DataInterface $data): array
     {
-        return $this->getDispatcher()->preview($data->toArray());
+        return $this->getDispatcher()->previewDispatch($data);
     }
 
     /**
