@@ -51,6 +51,8 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
 
     public const MESSAGE_NO_DATA_MAPPER_GROUP_CONFIG_FOUND = 'No data mapper group configuration found for group ID "%s" in outbound route "%s" with ID %s.';
 
+    public const MESSAGE_NO_DISPATCHER = 'Route "%s" with ID %s has no data dispatcher. Either implement getDispatcher() or override processData() and previewData().';
+
     public function __construct(
         string $keyword,
         RegistryInterface $registry,
@@ -180,8 +182,19 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
             throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->routeId));
         }
 
-        $dataDispatcher = $this->getDispatcher();
-        $dataDispatcher->send($data->toArray());
+        return $this->processData($data);
+    }
+
+    /**
+     * Hands the mapped data to whatever this route writes to.
+     *
+     * The default sends it through the route's data dispatcher. Routes whose target is not a
+     * DataDispatcher override this rather than process(), so they keep the gate evaluation and
+     * data mapping that process() performs around it.
+     */
+    protected function processData(DataInterface $data): bool
+    {
+        $this->getDispatcher()->send($data->toArray());
 
         return true;
     }
@@ -213,8 +226,7 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
                     throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_DATA_EMPTY, $this->getKeyword(), $this->routeId));
                 }
 
-                $dataDispatcher = $this->getDispatcher();
-                $viewData['dispatcher'] = $dataDispatcher->preview($data->toArray());
+                $viewData['dispatcher'] = $this->previewData($data);
             }
         } catch (DigitalMarketingFrameworkException $e) {
             $viewData['error'] = $e->getMessage();
@@ -223,7 +235,29 @@ abstract class OutboundRoute extends IntegrationPlugin implements OutboundRouteI
         return $viewData;
     }
 
-    abstract protected function getDispatcher(): DataDispatcherInterface;
+    /**
+     * Describes what processData() would send, without sending it.
+     *
+     * Routes that override processData() override this too, so the preview keeps matching what
+     * the route actually does.
+     *
+     * @return array<string,mixed>
+     */
+    protected function previewData(DataInterface $data): array
+    {
+        return $this->getDispatcher()->preview($data->toArray());
+    }
+
+    /**
+     * Only reached by the default processData()/previewData(). A route whose target is not a
+     * DataDispatcher overrides those two and never calls this.
+     *
+     * @throws DigitalMarketingFrameworkException
+     */
+    protected function getDispatcher(): DataDispatcherInterface
+    {
+        throw new DigitalMarketingFrameworkException(sprintf(static::MESSAGE_NO_DISPATCHER, $this->getKeyword(), $this->routeId));
+    }
 
     /**
      * TODO to be used for auto-generation of data mapper field configuration
