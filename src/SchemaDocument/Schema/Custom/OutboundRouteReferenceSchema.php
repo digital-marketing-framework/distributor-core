@@ -30,13 +30,13 @@ class OutboundRouteReferenceSchema extends IntegrationReferenceSchema
         $this->routeReferenceSchema->getAllowedValues()->addReference(
             sprintf('/%s/{../%s}/%s/*', ConfigurationInterface::KEY_INTEGRATIONS, static::KEY_INTEGRATION_REFERENCE, DistributorConfigurationInterface::KEY_OUTBOUND_ROUTES),
             ignorePath: $this->getIntegrationIgnorePath(),
-            label: '{value/type} {value/pass}'
+            label: '{pretty(value/type)} {value/pass}'
         );
         $this->routeReferenceSchema->getRenderingDefinition()->setFormat(RenderingDefinitionInterface::FORMAT_SELECT);
         $this->routeReferenceSchema->getRenderingDefinition()->setLabel('Route');
         $this->addProperty(static::KEY_ROUTE_REFERENCE, $this->routeReferenceSchema);
 
-        $this->getRenderingDefinition()->setLabel('{integrationReference} / {routeReference}');
+        $this->getRenderingDefinition()->setLabel('{pretty(integrationReference)} / {pretty(routeReference)}');
     }
 
     protected function getIntegrationIgnorePath(): array
