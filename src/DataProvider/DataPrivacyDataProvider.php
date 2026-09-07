@@ -66,7 +66,7 @@ class DataPrivacyDataProvider extends DataProvider implements DataPrivacyManager
         $schema = parent::getSchema();
 
         $fieldListItemSchema = new ContainerSchema();
-        $fieldListItemSchema->getRenderingDefinition()->setLabel('{consent}');
+        $fieldListItemSchema->getRenderingDefinition()->setLabel('{pretty(consent)}');
 
         $fieldSchema = new StringSchema(static::DEFAULT_FIELD);
         $fieldListItemSchema->addProperty(static::KEY_FIELD, $fieldSchema);

@@ -19,7 +19,7 @@ class OutboundRouteSchema extends SwitchSchema
     public function __construct(mixed $defaultValue = null)
     {
         parent::__construct('outboundRoutes', $defaultValue);
-        $this->getRenderingDefinition()->setLabel('{type} {pass}');
+        $this->getRenderingDefinition()->setLabel('{pretty(type)} {pass}');
 
         $typeValues = $this->typeSchema->getAllowedValues();
         $typeValues->reset();
