@@ -83,7 +83,7 @@ trait OutboundRouteRegistryTrait
 
             $fields = $class::getDefaultFields();
             if ($fields !== []) {
-                $fieldListDefinition = new FieldListDefinition(sprintf('distributor.out.defaults.%s.%s', $integrationInfo->getName(), $key));
+                $fieldListDefinition = new FieldListDefinition(sprintf('distributor.out.defaults.%s.%s', $integrationInfo->getName(), $key), label: $label);
                 foreach ($fields as $field) {
                     if (!$field instanceof FieldDefinition) {
                         $field = new FieldDefinition($field);
