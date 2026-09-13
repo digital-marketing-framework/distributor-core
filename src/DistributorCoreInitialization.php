@@ -5,6 +5,7 @@ namespace DigitalMarketingFramework\Distributor\Core;
 use DigitalMarketingFramework\Core\Alert\AlertHandlerInterface;
 use DigitalMarketingFramework\Core\Backend\Controller\SectionController\SectionControllerInterface;
 use DigitalMarketingFramework\Core\Backend\Section\Section;
+use DigitalMarketingFramework\Core\Backend\Section\SubSection;
 use DigitalMarketingFramework\Core\Cleanup\CleanupTaskInterface;
 use DigitalMarketingFramework\Core\DataProcessor\ValueSource\ValueSourceInterface;
 use DigitalMarketingFramework\Core\GlobalConfiguration\Schema\GlobalConfigurationSchemaInterface;
@@ -88,6 +89,19 @@ class DistributorCoreInitialization extends Initialization
     {
         $globalConfigurationSchema ??= new DistributorCoreGlobalConfigurationSchema();
         parent::__construct('distributor-core', '1.0.0', $packageAlias, $globalConfigurationSchema);
+    }
+
+    protected function getBackendSubSections(): array
+    {
+        // Deliberately not alphabetical: the overviews first, then the lists, narrowing as they go.
+        return [
+            new SubSection('Statistics', 'page.distributor.show-statistics', weight: 100),
+            new SubSection('Errors', 'page.distributor.show-errors', weight: 200),
+            new SubSection('List', 'page.distributor.list', ['edit', 'preview'], weight: 300),
+            new SubSection('List failed', 'page.distributor.list-failed', icon: 'link', weight: 400),
+            new SubSection('List stuck', 'page.distributor.list-stuck', icon: 'link', weight: 500),
+            new SubSection('List expired', 'page.distributor.list-expired', icon: 'link', weight: 600),
+        ];
     }
 
     protected function getBackendSections(): array
