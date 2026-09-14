@@ -44,7 +44,12 @@ class JobWatchAlertHandler extends AlertHandler implements GlobalConfigurationAw
         $maxExecutionTime = $this->getQueueSettings()->getMaximumExecutionTime();
         $stuckJobs = $this->distributorRegistry->getPersistentQueue()->fetchPendingAndRunning(1, 0, $maxExecutionTime);
         if ($stuckJobs !== []) {
-            $alerts[] = $this->createAlert('Some distributor jobs seem to be stuck.', 'Distributor', AlertInterface::TYPE_WARNING);
+            $alerts[] = $this->createAlert(
+                'Some distributor jobs seem to be stuck.',
+                'Distributor',
+                AlertInterface::TYPE_WARNING,
+                [$this->createAction('Show stuck jobs', 'page.distributor.list-stuck')]
+            );
         }
     }
 
@@ -55,7 +60,12 @@ class JobWatchAlertHandler extends AlertHandler implements GlobalConfigurationAw
     {
         $failedJobs = $this->distributorRegistry->getPersistentQueue()->fetchFailed(1);
         if ($failedJobs !== []) {
-            $alerts[] = $this->createAlert('Failed distributor jobs detected.', 'Distributor', type: AlertInterface::TYPE_ERROR);
+            $alerts[] = $this->createAlert(
+                'Failed distributor jobs detected.',
+                'Distributor',
+                AlertInterface::TYPE_ERROR,
+                [$this->createAction('Show failed jobs', 'page.distributor.list-failed')]
+            );
         }
     }
 
